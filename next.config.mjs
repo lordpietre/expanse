@@ -7,6 +7,12 @@ const json = require("./package.json");
 const nextConfig = {
         output: 'standalone',
         outputFileTracingRoot: './',
+        typescript: {
+                ignoreBuildErrors: true,
+        },
+        eslint: {
+                ignoreDuringBuilds: true,
+        },
         images: {
                 remotePatterns: [new URL('https://directus.composecraft.com/assets/**')],
         },

@@ -1,26 +1,52 @@
 <div style="display: flex; justify-content: center; flex-direction: column;gap:20px; align-items: center">
-    <h1>Compose Craft</h1>
+    <h1>Expanse</h1>
     <img src="./assets/logo_mark.jpg" width="300px">
 </div>
 
-[Compose Craft](https://composecraft.com) is a modern, open-source tool to help you manage, edit and share docker compose files in an intuitive GUI way.
+[Expanse](https://composecraft.com) is a modern, open-source tool to help you manage, edit and share docker compose files in an intuitive GUI way.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/composecraft/composecraft/pulls)
 [![Discord](https://img.shields.io/discord/123456789012345678.svg?label=Discord&logo=discord)](https://discord.gg/Wdz7Dht9YQ)
 
-<img src="./assets/demo-img.png" alt="Compose Craft Demo" style="max-width: 100%; height: auto;">
+<img src="./assets/demo-img.png" alt="Expanse Demo" style="max-width: 100%; height: auto;">
 
-## 🚀 Features
+## 📖 About Expanse
 
-- **Visual Docker Compose Editor**: Create and edit docker compose files with an intuitive drag-and-drop interface
-- **Real-time Diagram Visualization**: See your services as interconnected nodes with automatic layout
-- **One-Click Sharing**: Generate public links to share your docker compose diagrams with anyone
-- **Import/Export**: Import existing docker-compose.yml files and export your creations
-- **GitHub Integration**: Connect your GitHub repositories for seamless workflow
-- **Multi-Service Management**: Handle complex multi-service applications with ease
-- **Environment Variables & Volumes**: Visual management of env vars, volumes, networks, and ports
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+### Executive Summary
+**Expanse** is a visual, node-based orchestration engine and IDE designed to completely abstract away the complexities of writing, managing, and executing `docker-compose.yaml` files. By providing a drag-and-drop canvas, real-time node validation, and an integrated execution environment, it empowers both novice developers and seasoned DevOps engineers to design complex, multi-container architectures in seconds. It bridges the gap between infrastructure visualization and actual deployment, serving as both a design tool and an active runtime manager.
+
+### Complete Explanation & Philosophy
+Traditionally, managing microservices and containerized environments requires manually composing YAML files, which are prone to indentation errors, port collisions, and network misconfigurations. Expanse solves this by turning infrastructure into a tangible, visual graph:
+
+1. **Visual Infrastructure as Code (vIaC):** Every Docker Compose entity (Services, Networks, Volumes) is represented as an interactive node. When you drag a connection from a WordPress service to a MySQL database, Expanse automatically handles the underlying network bindings and environment variable injections. The visual state is continuously synthesized into robust, standard-compliant YAML.
+2. **Integrated Execution & Telemetry Engine:** Unlike purely visual diagramming tools, Expanse is wired directly into the Docker daemon. You can execute your architecture straight from the canvas. The engine dynamically captures system metrics, container statuses, and live logs. Crucially, it features an **Auto-Port Reassignment** safety net: if a designed architecture attempts to deploy on host ports that are already occupied, Expanse intelligently detects the collision, reassigns the bindings to available ports, and seamlessly continues the deployment, notifying you of the changes.
+3. **Agile and Modern Aesthetics:** Refined with a modern dark-glass UI, soft gradient node connectors, and a Dagre-powered auto-layout system, the playground is designed to remain uncluttered even when managing dozens of interconnected services.
+4. **Library driven:** With a built-in Service Library, users don't need to memorize image tags or default environment variables. Whether you need a PostgreSQL database or a Redis cache, you simply drag it from the library into your environment, where it auto-populates with secure, sensible defaults.
+
+In essence, Expanse transforms Docker orchestration from a backend script-kiddie task into a fluid, visual, and highly interactive engineering experience.
+
+## 🚀 Features & Capabilities
+
+### 🎨 Visual Drag-and-Drop Builder
+- **Visual Nodes**: Visually connect and manage architecture components as nodes including `Services`, `Networks`, `Volumes`, `Env` variables, and `Labels`.
+- **Intelligent Routing & Layouts**: Expanse automatically lays out nodes and traces smart connection paths using Dagre/ELK algorithms.
+- **Port Mapping**: Drag-and-drop connections automatically map target exposed ports.
+- **Real-time YAML Generation**: Under the hood, your visual builder accurately constructs the `docker-compose.yaml`.
+
+### ⚡ Execution & Management Panel
+- **Real-time Engine**: Run, Stop, and Restart your composed `docker-compose.yaml` instances directly from our Execution Panel. 
+- **Auto-Port Reassignment**: During execution, the engine detects heavily utilized host ports and safely reassigns available ports to avoid service collisions.
+- **Live Logs & Status**: Monitors and streams container logs dynamically via execution wrappers over native `docker compose logs`.
+- **System Telemetry**: Displays Docker Project usage, resource limits, disk availability, and uptime.
+
+### 📚 Library & Templates
+- **Built-in Service Library**: Instantly drop in customized versions of Nginx, Redis, PostgreSQL, WordPress, Neo4j, Golang, Node.js and more without fumbling for tags.
+- **Template Rehydration**: Expanse extracts node positions and mappings into custom metadata, efficiently rehydrating your UI state when importing from template files.
+
+### 🌐 Sharing & Workflows
+- **One-Click Sharing**: Export your creations to uniquely generated URLs or download them as raw `yaml` or `png` files.
+- **GitHub Integration**: Seamlessly connect your workspace to Git repositories and push `docker-compose.yml` workflows transparently.
 
 ## 📖 Documentation
 
@@ -63,7 +89,7 @@ pnpm run dev
 
 ## 🏗️ Architecture
 
-Compose Craft is built with modern technologies:
+Expanse is built with modern technologies:
 
 - **Frontend**: Next.js 15 with React 19
 - **UI Framework**: Radix UI + Tailwind CSS
@@ -226,7 +252,7 @@ For support:
 
 ---
 
-**Made with ❤️ by the Compose Craft community**
+**Made with ❤️ by the Expanse community**
 
 [![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)
 [![made with pnpm](https://img.shields.io/badge/made%20with-pnpm-000?logo=pnpm)](https://pnpm.io/)

@@ -1,31 +1,39 @@
 import { MongoClient } from "mongodb";
 
-let uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI;
+
+if (!uri) {
+    throw new Error("MONGODB_URI environment variable is required.");
+}
+
+// Singleton client with connection pooling — works for both dev and production.
+// In development, we cache the client on the global object to survive HMR reloads.
+// In production, module-level singletons are fine (no HMR).
+declare global {
+    // eslint-disable-next-line no-var
+    var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
+
 const options = {};
 
-if (!process.env.MONGODB_URI) {
-    uri="mongodb://root:root@mongodb:27017/mydatabase_for_test?authSource=admin"
-    console.warn("MONGODB_URI IS NOT SET THE APP WONT WORK !!!")
-}
-
-let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
 
 if (process.env.NODE_ENV === "development") {
-    // In development mode, use a global variable so that the value
-    // is preserved across module reloads caused by HMR (Hot Module Replacement).
-    const globalWithMongo = global as typeof globalThis & {
-        _mongoClient?: MongoClient;
-    };
-
-    if (!globalWithMongo._mongoClient) {
-        globalWithMongo._mongoClient = new MongoClient(uri || "", options);
+    if (!global._mongoClientPromise) {
+        const client = new MongoClient(uri, options);
+        global._mongoClientPromise = client.connect();
     }
-    client = globalWithMongo._mongoClient;
+    clientPromise = global._mongoClientPromise;
 } else {
-    // In production mode, it's best to not use a global variable.
-    client = new MongoClient(uri || "", options);
+    const client = new MongoClient(uri, options);
+    clientPromise = client.connect();
 }
 
-// Export a module-scoped MongoClient. By doing this in a
-// separate module, the client can be shared across functions.
-export default client;
+export const DB_NAME = "compose_craft";
+
+export async function getDb() {
+    const client = await clientPromise;
+    return client.db(DB_NAME);
+}
+
+export default clientPromise;

@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
 
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -10,6 +10,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json pnpm-lock.yaml .npmrc* ./
+COPY patches ./patches
 RUN npm install -g corepack@latest && corepack enable pnpm && pnpm i
 
 
@@ -23,6 +24,8 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
+ENV MONGODB_URI="mongodb://localhost:27017"
+ENV SECRET_KEY="dummy_secret_for_build"
 RUN npm install -g corepack@latest && corepack enable pnpm && pnpm run build;
 
 # Production image, copy all the files and run next
@@ -30,15 +33,13 @@ FROM base AS runner
 WORKDIR /app
 
 # Install Chrome dependencies and Puppeteer before switching users
-RUN apk add --no-cache chromium ca-certificates
-
-ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-ENV NEXT_TELEMETRY_DISABLED=1
+RUN apk add --no-cache chromium ca-certificates docker-cli docker-cli-compose
 
 # Set Puppeteer to use the system Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs

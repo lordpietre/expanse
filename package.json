@@ -88,6 +88,9 @@
     "onlyBuiltDependencies": [
       "puppeteer",
       "sharp"
-    ]
+    ],
+    "patchedDependencies": {
+      "@composecraft/docker-compose-lib": "patches/@composecraft__docker-compose-lib.patch"
+    }
   }
 }

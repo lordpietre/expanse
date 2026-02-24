@@ -1,74 +1,228 @@
-import {Service} from "@composecraft/docker-compose-lib";
-import {Handle, Position} from "@xyflow/react";
-import {Card, CardContent} from "@/components/ui/card";
-import {Container} from "lucide-react";
+"use client"
+import { Service } from "@composecraft/docker-compose-lib";
+import { Handle, Position } from "@xyflow/react";
+import { CardContent } from "@/components/ui/card";
+import { Container, Database, Globe, Network, HardDrive, Key, Tag, ChevronDown, ChevronUp } from "lucide-react";
+import { useExecutionStore } from "@/store/execution";
+import { cn } from "@/lib/utils";
 import Selectable from "@/components/playground/node/Selectable";
-import useSelectionStore from "@/store/selection";
-import {Separator} from "@/components/ui/separator";
+import { useState } from "react";
+import { useComposeStore } from "@/store/compose";
 
-export default function ServiceNode({ data }:{data:{service:Service}}) {
+const getCategoryTheme = (imageName: string = "") => {
+    const name = imageName.toLowerCase();
+    if (name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria')) {
+        return { icon: Database, gradient: "from-amber-500 to-orange-600", color: "text-amber-400", glow: "shadow-amber-500/20" };
+    }
+    if (name.includes('nginx') || name.includes('apache') || name.includes('proxy') || name.includes('http')) {
+        return { icon: Globe, gradient: "from-sky-500 to-blue-600", color: "text-sky-400", glow: "shadow-sky-500/20" };
+    }
+    return { icon: Container, gradient: "from-emerald-500 to-teal-600", color: "text-emerald-400", glow: "shadow-emerald-500/20" };
+};
 
-    const {selectedId} = useSelectionStore()
+export default function ServiceNode({ data, selected }: { data: { service: Service }, selected?: boolean }) {
+    const { tick } = useComposeStore();
+    const service = data.service;
+    const { serviceStatuses } = useExecutionStore();
+    const isRunning = serviceStatuses[service.name]?.status === 'running';
+    const theme = getCategoryTheme(service.image?.name);
+    const Icon = theme.icon;
+    const [expanded, setExpanded] = useState(false);
 
     return (
-        <Selectable id={data.service.id}>
-            <Handle id='service' type="target" position={Position.Top} isConnectable={true} />
-            <Card className={`flex hover:border-dashed hover:bg-slate-50 border-2 border-blue-500 ${selectedId===data.service.id ? "bg-blue-100" : ""}`}>
-                <CardContent className="p-3">
-                    <div className="flex flex-row gap-3 items-center h-[40px]">
-                        <Container className="stroke-blue-500" height={30}/>
-                        <span className="flex flex-col">
-                            <p className="">{data.service?.name}</p>
-                            <p className="text-xs text-slate-500">{data.service?.image?.toString()}</p>
-                        </span>
+        <Selectable id={service.id}>
+            <div className={cn(
+                "group relative flex flex-col transition-all duration-500",
+                selected
+                    ? "p-[1.5px] rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 scale-[1.02] z-50 shadow-xl shadow-indigo-500/20"
+                    : "p-[1px] rounded-xl bg-white/5 hover:bg-white/10 shadow-lg",
+                isRunning && "float"
+            )}>
+                {/* Dark glass card */}
+                <div className="bg-[#0d1117]/90 backdrop-blur-2xl rounded-[0.7rem] flex flex-col overflow-visible border border-white/5" style={{ minWidth: 190 }}>
+
+                    {/* Gradient Header — always visible, click to toggle */}
+                    <div
+                        className={cn(
+                            "px-3 py-2 flex items-center justify-between relative overflow-hidden bg-gradient-to-br rounded-[0.7rem] cursor-pointer select-none",
+                            !expanded && "rounded-[0.7rem]",
+                            expanded && "rounded-t-[0.7rem]",
+                            theme.gradient
+                        )}
+                        onClick={() => setExpanded(e => !e)}
+                        title={expanded ? "Collapse node" : "Expand node"}
+                    >
+                        <div className="absolute inset-0 shimmer opacity-30" />
+                        <div className="flex flex-col z-10 min-w-0">
+                            <h3 className="text-white font-black text-base tracking-tight uppercase truncate max-w-[120px] leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                                {service.name}
+                            </h3>
+                            <span className="text-white/70 text-[9px] font-bold uppercase tracking-widest truncate max-w-[110px] mt-0.5" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                                {service.image?.toString() || 'no-image'}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 z-10 ml-2 shrink-0">
+                            <div className="bg-black/20 backdrop-blur-sm p-2 rounded-lg border border-white/20">
+                                <Icon className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="bg-black/20 backdrop-blur-sm p-1 rounded-lg border border-white/20">
+                                {expanded
+                                    ? <ChevronUp className="w-3 h-3 text-white/70" />
+                                    : <ChevronDown className="w-3 h-3 text-white/70" />
+                                }
+                            </div>
+                        </div>
                     </div>
-                    <Separator/>
-                    <span className="relative flex items-center pl-6 py-2 transform -translate-x-[16px]">
-                        <p>Networks</p>
+
+                    {/* Collapsed summary — always visible below header */}
+                    <div className="flex items-center gap-3 px-3 py-1.5 border-t border-white/5">
+                        {/* Network connector — always visible */}
+                        <div className="relative flex items-center gap-1.5">
+                            <Handle
+                                id="network"
+                                type="source"
+                                position={Position.Left}
+                                className="!w-4 !h-4 !rounded-full !-left-3.5 !bg-blue-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(59,130,246,0.5)] hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                            />
+                            <Network className="w-3 h-3 text-blue-400" />
+                            <span className="text-[8px] font-bold text-blue-300">
+                                {service.networks?.size || 0}
+                            </span>
+                        </div>
+
+                        <div className="w-px h-4 bg-white/10" />
+
+                        {/* Volume connector — always visible */}
+                        <div className="relative flex items-center gap-1.5">
+                            <Handle
+                                id="volume-target"
+                                type="target"
+                                position={Position.Right}
+                                className="!w-4 !h-4 !rounded-full !-right-3.5 !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                            />
+                            <Handle
+                                id="volume"
+                                type="source"
+                                position={Position.Right}
+                                className="!w-4 !h-4 !rounded-full !-right-7 !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                            />
+                            <HardDrive className="w-3 h-3 text-amber-400" />
+                            <span className="text-[8px] font-bold text-amber-300">
+                                {service.bindings?.size || 0}
+                            </span>
+                        </div>
+
+                        {/* Dependency handle — always present for DB connections */}
                         <Handle
-                            id='network'
-                            type="source"
-                            position={Position.Left}
-                            isConnectable={true}
-                            className="!left-0 !top-1/2 !-translate-y-1/2"
+                            id="service"
+                            type="target"
+                            position={Position.Bottom}
+                            className="!w-4 !h-4 !rounded-full !-bottom-2 !bg-cyan-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(6,182,212,0.5)] hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
                         />
-                    </span>
-                    <Separator/>
-                    <span className="relative flex items-center pr-6 py-2 justify-end transform translate-x-[16px]">
-                        <p>Volumes</p>
-                        <Handle
-                            id='volume'
-                            type="source"
-                            position={Position.Right}
-                            isConnectable={true}
-                            className="!right-0 !top-1/2 !-translate-y-1/2"
-                        />
-                    </span>
-                    <Separator/>
-                    <span className="relative flex items-center pl-6 py-2 transform -translate-x-[16px]">
-                        <p>Env</p>
-                        <Handle
-                            id='env'
-                            type="source"
-                            position={Position.Left}
-                            isConnectable={true}
-                            className="!left-0 !top-1/2 !-translate-y-1/2"
-                        />
-                    </span>
-                    <Separator/>
-                    <span className="relative flex items-center pl-6 py-2 transform -translate-x-[16px]">
-                        <p>Label</p>
-                        <Handle
-                            id='label'
-                            type="source"
-                            position={Position.Left}
-                            isConnectable={true}
-                            className="!left-0 !top-1/2 !-translate-y-1/2"
-                        />
-                    </span>
-                </CardContent>
-            </Card>
-            <Handle id='service' type="source" position={Position.Bottom} isConnectable={true}/>
+                    </div>
+
+                    {/* Expanded detail sections */}
+                    {expanded && (
+                        <CardContent className="p-0 bg-[#0d1117]/80">
+                            {/* Running badge */}
+                            {isRunning && (
+                                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-500/10 border-b border-emerald-500/10">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                                    <span className="text-[9px] font-black uppercase text-emerald-400 tracking-widest">Live</span>
+                                </div>
+                            )}
+
+                            <div className="flex flex-col divide-y divide-white/5">
+                                {/* NETWORKS */}
+                                <div className="relative px-3 py-1.5 hover:bg-white/3 transition-colors">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <Network className="w-3 h-3 text-blue-400" />
+                                        <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Networks</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {Array.from(service.networks || []).map(net => (
+                                            <div key={net.id} className="px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[8px] font-bold text-blue-300 leading-none">{net.name}</div>
+                                        ))}
+                                        {(service.networks?.size || 0) === 0 && <span className="text-[8px] italic text-slate-600 leading-none">None</span>}
+                                    </div>
+                                </div>
+
+                                {/* DATABASE DEPENDENCIES */}
+                                <div className="relative px-3 py-1.5 hover:bg-white/3 transition-colors">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <Database className="w-3 h-3 text-cyan-400" />
+                                        <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">DB</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {Array.from(service.depends_on || []).filter(dep => {
+                                            const name = dep.image?.name?.toLowerCase() || "";
+                                            return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria') || name.includes('mysql');
+                                        }).map((dep, idx) => (
+                                            <div key={idx} className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[8px] font-bold text-cyan-300 leading-none">
+                                                {dep.name}
+                                            </div>
+                                        ))}
+                                        {(!service.depends_on || Array.from(service.depends_on).filter(dep => {
+                                            const name = dep.image?.name?.toLowerCase() || "";
+                                            return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria') || name.includes('mysql');
+                                        }).length === 0) && (
+                                                <span className="text-[8px] italic text-slate-600 leading-none">None</span>
+                                            )}
+                                    </div>
+                                </div>
+
+                                {/* VOLUMES */}
+                                <div className="relative px-3 py-1.5 hover:bg-white/3 transition-colors">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <HardDrive className="w-3 h-3 text-amber-400" />
+                                        <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Volumes</span>
+                                    </div>
+                                    <div className="space-y-0.5">
+                                        {Array.from(service.bindings || []).map((vol, idx) => (
+                                            <div key={idx} className="text-[8px] font-mono text-slate-500 truncate bg-amber-500/5 px-1.5 py-0.5 rounded border border-amber-500/10 leading-none">
+                                                {vol.toString()}
+                                            </div>
+                                        ))}
+                                        {(service.bindings?.size || 0) === 0 && <span className="text-[8px] italic text-slate-600 leading-none">None</span>}
+                                    </div>
+                                </div>
+
+                                {/* ENVIRONMENT */}
+                                <div className="relative px-3 py-1.5 hover:bg-white/3 transition-colors">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <Key className="w-3 h-3 text-violet-400" />
+                                        <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Env</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-0.5">
+                                        {service.environment && Array.from(service.environment).map((env, idx) => (
+                                            <div key={idx} className="text-[8px] font-mono text-violet-400 truncate px-1.5 py-0.5 rounded bg-violet-500/10 border border-violet-500/15 leading-none">
+                                                {env.key}={env.value || ""}
+                                            </div>
+                                        ))}
+                                        {(!service.environment || service.environment.size === 0) && <span className="text-[8px] italic text-slate-600 leading-none">None</span>}
+                                    </div>
+                                </div>
+
+                                {/* LABELS */}
+                                <div className="relative px-3 py-1.5 hover:bg-white/3 transition-colors">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <Tag className="w-3 h-3 text-rose-400" />
+                                        <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Labels</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {service.labels && Array.from(service.labels).map((label, idx) => (
+                                            <div key={idx} className="px-2 py-0.5 rounded-md bg-rose-500/10 border border-rose-500/20 text-[8px] font-black text-rose-400 leading-none">
+                                                {label.key}
+                                            </div>
+                                        ))}
+                                        {(!service.labels || service.labels.length === 0) && <span className="text-[8px] italic text-slate-600 leading-none">None</span>}
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    )}
+                </div>
+            </div>
         </Selectable>
     );
 }

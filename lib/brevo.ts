@@ -1,17 +1,17 @@
-import axios, {AxiosError} from "axios";
+import axios, { AxiosError } from "axios";
 
 type RegisterType = {
-    email: string|null,
+    email: string | null,
 }
 
-export async function registerUserToBrevo(data:RegisterType):Promise<string|null>{
-    if((process.env.BREVO_DISABLED || "").toLowerCase()=="true"){
+export async function registerUserToBrevo(data: RegisterType): Promise<string | null> {
+    if ((process.env.BREVO_DISABLED || "").toLowerCase() == "true") {
         return null
     }
-    if(!data.email){
+    if (!data.email) {
         return null
     }
-    try{
+    try {
         const resp = await axios.post("https://api.brevo.com/v3/contacts",
             {
                 email: data.email,
@@ -24,12 +24,12 @@ export async function registerUserToBrevo(data:RegisterType):Promise<string|null
                 }
             })
         return `${resp.data.id}`
-    }catch (e){
-        // @ts-ignore
-        if((e as AxiosError)?.response?.data?.message === "Unable to create contact, email is already associated with another Contact"){
+    } catch (e) {
+        const axiosError = e as AxiosError<any>;
+        if (axiosError?.response?.data?.message === "Unable to create contact, email is already associated with another Contact") {
             console.log("retrieve contact ")
         }
-        try{
+        try {
             const resp = await axios.get(`https://api.brevo.com/v3/contacts/${data.email}`,
                 {
                     headers: {
@@ -37,9 +37,9 @@ export async function registerUserToBrevo(data:RegisterType):Promise<string|null
                         "api-key": process.env.BREVO_API_KEY
                     }
                 })
-            await updateUserList(data.email,[9])
+            await updateUserList(data.email, [9])
             return `${resp.data.id}`
-        }catch(e){
+        } catch (e) {
             console.error(e)
         }
         console.error(e)
@@ -47,8 +47,8 @@ export async function registerUserToBrevo(data:RegisterType):Promise<string|null
     }
 }
 
-export async function updateUserList(email:string,listsToAdd:number[]=[],listsToRemove:number[]=[]){
-    try{
+export async function updateUserList(email: string, listsToAdd: number[] = [], listsToRemove: number[] = []) {
+    try {
         const resp = await axios.put(`https://api.brevo.com/v3/contacts/${email}`,
             {
                 listIds: listsToAdd,
@@ -61,14 +61,14 @@ export async function updateUserList(email:string,listsToAdd:number[]=[],listsTo
                 }
             })
         return `${resp.data}`
-    }catch(e){
+    } catch (e) {
         console.error(e)
     }
 }
 
-export async function sendRecoverPassdEmail(to:string,code:string){
+export async function sendRecoverPassdEmail(to: string, code: string) {
     const url = `${process.env.URL}/forgotPassword/reset?code=${code}`
-    if((process.env.BREVO_DISABLED || "").toLowerCase()=="true"){
+    if ((process.env.BREVO_DISABLED || "").toLowerCase() == "true") {
         console.log(`BREVO deactivated reinitialise url for user ${to} is : ${url}`)
         return null
     }

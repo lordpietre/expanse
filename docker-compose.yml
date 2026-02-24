@@ -1,35 +1,42 @@
 name: compose-craft
+
 services:
   saas:
-    image: composecraft/composecraft:latest
+    build: .
+    image: composecraft:local
     ports:
-      - 3000:3000
+      - "4000:3000"           # ← ¡cambio importante! host:4000 → contenedor:3000
     environment:
       - CORE_ONLY=true
-      - URL=http://localhost:3000
-      - SECRET_KEY=changeme
-      - MONGODB_URI=mongodb://dev:dev@db
+      - URL=http://192.168.1.128:4000
+      - SECRET_KEY=changeme           # cámbialo por algo largo y aleatorio
+      - MONGODB_URI=mongodb://dev:dev@db:27017/?authSource=admin
     depends_on:
       - db
-    networks:
-      - internal
-  db:
-    image: mongo:latest
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=dev
-      - MONGO_INITDB_ROOT_PASSWORD=dev
-    ports:
-      - 27017:27017
+    restart: unless-stopped
+    user: root
     networks:
       - internal
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  db:
+    image: mongo:latest
+    environment:
+      # IMPORTANT: Ensure these match MONGODB_URI in the saas service
+      MONGO_INITDB_ROOT_USERNAME: dev
+      MONGO_INITDB_ROOT_PASSWORD: dev
+      # Puedes agregar si quieres:
+      # MONGO_INITDB_DATABASE: composecraft
+    volumes:
       - mongo_data:/data/db
+    networks:
+      - internal
+    restart: unless-stopped
+
 networks:
   internal:
     driver: bridge
-    attachable: false
-    external: false
+
 volumes:
   mongo_data:
-    driver: local
-    external: false

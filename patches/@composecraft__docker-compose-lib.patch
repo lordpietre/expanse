@@ -1,0 +1,242 @@
+diff --git a/lib/cjs/compose/network/network.d.ts b/lib/cjs/compose/network/network.d.ts
+index 01e57501c7beeff92dfe61ef101814b36ef48dea..2881c30604a91e9327ded473eef28171944bb2d1 100644
+--- a/lib/cjs/compose/network/network.d.ts
++++ b/lib/cjs/compose/network/network.d.ts
+@@ -8,6 +8,7 @@ export interface NetworkConstructor {
+     external?: boolean;
+     internal?: boolean;
+     labels?: KeyValue[];
++    ipam?: any;
+ }
+ declare class Network {
+     id: string;
+@@ -17,7 +18,8 @@ declare class Network {
+     attachable: boolean;
+     external: boolean;
+     labels?: KeyValue[];
+-    constructor({ name, driver, driver_opts, attachable, external, labels, }: NetworkConstructor);
++    ipam?: any;
++    constructor({ name, driver, driver_opts, attachable, external, labels, ipam }: NetworkConstructor);
+     toDict(): object;
+     equals(other: Network): boolean;
+     toJSON(): object;
+diff --git a/lib/cjs/compose/network/network.js b/lib/cjs/compose/network/network.js
+index 5a815602724cc5e370febb10f42ba304792c79c0..c21bb3a654aa9813a9999d31173945589cf07b46 100644
+--- a/lib/cjs/compose/network/network.js
++++ b/lib/cjs/compose/network/network.js
+@@ -4,7 +4,7 @@ exports.Network = void 0;
+ const uuid_1 = require("uuid");
+ const driver_1 = require("../network/driver");
+ class Network {
+-    constructor({ name, driver = driver_1.NetworkDriver.BRIDGE, driver_opts, attachable = false, external = false, labels, }) {
++    constructor({ name, driver = driver_1.NetworkDriver.BRIDGE, driver_opts, attachable = false, external = false, labels, ipam }) {
+         this.id = "net_" + (0, uuid_1.v4)();
+         this.name = name;
+         this.driver = driver;
+@@ -12,6 +12,7 @@ class Network {
+         this.attachable = attachable;
+         this.external = external;
+         this.labels = labels;
++        this.ipam = ipam;
+     }
+     toDict() {
+         var _a, _b;
+@@ -21,6 +22,7 @@ class Network {
+             attachable: this.attachable,
+             external: this.external,
+             labels: (_b = this.labels) === null || _b === void 0 ? void 0 : _b.map((lab) => lab.toString()),
++            ipam: this.ipam,
+         };
+     }
+     equals(other) {
+diff --git a/lib/cjs/compose/service/service.d.ts b/lib/cjs/compose/service/service.d.ts
+index b953d3dabefaa37a2e4430efa893af67014c7db0..aaa7508cc89b79af06acdcbe1b155aa950bc1fcc 100644
+--- a/lib/cjs/compose/service/service.d.ts
++++ b/lib/cjs/compose/service/service.d.ts
+@@ -35,6 +35,7 @@ export declare class Service extends Serializable {
+     working_dir?: string;
+     depends_on: SuperSet<Readonly<Service>>;
+     networks: SuperSet<Readonly<Network>>;
++    ipv4_addresses?: Record<string, string>;
+     network_mode?: string;
+     constructor(init: Partial<Service>);
+     check(): void;
+diff --git a/lib/cjs/compose/service/service.js b/lib/cjs/compose/service/service.js
+index 6ecc9fbe7b89e3fc60a49f004da2021b879d756b..916f9a5b501217e0156e0261ee24dbbfc6570083 100644
+--- a/lib/cjs/compose/service/service.js
++++ b/lib/cjs/compose/service/service.js
+@@ -33,6 +33,7 @@ class Service extends serializable_1.Serializable {
+         this.bindings = init.bindings || new superSet_1.SuperSet();
+         this.depends_on = init.depends_on || new superSet_1.SuperSet();
+         this.networks = init.networks || new superSet_1.SuperSet();
++        this.ipv4_addresses = init.ipv4_addresses || {};
+         this.network_mode = init.network_mode;
+         this.check();
+     }
+diff --git a/lib/cjs/compose/volume/volume.js b/lib/cjs/compose/volume/volume.js
+index 6ac5b125cd72e18f3ee8c8ba215ef1c3fa2d4fb4..56ff3d5f656b6ee3da678581dbea83a9a7ea94a6 100644
+--- a/lib/cjs/compose/volume/volume.js
++++ b/lib/cjs/compose/volume/volume.js
+@@ -21,7 +21,7 @@ class Volume extends serializable_1.Serializable {
+         var _a, _b;
+         return {
+             driver: this.driver.toString(),
+-            driver_opts: (_a = this.driver_opts) === null || _a === void 0 ? void 0 : _a.map((dr) => dr.toString()),
++            driver_opts: Array.isArray(this.driver_opts) ? this.driver_opts.reduce((acc, dr) => { acc[dr.key] = dr.value; return acc; }, {}) : this.driver_opts,
+             labels: (_b = this.labels) === null || _b === void 0 ? void 0 : _b.map((lab) => lab.toString()),
+             external: this.external,
+         };
+diff --git a/lib/cjs/translator/translator.js b/lib/cjs/translator/translator.js
+index 50f33abb575a3619631e303c917840c3e3456950..6b2caa2c47773290508cf0c7fad6acecffabe27a 100644
+--- a/lib/cjs/translator/translator.js
++++ b/lib/cjs/translator/translator.js
+@@ -58,7 +58,23 @@ class Translator {
+             //ones linked to other params
+             serviceDict.secrets = Array.from(service.secrets).map((sec) => sec.name);
+             serviceDict.depends_on = Array.from(service.depends_on).map((dep) => dep.name);
+-            serviceDict.networks = Array.from(service.networks).map((net) => net.name);
++            if (service.networks.size > 0) {
++                if (service.ipv4_addresses && Object.keys(service.ipv4_addresses).length > 0) {
++                    serviceDict.networks = {};
++                    Array.from(service.networks).forEach((net) => {
++                        const ip = service.ipv4_addresses[net.name];
++                        if (ip) {
++                            serviceDict.networks[net.name] = { ipv4_address: ip };
++                        } else {
++                            serviceDict.networks[net.name] = null;
++                        }
++                    });
++                } else {
++                    serviceDict.networks = Array.from(service.networks).map((net) => net.name);
++                }
++            } else {
++                serviceDict.networks = [];
++            }
+             if (service.bindings.size > 0) {
+                 serviceDict.volumes = [];
+             }
+@@ -72,7 +88,7 @@ class Translator {
+             if (serviceDict.secrets.length === 0) {
+                 serviceDict.secrets = undefined;
+             }
+-            if (serviceDict.networks.length === 0) {
++            if (serviceDict.networks && (Array.isArray(serviceDict.networks) ? serviceDict.networks.length === 0 : Object.keys(serviceDict.networks).length === 0)) {
+                 serviceDict.networks = undefined;
+             }
+             //finally append to result
+@@ -130,7 +146,9 @@ class Translator {
+         if (input === null || input === void 0 ? void 0 : input.networks) {
+             (_a = Object.keys(input === null || input === void 0 ? void 0 : input.networks)) === null || _a === void 0 ? void 0 : _a.forEach((key) => {
+                 const network = input === null || input === void 0 ? void 0 : input.networks[key];
+-                const net = new network_1.Network(Object.assign({ name: key }, (0, utils_1.getSimpleValues)(network)));
++                const cleanParams = (0, utils_1.getSimpleValues)(network);
++                if (network && network.ipam) { cleanParams.ipam = network.ipam; }
++                const net = new network_1.Network(Object.assign({ name: key }, cleanParams));
+                 result.networks.add(net);
+             });
+         }
+@@ -138,7 +156,9 @@ class Translator {
+         if (input === null || input === void 0 ? void 0 : input.volumes) {
+             (input === null || input === void 0 ? void 0 : input.volumes) && ((_b = Object.keys(input === null || input === void 0 ? void 0 : input.volumes)) === null || _b === void 0 ? void 0 : _b.forEach((key) => {
+                 const volume = input === null || input === void 0 ? void 0 : input.volumes[key];
+-                const vol = new volume_1.Volume(Object.assign({ name: key }, (0, utils_1.getSimpleValues)(volume)));
++                const cleanParams = (0, utils_1.getSimpleValues)(volume);
++                if (volume && volume.driver_opts) { cleanParams.driver_opts = volume.driver_opts; }
++                const vol = new volume_1.Volume(Object.assign({ name: key }, cleanParams));
+                 result.volumes.add(vol);
+             }));
+         }
+@@ -198,10 +218,10 @@ class Translator {
+                     }
+                     else {
+                         ser.ports = [new service_1.PortMapping({
+-                                hostPort: Number(source),
+-                                containerPort: Number(target),
+-                                protocol: protocol
+-                            })];
++                            hostPort: Number(source),
++                            containerPort: Number(target),
++                            protocol: protocol
++                        })];
+                     }
+                 });
+             }
+@@ -262,13 +282,28 @@ class Translator {
+             const rawSer = input === null || input === void 0 ? void 0 : input.services[key];
+             const service = Array.from(result.services).find(ser => ser.name === key);
+             if (rawSer.networks) {
+-                rawSer.networks = (0, utils_1.turnObjectInArrayWithName)(rawSer.networks);
+-                rawSer.networks.forEach((net_name) => {
+-                    const network = Array.from(result.networks).find(net => net.name === net_name);
+-                    if (network && service) {
+-                        service.networks.add(network);
+-                    }
+-                });
++                if (Array.isArray(rawSer.networks)) {
++                    rawSer.networks.forEach((net_name) => {
++                        const network = Array.from(result.networks).find(net => net.name === net_name);
++                        if (network && service) {
++                            service.networks.add(network);
++                        }
++                    });
++                } else {
++                    Object.keys(rawSer.networks).forEach((net_name) => {
++                        const networkConfig = rawSer.networks[net_name];
++                        const network = Array.from(result.networks).find(net => net.name === net_name);
++                        if (network && service) {
++                            service.networks.add(network);
++                            if (networkConfig && networkConfig.ipv4_address) {
++                                if (!service.ipv4_addresses) {
++                                    service.ipv4_addresses = {};
++                                }
++                                service.ipv4_addresses[net_name] = networkConfig.ipv4_address;
++                            }
++                        }
++                    });
++                }
+             }
+             if (rawSer.volumes) {
+                 rawSer.volumes.forEach((volRaw) => {
+diff --git a/lib/esm/compose/volume/volume.js b/lib/esm/compose/volume/volume.js
+index bb077dd7a36c708d69b072d774e30e86f9471ebc..8fd4307fcff9bea55944f582e42582b12ab820c7 100644
+--- a/lib/esm/compose/volume/volume.js
++++ b/lib/esm/compose/volume/volume.js
+@@ -18,7 +18,7 @@ class Volume extends Serializable {
+         var _a, _b;
+         return {
+             driver: this.driver.toString(),
+-            driver_opts: (_a = this.driver_opts) === null || _a === void 0 ? void 0 : _a.map((dr) => dr.toString()),
++            driver_opts: Array.isArray(this.driver_opts) ? this.driver_opts.reduce((acc, dr) => { acc[dr.key] = dr.value; return acc; }, {}) : this.driver_opts,
+             labels: (_b = this.labels) === null || _b === void 0 ? void 0 : _b.map((lab) => lab.toString()),
+             external: this.external,
+         };
+diff --git a/lib/esm/translator/translator.js b/lib/esm/translator/translator.js
+index b7b489050ea87dc27133f1b4fbdec9694c55950f..2c69d4e7d48e242958dece44cb74fb3dc294d8ac 100644
+--- a/lib/esm/translator/translator.js
++++ b/lib/esm/translator/translator.js
+@@ -135,7 +135,9 @@ export class Translator {
+         if (input === null || input === void 0 ? void 0 : input.volumes) {
+             (input === null || input === void 0 ? void 0 : input.volumes) && ((_b = Object.keys(input === null || input === void 0 ? void 0 : input.volumes)) === null || _b === void 0 ? void 0 : _b.forEach((key) => {
+                 const volume = input === null || input === void 0 ? void 0 : input.volumes[key];
+-                const vol = new Volume(Object.assign({ name: key }, getSimpleValues(volume)));
++                const cleanParams = getSimpleValues(volume);
++                if (volume && volume.driver_opts) { cleanParams.driver_opts = volume.driver_opts; }
++                const vol = new Volume(Object.assign({ name: key }, cleanParams));
+                 result.volumes.add(vol);
+             }));
+         }
+@@ -195,10 +197,10 @@ export class Translator {
+                     }
+                     else {
+                         ser.ports = [new PortMapping({
+-                                hostPort: Number(source),
+-                                containerPort: Number(target),
+-                                protocol: protocol
+-                            })];
++                            hostPort: Number(source),
++                            containerPort: Number(target),
++                            protocol: protocol
++                        })];
+                     }
+                 });
+             }

@@ -1,5 +1,5 @@
 /**
- * Centralized configuration for Compose Craft
+ * Centralized configuration for Expanse
  * 
  * This module provides utilities to check the application mode
  * and configure behavior accordingly.

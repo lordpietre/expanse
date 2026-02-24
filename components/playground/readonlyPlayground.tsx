@@ -1,36 +1,36 @@
 "use client"
 
-import {Compose, Translator, Volume} from "@composecraft/docker-compose-lib";
-import {NodeData} from "@/components/playground/playground";
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import { Compose, Translator, Volume } from "@composecraft/docker-compose-lib";
+import { NodeData } from "@/components/playground/playground";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ServiceNode from "@/components/playground/node/serviceNode";
 import NetworkNode from "@/components/playground/node/networkNode";
 import VolumeNode from "@/components/playground/node/volumeNode";
 import BindingNode from "@/components/playground/node/bindingNode";
 import EnvNode from "@/components/playground/node/envNode";
-import {Background, BackgroundVariant, Edge, Node, ReactFlow, XYPosition} from "@xyflow/react";
-import {dependencyEdgeStyle, envEdgeStyle, networkEdgeStyle, volumeEdgeStyle} from "@/components/playground/node/utils";
+import { Background, BackgroundVariant, Edge, Node, ReactFlow, XYPosition } from "@xyflow/react";
+import { dependencyEdgeStyle, envEdgeStyle, networkEdgeStyle, volumeEdgeStyle } from "@/components/playground/node/utils";
 import '@xyflow/react/dist/style.css'
-import {composeMetadata, recreatePositionMap, reHydrateComposeIds} from "@/lib/metadata";
+import { composeMetadata, recreatePositionMap, reHydrateComposeIds } from "@/lib/metadata";
 import CustomBackground from "@/components/playground/customBackground";
 
 interface options {
-    compose : Compose
+    compose: Compose
     positionMap: composeMetadata
 }
 
-export default function ReadOnlyPlayGround(opt:options){
+export default function ReadOnlyPlayGround(opt: options) {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [compose,setCompose] = useState(new Compose())
-    const [positionMap, setPositionMap] = useState<Map<string,NodeData>>(new Map())
+    const [compose, setCompose] = useState(new Compose())
+    const [positionMap, setPositionMap] = useState<Map<string, NodeData>>(new Map())
 
     useEffect(() => {
-        if(opt.compose){
+        if (opt.compose) {
             const c = Translator.fromDict(opt.compose)
             setCompose(c)
-            if(opt.positionMap){
-                reHydrateComposeIds(c,opt.positionMap)
+            if (opt.positionMap) {
+                reHydrateComposeIds(c, opt.positionMap)
                 setPositionMap(recreatePositionMap(opt.positionMap.positionMap))
             }
         }
@@ -41,11 +41,11 @@ export default function ReadOnlyPlayGround(opt:options){
             if (!positionMap.has(service.id)) {
                 positionMap.set(service.id,
                     {
-                        position: {x: 0, y: 0},
+                        position: { x: 0, y: 0 },
                     })
             }
         })
-    }, [compose,positionMap]);
+    }, [compose, positionMap]);
 
     const nodeTypes = useMemo(() => (
         {
@@ -90,18 +90,18 @@ export default function ReadOnlyPlayGround(opt:options){
         compose.services.forEach((service) => {
             result.push({
                 id: service.id,
-                position: positionMap.get(service.id)?.position || {x: 10, y: 10},
+                position: positionMap.get(service.id)?.position || { x: 10, y: 10 },
                 type: "service",
-                data: {service},
+                data: { service },
                 draggable: true
             } as Node)
             service.bindings.forEach((binding) => {
                 if (!Object.prototype.hasOwnProperty.call(binding.source, "id")) {
                     result.push({
                         id: binding.id,
-                        position: positionMap.get(binding.id)?.position || {x: 10, y: 10},
+                        position: positionMap.get(binding.id)?.position || { x: 10, y: 10 },
                         type: "binding",
-                        data: {binding},
+                        data: { binding },
                         draggable: true
                     } as Node)
                 }
@@ -109,26 +109,26 @@ export default function ReadOnlyPlayGround(opt:options){
         })
         compose.networks.forEach((network) => result.push({
             id: network.id,
-            position: positionMap.get(network.id)?.position || {x: 10, y: 10},
+            position: positionMap.get(network.id)?.position || { x: 10, y: 10 },
             type: "network",
-            data: {network},
+            data: { network },
             draggable: true
         }))
         compose.volumes.forEach((volume) => {
             result.push({
                 id: volume.id,
-                position: positionMap.get(volume.id)?.position || {x: 10, y: 10},
+                position: positionMap.get(volume.id)?.position || { x: 10, y: 10 },
                 type: "volume",
-                data: {volume},
+                data: { volume },
                 draggable: true
             })
         })
         compose.envs.forEach((env) => {
             result.push({
                 id: env.id,
-                position: positionMap.get(env.id)?.position || {x: 10, y: 10},
+                position: positionMap.get(env.id)?.position || { x: 10, y: 10 },
                 type: "env",
-                data: {env},
+                data: { env },
                 draggable: true
             })
         })
@@ -194,7 +194,7 @@ export default function ReadOnlyPlayGround(opt:options){
         return result
     }
 
-    return(
+    return (
         <ReactFlow
             nodes={composeToNodes(compose)}
             edges={composeToEdge(compose)}
@@ -205,8 +205,8 @@ export default function ReadOnlyPlayGround(opt:options){
             maxZoom={1}
             minZoom={Number.NEGATIVE_INFINITY}
         >
-            <CustomBackground id="2" gap={500} offset={50}/>
-            <Background id="1" variant={"dots" as BackgroundVariant} gap={12} size={1}/>
+            <CustomBackground id="2" gap={500} offset={50} />
+            <Background id="1" variant={"dots" as BackgroundVariant} gap={12} size={1} color="rgba(74, 222, 128, 0.4)" />
         </ReactFlow>
     )
 

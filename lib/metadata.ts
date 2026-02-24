@@ -1,5 +1,6 @@
-import {Compose} from "@composecraft/docker-compose-lib";
-import {NodeData} from "@/components/playground/playground";
+import { Compose } from "@composecraft/docker-compose-lib";
+import { NodeData } from "@/components/playground/playground";
+import usePositionMap from "@/store/metadataMap";
 
 export type nameId = {
     id: string;
@@ -7,10 +8,14 @@ export type nameId = {
 }
 type PositionMap = {
     id: string,
-    position : {
+    position: {
         x: number,
         y: number
     }
+}
+type ConnectionMapEntry = {
+    key: string, // "sourceId:targetId"
+    targetHandle: string
 }
 
 export type composeMetadata = {
@@ -23,11 +28,12 @@ export type composeMetadata = {
         labelsIds: nameId[];
     }
     positionMap: PositionMap[]
+    connectionMap?: ConnectionMapEntry[]
 }
 
-export function extractMetadata(compose:Compose,positionMap:Map<string,NodeData>):composeMetadata{
+export function extractMetadata(compose: Compose, positionMap: Map<string, NodeData>): composeMetadata {
     const result: composeMetadata = {
-        Ids : {
+        Ids: {
             servicesIds: [],
             networksIds: [],
             volumesIds: [],
@@ -35,66 +41,71 @@ export function extractMetadata(compose:Compose,positionMap:Map<string,NodeData>
             envsIds: [],
             labelsIds: []
         },
-        positionMap: []
+        positionMap: [],
+        connectionMap: []
     }
-    compose.services.forEach(service=>{
-        result.Ids.servicesIds.push({name: service?.name, id: service.id})
-        service.bindings.forEach(bin=>{
-            if(typeof bin.source === "string"){
-                result.Ids.bindingsIds.push({name: bin.source, id: bin.id})
+    const connectionMapState = usePositionMap.getState().connectionMap;
+    compose.services.forEach(service => {
+        result.Ids.servicesIds.push({ name: service?.name, id: service.id })
+        service.bindings.forEach(bin => {
+            if (typeof bin.source === "string") {
+                result.Ids.bindingsIds.push({ name: bin.source, id: bin.id })
             }
         })
         service.labels?.forEach(label => {
-            result.Ids.labelsIds.push({name: `${service.id}___${label.key}`, id: label.id})
+            result.Ids.labelsIds.push({ name: `${service.id}___${label.key}`, id: label.id })
         })
     })
-    compose.networks.forEach(network=>result.Ids.networksIds.push({name: network.name, id: network.id}))
-    compose.volumes.forEach(volume=>result.Ids.volumesIds.push({name: volume.name, id: volume.id}))
-    compose.envs.forEach(env=>result.Ids.envsIds.push({name:env.key, id: env.id}))
-    positionMap.forEach((key,value)=>result.positionMap.push({
-        id: value,
+    compose.networks.forEach(network => result.Ids.networksIds.push({ name: network.name, id: network.id }))
+    compose.volumes.forEach(volume => result.Ids.volumesIds.push({ name: volume.name, id: volume.id }))
+    compose.envs.forEach(env => result.Ids.envsIds.push({ name: env.key, id: env.id }))
+    positionMap.forEach((val, id) => result.positionMap.push({
+        id: id,
         position: {
-            x: key.position.x,
-            y: key.position.y
+            x: val.position.x,
+            y: val.position.y
         }
+    }))
+    connectionMapState.forEach((targetHandle: string, key: string) => result.connectionMap?.push({
+        key,
+        targetHandle
     }))
     console.log(result)
     return result
 }
 
-export function reHydrateComposeIds(compose:Compose,metadata:composeMetadata){
-    console.log(metadata)
-    metadata.Ids.servicesIds.forEach(({name,id})=>{
-        const service = Array.from(compose.services).find(s=>s.name === name)
-        if(service){
+export function reHydrateComposeIds(compose: Compose, metadata: composeMetadata) {
+    metadata.Ids.servicesIds.forEach(({ name, id }) => {
+        const service = Array.from(compose.services).find(s => s.name === name)
+        if (service) {
             service.id = id
         }
-        service?.bindings.forEach((bin)=>{
-            const found = metadata.Ids.bindingsIds.find(b=>b.name === bin.source)
-            if(found){
-                bin.id= found.id
+        service?.bindings.forEach((bin) => {
+            const found = metadata.Ids.bindingsIds.find(b => b.name === bin.source)
+            if (found) {
+                bin.id = found.id
             }
         })
     })
-    metadata.Ids.networksIds.forEach(({name,id})=>{
-        const network = Array.from(compose.networks).find(n=>n.name === name)
-        if(network){
+    metadata.Ids.networksIds.forEach(({ name, id }) => {
+        const network = Array.from(compose.networks).find(n => n.name === name)
+        if (network) {
             network.id = id
         }
     })
-    metadata.Ids.envsIds.forEach(({name,id})=>{
-        const env = Array.from(compose.envs).find(n=>n.key === name)
-        if(env){
+    metadata.Ids.envsIds.forEach(({ name, id }) => {
+        const env = Array.from(compose.envs).find(n => n.key === name)
+        if (env) {
             env.id = id
         }
     })
-    metadata.Ids.volumesIds.forEach(({name,id})=>{
-        const vol = Array.from(compose.volumes).find(n=>n.name === name)
-        if(vol){
+    metadata.Ids.volumesIds.forEach(({ name, id }) => {
+        const vol = Array.from(compose.volumes).find(n => n.name === name)
+        if (vol) {
             vol.id = id
         }
     })
-    metadata.Ids.labelsIds.forEach(({name, id}) => {
+    metadata.Ids.labelsIds.forEach(({ name, id }) => {
         const [serviceId, labelKey] = name.split('___');
         if (serviceId && labelKey) {
             const service = Array.from(compose.services).find(s => s.id === serviceId);
@@ -108,12 +119,20 @@ export function reHydrateComposeIds(compose:Compose,metadata:composeMetadata){
     })
 }
 
-export function recreatePositionMap(input:PositionMap[]):Map<string,NodeData>{
+export function recreatePositionMap(input: PositionMap[]): Map<string, NodeData> {
     const result = new Map()
-    input.forEach((v)=>{
-        result.set(v.id,{
-            position : v.position
+    input?.forEach((v) => {
+        result.set(v.id, {
+            position: v.position
         })
+    })
+    return result
+}
+
+export function recreateConnectionMap(input: ConnectionMapEntry[] | undefined): Map<string, string> {
+    const result = new Map()
+    input?.forEach((v) => {
+        result.set(v.key, v.targetHandle)
     })
     return result
 }

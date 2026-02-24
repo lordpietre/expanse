@@ -6,7 +6,7 @@ Welcome to the project's roadmap! This document outlines our vision, goals, and 
 
 ## Vision
 
-Compose Craft is a community tool that is free, will be free and will forever stay free.
+Expanse is a community tool that is free, will be free and will forever stay free.
 Our goal is to make docker-compose easier for everyone and help anyone use it to document any tech stack.
 
 ---

@@ -1,6 +1,6 @@
-# Contributing to Compose Craft
+# Contributing to Expanse
 
-Thank you for your interest in contributing to Compose Craft! We welcome contributions from the community and are happy to have you on board.
+Thank you for your interest in contributing to Expanse! We welcome contributions from the community and are happy to have you on board.
 
 ## Code of Conduct
 
@@ -97,4 +97,4 @@ If you have any questions or need clarification:
 
 ## License
 
-By contributing to Compose Craft, you agree that your contributions will be licensed under its [licence](./LICENSE).
+By contributing to Expanse, you agree that your contributions will be licensed under its [licence](./LICENSE).

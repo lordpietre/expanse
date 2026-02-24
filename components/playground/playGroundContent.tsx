@@ -1,283 +1,430 @@
-import {useSearchParams} from "next/navigation";
+import React, { useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity } from "lucide-react";
+import Playground, { PlaygroundHandle } from "@/components/playground/playground";
+import { useComposeStore } from "@/store/compose";
+import useSelectionStore from "@/store/selection";
+import { useExecutionStore } from "@/store/execution";
 import useComposeIdStore from "@/store/composeId";
-import {useComposeStore} from "@/store/compose";
-import usePositionMap from "@/store/metadataMap";
-import {useEffect, useMemo, useRef, useState} from "react";
-import Playground, {PlaygroundHandle} from "@/components/playground/playground";
-import toast from "react-hot-toast";
-import {getComposeById} from "@/actions/userActions";
-import {composeMetadata, recreatePositionMap, reHydrateComposeIds} from "@/lib/metadata";
-import {Compose, Translator} from "@composecraft/docker-compose-lib";
-import {generateRandomName} from "@/lib/utils";
-import {default as NextImage} from "next/image";
-import logo from "@/assets/logo.png";
-import {Button} from "@/components/ui/button";
-import YAML from "yaml";
-import {Code, FileDown, FileUp, FlaskRound, Library, Sparkles, Image} from "lucide-react";
-import { toPng } from 'html-to-image';
-import {
-    Dialog,
-    DialogContent,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import YamlEditor from "@/components/playground/yamlEditor";
+import { Translator } from "@composecraft/docker-compose-lib";
+import YAML from "yaml";
+import { toPng } from "html-to-image";
+
+import LibraryModal from "./libraryModal";
 import EditMenu from "@/components/playground/editMenu";
-import ShareButton from "@/components/playground/shareButton";
-import IntegrateGitHubButton from "@/components/playground/integrateGitHubButton";
-import useDisableStateStore from "@/store/disabled";
-// @ts-ignore
-import { Base64UrlEncoder } from "next-base64-encoder";
-import EmbedSignin from "@/components/display/embedSignin";
-import CreateIssueModal from "@/components/playground/createIssueModal";
+import { runCompose as executeCompose, stopCompose, getComposeStatus, getComposeLogs, validateComposePorts, restartCompose } from "@/actions/dockerActions";
+import ExecutionPanel from "./executionPanel";
+import toast from "react-hot-toast";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
-interface PlayGroundContentOptions {
-    inviteMode?: boolean
-}
+import useUIStore from "@/store/ui";
+import usePositionMap from "@/store/metadataMap";
 
+import { useSearchParams } from "next/navigation";
+import { getComposeById } from "@/actions/userActions";
+import { reHydrateComposeIds, recreatePositionMap } from "@/lib/metadata";
 
-export default function PlaygroundContent(opts:PlayGroundContentOptions) {
-    const { inviteMode = false } = opts;
-    const { setState } = useDisableStateStore.getState();
-
-    useEffect(() => {
-        setState(inviteMode);
-    }, [setState, inviteMode]);
-
-    const replaceComposeOptions = useMemo(() => ({
-        disableSave: inviteMode
-    }), [inviteMode]);
-    const searchParams = useSearchParams()
-    const {setId} = useComposeIdStore()
-    const {compose,replaceCompose} = useComposeStore();
-    const {setPositionMap} = usePositionMap()
+export default function PlaygroundContent({ inviteMode = false }: { inviteMode?: boolean }) {
+    const { compose, setCompose } = useComposeStore();
+    const { id: composeId } = useComposeIdStore();
+    const { setSelectedString } = useSelectionStore();
+    const { isExecuting, setExecuting, clearStatuses, updateStatuses, setLogs } = useExecutionStore();
+    const { isLibraryOpen, setIsLibraryOpen } = useUIStore();
     const playgroundRef = useRef<PlaygroundHandle>(null);
 
-    const [errorDialog,setErroDialog] = useState(false)
-    const [rawImportedFile, setRawImportedFile] = useState("")
+    const searchParams = useSearchParams();
+    const idParam = searchParams.get('id');
 
-    const exportPlaygroundAsPNG = async () => {
-        const playgroundContainer = document.querySelector('.react-flow');
-        if (!playgroundContainer) {
-            toast.error('Playground not found');
-            return;
+    React.useEffect(() => {
+        const loadCompose = async () => {
+            if (idParam) {
+                try {
+                    const loadedCompose = await getComposeById(idParam);
+                    if (loadedCompose) {
+                        const newCompose = Translator.fromDict(loadedCompose.data);
+                        if (loadedCompose.metadata) {
+                            reHydrateComposeIds(newCompose, loadedCompose.metadata);
+                            usePositionMap.getState().setPositionMap(recreatePositionMap(loadedCompose.metadata.positionMap));
+                            if (loadedCompose.metadata.connectionMap) {
+                                // Rehydrate connection map as well
+                                const connections = new Map<string, string>(Object.entries(loadedCompose.metadata.connectionMap) as [string, string][]);
+                                usePositionMap.getState().setConnectionMap(connections);
+                            }
+                        }
+                        await setCompose(() => newCompose);
+                        useComposeIdStore.getState().setId(idParam);
+
+                        // Wait for nodes to be rendered and layed out if there was no metadata
+                        if (!loadedCompose.metadata) {
+                            setTimeout(() => {
+                                playgroundRef.current?.onLayout("TB");
+                            }, 100);
+                        }
+                    }
+                } catch (error) {
+                    toast.error("Failed to load compose.");
+                    console.error(error);
+                }
+            }
+        };
+
+        loadCompose();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [idParam]);
+
+    React.useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (isExecuting && composeId) {
+            const fetchData = async () => {
+                const [statuses, logsRes] = await Promise.all([
+                    getComposeStatus(composeId),
+                    getComposeLogs(composeId)
+                ]);
+
+                if (statuses) updateStatuses(statuses);
+                if (logsRes.success) setLogs(logsRes.logs || "");
+            };
+
+            fetchData();
+            interval = setInterval(fetchData, 3000);
         }
 
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isExecuting, composeId, updateStatuses, setLogs]);
+
+    const handleExecute = async () => {
+        if (!composeId) {
+            toast.error("Save your compose first");
+            return;
+        }
         try {
+            setExecuting(true);
+            const translator = new Translator(compose);
+            let yaml = YAML.stringify(translator.toDict());
 
-            // Hide controls temporarily
-            playgroundRef.current?.setHideControls(true);
-            
-            // Wait a frame for the DOM to update
-            await new Promise(resolve => setTimeout(resolve, 50));
-            
-            const dataUrl = await toPng(playgroundContainer as HTMLElement, {
-                backgroundColor: undefined,
-                quality: 1.0,
-                pixelRatio: 2,
-                cacheBust: true
-            });
+            // Port Validation Check
+            const portValidation = await validateComposePorts(yaml);
+            if (portValidation.hasChanges) {
+                // Apply reassignments to the store
+                await setCompose((currentCompose) => {
+                    Object.entries(portValidation.reassignments).forEach(([serviceName, changes]) => {
+                        const service = Array.from(currentCompose.services).find(s => s.name === serviceName);
+                        if (service && service.ports) {
+                            changes.forEach(change => {
+                                const portMapping = service.ports?.find(p => p.hostPort === change.old);
+                                if (portMapping) {
+                                    portMapping.hostPort = change.new;
+                                }
+                            });
+                        }
+                    });
+                });
 
-            // Show controls again
-            playgroundRef.current?.setHideControls(false);
+                // Generate new YAML with the updated compose object
+                yaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
 
-            const link = document.createElement('a');
-            link.download = `playground-${compose.name || 'export'}.png`;
-            link.href = dataUrl;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+                toast(() => (
+                    <div className="flex flex-col gap-1">
+                        <span className="font-bold text-slate-900">Ports Reassigned</span>
+                        <span className="text-xs text-slate-500">Some host ports were already in use and have been randomly assigned to free ports.</span>
+                    </div>
+                ), { duration: 6000, icon: '🔄' });
+            }
 
-            toast.success('Playground exported as PNG!');
+            let retries = 0;
+            let success = false;
+            let currentYaml = yaml;
+
+            while (retries < 5 && !success) {
+                const res = await executeCompose(composeId, currentYaml);
+                if (res.success) {
+                    toast.success(
+                        (t) => (
+                            <div className="flex flex-col gap-1 w-full min-w-[200px]">
+                                <span className="font-bold">Compose execution started</span>
+                                {Array.from(useComposeStore.getState().compose.services).some(s => s.ports && s.ports.length > 0) && (
+                                    <div className="flex flex-col gap-1 mt-1 border-t border-slate-100 pt-2">
+                                        <span className="text-[10px] uppercase font-bold text-slate-400">Exposed Ports</span>
+                                        {Array.from(useComposeStore.getState().compose.services).filter(s => s.ports && s.ports.length > 0).map(s => (
+                                            <div key={s.name} className="flex justify-between items-center text-xs">
+                                                <span className="text-slate-600 font-medium">{s.name}</span>
+                                                <div className="flex gap-1">
+                                                    {s.ports!.map(p => (
+                                                        <span key={`${p.hostPort}`} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
+                                                            {p.hostPort}:{p.containerPort}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ),
+                        { duration: 8000 }
+                    );
+                    success = true;
+                } else if (res.collisionPort) {
+                    toast.error(`Host port ${res.collisionPort} is currently occupied natively. Reassigning...`);
+
+                    await setCompose((currentCompose) => {
+                        currentCompose.services.forEach(service => {
+                            service.ports?.forEach(portMapping => {
+                                if (portMapping.hostPort === res.collisionPort) {
+                                    portMapping.hostPort += 1; // Increment and retry
+                                }
+                            });
+                        });
+                    });
+                    currentYaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
+                    retries++;
+                } else {
+                    toast.error(res.error || "Failed to start compose");
+                    setExecuting(false);
+                    return;
+                }
+            }
+
+            if (!success) {
+                toast.error("Exceeded maximum retries for port fixing.");
+                setExecuting(false);
+            }
         } catch (error) {
-            console.error('Error exporting playground as PNG:', error);
-            toast.error('Failed to export playground as PNG');
-            // Make sure controls are visible again even if there's an error
-            playgroundRef.current?.setHideControls(false);
+            toast.error("An unexpected error occurred");
+            setExecuting(false);
         }
     };
 
-    useEffect( () => {
-        if(inviteMode){
-            return //prevent any save mechanism
-        }
-        const id = searchParams.get('id')
-        const data = searchParams.get('data')
-        if(id){
-            getComposeById(id).then((r)=>{
-                const metadta: composeMetadata = r?.metadata
-                const data = r?.data
-                const id = r?.id
-                if(id){
-                    setId(id)
+    const handleRestart = async () => {
+        if (!composeId) return;
+        setExecuting(true);
+        clearStatuses();
+
+        let yaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
+
+        try {
+            let retries = 0;
+            let success = false;
+            let currentYaml = yaml;
+
+            while (retries < 5 && !success) {
+                const res = await restartCompose(composeId, currentYaml);
+                if (res.success) {
+                    toast.success(
+                        (t) => (
+                            <div className="flex flex-col gap-1 w-full min-w-[200px]">
+                                <span className="font-bold">Compose restarted</span>
+                                {Array.from(useComposeStore.getState().compose.services).some(s => s.ports && s.ports.length > 0) && (
+                                    <div className="flex flex-col gap-1 mt-1 border-t border-slate-100 pt-2">
+                                        <span className="text-[10px] uppercase font-bold text-slate-400">Exposed Ports</span>
+                                        {Array.from(useComposeStore.getState().compose.services).filter(s => s.ports && s.ports.length > 0).map(s => (
+                                            <div key={s.name} className="flex justify-between items-center text-xs">
+                                                <span className="text-slate-600 font-medium">{s.name}</span>
+                                                <div className="flex gap-1">
+                                                    {s.ports!.map(p => (
+                                                        <span key={`${p.hostPort}`} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
+                                                            {p.hostPort}:{p.containerPort}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ),
+                        { duration: 8000 }
+                    );
+                    success = true;
+                } else if (res.collisionPort) {
+                    toast.error(`Host port ${res.collisionPort} is currently occupied natively. Reassigning...`);
+
+                    await setCompose((currentCompose) => {
+                        currentCompose.services.forEach(service => {
+                            service.ports?.forEach(portMapping => {
+                                if (portMapping.hostPort === res.collisionPort) {
+                                    portMapping.hostPort += 1; // Increment and retry
+                                }
+                            });
+                        });
+                    });
+                    currentYaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
+                    retries++;
+                } else {
+                    toast.error(res.error || "Failed to restart compose");
+                    setExecuting(false);
+                    return;
                 }
-                if(data){
-                    const savedCompose = Translator.fromDict(data)
-                    if(metadta){
-                        reHydrateComposeIds(savedCompose,metadta)
-                        setPositionMap(recreatePositionMap(metadta.positionMap))
-                    }
-                    replaceCompose(savedCompose,replaceComposeOptions)
-                    if(!metadta){
-                        setTimeout(()=>playgroundRef.current?.onLayout("TB"),500)
-                    }
-                    console.debug("reloaded a previous docker compose")
-                }
-            })
-        }else{
-            setId(undefined)
-            replaceCompose(new Compose({ name: generateRandomName() }),replaceComposeOptions)
+            }
+            if (!success) {
+                toast.error("Exceeded max retries for port fixing.");
+                setExecuting(false);
+            }
+        } catch (error) {
+            toast.error("An unexpected error occurred");
+            setExecuting(false);
         }
-        if(data){
-            const base64UrlEncoder = new Base64UrlEncoder();
-            const byteArrayPhrase = base64UrlEncoder.encode(data);
-            const decodedPhrase = new TextDecoder().decode(byteArrayPhrase)
-            const parsedObj = JSON.parse(decodedPhrase)
-            const actualObj = JSON.parse(parsedObj)  // Parse twice!
-            const savedCompose = Translator.fromDict(actualObj?.compose)
-            reHydrateComposeIds(savedCompose,actualObj.metadata)
-            setPositionMap(recreatePositionMap(actualObj.metadata.positionMap))
-            replaceCompose(savedCompose,replaceComposeOptions)
+    };
+
+    const handleStop = async () => {
+        if (!composeId) return;
+        try {
+            const res = await stopCompose(composeId);
+            if (res.success) {
+                toast.success("Compose stopped");
+                setExecuting(false);
+                clearStatuses();
+            } else {
+                toast.error(res.error || "Failed to stop compose");
+            }
+        } catch (error) {
+            toast.error("An unexpected error occurred");
         }
-    }, [inviteMode, replaceCompose, replaceComposeOptions, searchParams, setId, setPositionMap]);
+    };
+
+    const exportPlaygroundAsPNG = async () => {
+        const playgroundElement = document.querySelector('.react-flow__renderer') as HTMLElement;
+        if (playgroundElement) {
+            const dataUrl = await toPng(playgroundElement, { backgroundColor: '#f8fafc' });
+            const link = document.createElement('a');
+            link.download = 'composecraft-playground.png';
+            link.href = dataUrl;
+            link.click();
+        }
+    };
 
     return (
-        <section className="w-full flex flex-col h-full max-h-full">
-            <CreateIssueModal open={errorDialog} close={()=>{setErroDialog(false)}} content={rawImportedFile} />
-            <div className="items-center border-b-2 border-slate-300 flex flex-row py-4 px-10">
-                <button className='' onClick={() => {
-                    window.location.href = inviteMode ? "/" : "/dashboard"
-                }}>
-                    <NextImage src={logo} className="h-14 object-contain w-fit" alt="logo"/>
-                </button>
-                {inviteMode &&
-                    <div className="ml-10 flex flex-row gap-10 justify-center items-center">
-                        <div className="flex flex-row gap-2 font-medium">
-                            <FlaskRound className="stroke-[#1A96F8]"/>
-                            Try mode
-                        </div>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <button
-                                   
-                                    className="relative inline-flex items-center justify-center gap-2 px-8 py-2 font-medium transition-all duration-200 ease-in-out rounded-lg bg-gradient-to-r from-[#1A96F8] via-[#3AA8FF] to-[#62BEFF] text-white hover:opacity-90 hover:px-10 focus:outline-none focus:ring-2 focus:ring-[#1A96F8]/50 focus:ring-offset-2 shadow-lg"
-                                >
-                                    <Sparkles className="w-5 h-5"/>
-                                    <span className="relative">Create an account</span>
-                                </button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <div>
-                                    <EmbedSignin redirectToPlayGround={true}/>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                }
-                <div className="flex max-h-full flex-row gap-3 ml-auto">
-                    <Button onClick={async () => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = '.yaml,.yml';
+        <section className="flex flex-col h-screen bg-[hsl(222,47%,5%)] relative overflow-hidden">
+            {/* Mesh Background */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none mesh-gradient-blue" />
 
-                        input.onchange = async (event) => {
-                            const target = event.target as HTMLInputElement;
-                            const file = target.files?.[0];
-                            if (file) {
-                                const content = await file.text();
-                                try {
-                                    setRawImportedFile(content)
-                                    const parsedYaml = YAML.parse(content); // First parse the YAML content
-                                    replaceCompose(Translator.fromDict(parsedYaml), replaceComposeOptions)
-                                    setTimeout(() => {
-                                        playgroundRef.current?.onLayout("TB")
-                                    }, 1000)
-                                } catch (error) {
-                                    console.error('Error reading file:', error);
-                                    setErroDialog(true)
-                                }
-                            }
-                            // Clean up
-                            input.remove();
-                        };
-                        input.click();
-                    }} variant="secondary" className="bg-slate-200 flex gap-2">
-                        <FileUp height={20}/>
-                        Import file
+            <div className="flex z-10 p-3 px-8 border-b border-white/5 relative justify-between backdrop-blur-3xl bg-[#0a0d14]/80 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+                <div className="flex gap-4 items-center pl-8">
+                    <Button variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm font-bold flex gap-2 transition-all">
+                        <FileUp className="w-4 h-4 text-blue-400" /> Import
                     </Button>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="secondary"
-                                    className="bg-slate-200 flex gap-2">
-                                <Code height={20}/>
-                                View Code
+                            <Button variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm font-bold flex gap-2 transition-all">
+                                <Code className="w-4 h-4 text-indigo-400" /> Code
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="min-w-[70vw]">
-                            <DialogTitle>
-                                docker-compose.yaml
-                            </DialogTitle>
-                            <div>
-                                <YamlEditor/>
+                        <DialogContent aria-describedby={undefined} className="max-w-[70vw] h-[80vh] flex flex-col p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
+                            <DialogTitle className="sr-only">YAML Details</DialogTitle>
+                            <div className="flex-grow rounded-2xl overflow-hidden glass shadow-2xl relative">
+                                <div className="absolute inset-0 bg-slate-900" />
+                                <div className="absolute top-0 left-0 right-0 h-14 bg-slate-900/50 backdrop-blur-xl border-b border-white/10 z-10 flex items-center px-6">
+                                    <div className="flex gap-2 mr-4">
+                                        <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                                        <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                                        <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                                    </div>
+                                    <h3 className="font-mono text-sm text-slate-300">docker-compose.yaml</h3>
+
+                                    <Button
+                                        variant="default"
+                                        size="sm"
+                                        className="ml-auto bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                        onClick={() => {
+                                            const yaml = YAML.stringify(new Translator(compose).toDict());
+                                            const blob = new Blob([yaml], { type: 'text/yaml' });
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = 'docker-compose.yaml';
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                            toast.success('File downloaded successfully');
+                                        }}
+                                    >
+                                        <FileDown className="w-4 h-4 mr-2" />
+                                        Download
+                                    </Button>
+                                </div>
+                                <div className="pt-14 h-full relative z-0">
+                                    <YamlEditor />
+                                </div>
                             </div>
                         </DialogContent>
                     </Dialog>
-                    <Button className="bg-slate-200 flex gap-2"
-                            variant="secondary" onClick={() => playgroundRef.current?.onLayout("TB")}>
-                        Auto layout
+                    <Button
+                        onClick={() => playgroundRef.current?.onLayout("TB")}
+                        variant="secondary"
+                        className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm transition-all"
+                    >
+                        <Zap className="w-4 h-4 text-amber-400 mr-2" />
+                        <span className="font-bold">Layout</span>
                     </Button>
-                    <Button 
-                        onClick={exportPlaygroundAsPNG}
-                        variant="secondary" 
-                        className="bg-slate-200 flex gap-2">
-                        <Image height={20}/>
-                        Export PNG
-                    </Button>
-                    <ShareButton inviteMode={inviteMode}/>
-                    {process.env.NEXT_PUBLIC_DISABLE_GITHUB_INTEGRATION !== '1' && (
-                        <IntegrateGitHubButton inviteMode={inviteMode}/>
-                    )}
-                    <Button variant="secondary" className="bg-slate-200">
-                        ...
+                    <Link href="/global-dashboard">
+                        <Button variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm transition-all" >
+                            <Activity className="w-4 h-4 text-rose-500 mr-2" />
+                            <span className="font-bold">Dashboard</span>
+                        </Button>
+                    </Link>
+                </div>
+
+                <div className="flex gap-3">
+                    <Button onClick={exportPlaygroundAsPNG} variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm transition-all">
+                        <Image className="w-4 h-4 text-emerald-500" />
                     </Button>
                 </div>
             </div>
-            <div className="w-full flex-grow flex flex-row pb-5">
-                <span className="w-3/4 m-5 mb-0 rounded-xl border-2 ">
-                    <Playground ref={playgroundRef}/>
-                </span>
-                <div className="w-1/4 flex flex-col mr-5 h-full justify-between">
-                    <div className="pt-5">
-                        <EditMenu/>
+
+            <div className="flex-grow flex flex-row p-6 gap-6 overflow-hidden">
+                <div className="flex-grow bg-[#070b0f]/60 rounded-2xl overflow-hidden relative shadow-2xl border border-white/5">
+                    <Playground ref={playgroundRef} />
+                </div>
+
+                <div className="w-[400px] flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-2xl">
+                        <EditMenu />
                     </div>
-                    <div className="flex-col flex gap-2">
-                    <Button type="button" onClick={() => {
-                            const translator = new Translator(compose)
-                            const result = YAML.stringify(translator.toDict())
-                            const blob = new Blob([result], { type: 'text/yaml' });
-                            const url = URL.createObjectURL(blob);
-                            const link = document.createElement('a');
-                            link.href = url;
-                            link.download = 'docker-compose.yaml';
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            URL.revokeObjectURL(url);
-                        }} className="w-full flex gap-2">
-                            <FileDown height={20} />
-                            Download compose
-                        </Button>
-                        <Button onClick={()=>toast(
-                            "This feature is not already released",{
-                                icon: "⚠️"
-                            }
-                        )} variant="secondary" className="w-full flex gap-2 bg-slate-200">
-                            <Library />
-                            Library
-                        </Button>
+
+                    <div className="bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-5 shadow-2xl flex flex-col gap-4 mt-auto">
+                        <div className="flex flex-col gap-3">
+                            <Button
+                                onClick={isExecuting ? handleStop : handleExecute}
+                                className={cn(
+                                    "w-full py-5 rounded-2xl font-black text-base uppercase tracking-widest transition-all duration-500 scale-100 active:scale-95 shadow-2xl relative overflow-hidden group",
+                                    isExecuting ? "bg-rose-500 hover:bg-rose-600 shadow-rose-500/30" : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/30"
+                                )}
+                            >
+                                <div className="absolute inset-0 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity animate-liquid" />
+                                <div className="relative z-10 flex items-center justify-center gap-3">
+                                    {isExecuting ? <Square className="fill-white" /> : <Play className="fill-white" />}
+                                    <span>{isExecuting ? "Detener" : "Ejecutar"}</span>
+                                </div>
+                            </Button>
+
+                            {isExecuting && (
+                                <Button
+                                    onClick={handleRestart}
+                                    variant="outline"
+                                    className="w-full py-5 rounded-xl font-black text-sm uppercase tracking-widest transition-all duration-300 hover:bg-amber-500/10 border-amber-500/30 text-amber-400 relative overflow-hidden group"
+                                >
+                                    <div className="relative z-10 flex items-center justify-center gap-3">
+                                        <Zap className="fill-amber-500" />
+                                        <span>Reiniciar</span>
+                                    </div>
+                                </Button>
+                            )}
+
+                            {isExecuting && (
+                                <div className="mt-2 text-white">
+                                    <ExecutionPanel />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
+            <LibraryModal open={isLibraryOpen} onOpenChange={setIsLibraryOpen} />
         </section>
     );
 }

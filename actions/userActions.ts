@@ -1,84 +1,92 @@
 'use server'
 
-import client from "@/lib/mongodb"
-import {z} from "zod";
-import {zfd} from "zod-form-data";
+import { getDb } from "@/lib/mongodb"
+import { z } from "zod";
+import { zfd } from "zod-form-data";
 import bcrypt from "bcryptjs";
-import {registerUserToBrevo, sendRecoverPassdEmail, updateUserList} from "@/lib/brevo";
-import {cookies} from 'next/headers'
-import {redirect} from "next/navigation";
-import {SignJWT} from "jose";
-import {ObjectId} from "bson";
-import {composeMetadata} from "@/lib/metadata";
-import {revalidatePath} from "next/cache";
-import {ensureAuth} from "@/lib/auth";
-import {generateRandomString, isWithinOneDay} from "@/lib/utils";
-// @ts-ignore
-import { Base64UrlDecoder } from 'next-base64-encoder';
+import { registerUserToBrevo, sendRecoverPassdEmail, updateUserList } from "@/lib/brevo";
+import { cookies } from 'next/headers'
+import { redirect } from "next/navigation";
+import { SignJWT } from "jose";
+import { ObjectId } from "bson";
+import { composeMetadata } from "@/lib/metadata";
+import { revalidatePath } from "next/cache";
+import { ensureAuth } from "@/lib/auth";
+import { generateRandomString, isWithinOneDay } from "@/lib/utils";
 
-export async function createOrLoginUser(email:string,data:any):Promise<string>{
-    await client.connect()
-    const db = client.db("compose_craft")
-    const collection = db.collection("users")
-    const userExist = await collection.findOne({email: email})
-    const secretKey = process.env.SECRET_KEY
+/** 30-day expiry used consistently for both the JWT payload and the cookie */
+const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
+const SESSION_DURATION_STR = '30d';
+
+export async function createOrLoginUser(email: string, data: any): Promise<string> {
+    // Validate secret key before any DB operation
+    const secretKey = process.env.SECRET_KEY;
+    if (!secretKey) {
+        throw new Error("Server configuration error: SECRET_KEY is not set.");
+    }
+
+    const db = await getDb();
+    const collection = db.collection("users");
+    const userExist = await collection.findOne({ email: email });
+
     if (userExist) {
-        // Compare the hashed password with the input password
-        const passwordMatch = await bcrypt.compare(data.password, userExist.password);
-
-        // If the password doesn't match, throw an error
-        if (!passwordMatch) {
-            throw new Error("Invalid email or password");
+        // Skip password check for OAuth users (external field is set, no password stored)
+        if (!data.external) {
+            const passwordMatch = await bcrypt.compare(data.password, userExist.password);
+            if (!passwordMatch) {
+                throw new Error("Invalid email or password");
+            }
         }
 
-        const token = await new SignJWT({userId: userExist._id, email:userExist.email})
-            .setProtectedHeader({alg: 'HS256'}) // Algorithm for signing the JWT
-            .setExpirationTime('31d') // Set the expiration time to 31 days
-            .sign(new TextEncoder().encode(secretKey)); // Sign the JWT with the secret key
+        const token = await new SignJWT({ userId: userExist._id, email: userExist.email })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime(SESSION_DURATION_STR)
+            .sign(new TextEncoder().encode(secretKey));
 
-        // Set the JWT token in an HTTP-only cookie
         (await cookies()).set({
             name: "token",
             value: token,
             httpOnly: true,
             path: "/",
-            expires: new Date(Date.now() + 29 * 24 * 60 * 60 * 1000),
-        })
+            expires: new Date(Date.now() + SESSION_DURATION_MS),
+        });
 
-        return userExist._id.toString()
+        return userExist._id.toString();
     }
-    data.password = await bcrypt.hash(data.password, 10);
-    const result = await collection.insertOne({email: email, ...data, createdAt: new Date().getTime()});
-    if (!secretKey) {
-        throw new Error("error on our admin system")
+
+    // New user: hash password only if provided (not OAuth)
+    if (data.password) {
+        data.password = await bcrypt.hash(data.password, 10);
     }
+
+    const result = await collection.insertOne({ email: email, ...data, createdAt: new Date().getTime() });
+
     if (result.insertedId) {
-        const token = await new SignJWT({userId: result.insertedId, email:email})
-            .setProtectedHeader({alg: 'HS256'}) // Algorithm for signing the JWT
-            .setExpirationTime('31d') // Set the expiration time to 31 days
-            .sign(new TextEncoder().encode(secretKey)); // Sign the JWT with the secret key
+        const token = await new SignJWT({ userId: result.insertedId, email: email })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime(SESSION_DURATION_STR)
+            .sign(new TextEncoder().encode(secretKey));
 
-        // Set the JWT token in an HTTP-only cookie
         (await cookies()).set({
             name: "token",
             value: token,
             httpOnly: true,
-            path: "/"
-        })
+            path: "/",
+            expires: new Date(Date.now() + SESSION_DURATION_MS),
+        });
 
-        return result.insertedId.toString()
+        return result.insertedId.toString();
     }
-    return ""
+
+    return "";
 }
 
-export async function registerUser(email:string, password:string, company:string, terms:boolean,data:string) {
-    if(process.env.DISABLE_SIGNUP){
+export async function registerUser(email: string, password: string, company: string, terms: boolean, data: string) {
+    if (process.env.DISABLE_SIGNUP) {
         console.error("Signup is disabled")
         throw new Error("Signup is disabled")
     }
-    // eslint-disable-next-line no-useless-catch
-    await client.connect()
-    const brevoId = await registerUserToBrevo({email: email})
+    const brevoId = await registerUserToBrevo({ email: email })
     const user = {
         email: email,
         password: password,
@@ -86,112 +94,85 @@ export async function registerUser(email:string, password:string, company:string
         termsAccepted: !!terms,
         brevoId: brevoId
     }
-    await createOrLoginUser(user.email,user)
+    await createOrLoginUser(user.email, user)
     const parsedData = JSON.parse(data)
-    if(Object.keys(parsedData)?.length === 0){
+    if (Object.keys(parsedData)?.length === 0) {
         return ""
     }
-    if(data){
-        const byteArrayPhrase = new TextEncoder().encode(JSON.stringify(parsedData));
-        const base64UrlDecoder = new Base64UrlDecoder();
-        const base64UrlPhrase = base64UrlDecoder.decode(byteArrayPhrase);
-        return base64UrlPhrase
+    if (data) {
+        // Use native Buffer API instead of external Base64UrlDecoder dependency
+        return Buffer.from(JSON.stringify(parsedData)).toString('base64url')
     }
     return true
 }
 
-export const registerCompose = async (compose: object,metadata:composeMetadata, id?: string | undefined) => {
-    const payload = await ensureAuth()
-    await client.connect()
-    const db = client.db("compose_craft")
-    const user_collection = db.collection("users")
+export const registerCompose = async (compose: object, metadata: composeMetadata, id?: string | undefined) => {
+    const payload = await ensureAuth();
+    const db = await getDb();
     const userId = new ObjectId(payload.userId as string);
-    const user = await user_collection.findOne({_id: userId});
-    const collection = db.collection("composes")
-    let result = ""
+    const collection = db.collection("composes");
+    let result = "";
     if (id) {
-        console.debug('update document')
-        // Update existing document
-        const objectId = new ObjectId(id); // Convert `id` to ObjectId
+        const objectId = new ObjectId(id);
         const updateResult = await collection.updateOne(
-            {_id: objectId},               // Filter by document ID
-            {
-                $set: {
-                    data: compose,
-                    metadata: metadata,
-                    updatedAt: Date.now()
-                }
-            } // Fields to update
+            { _id: objectId, userId: userId }, // scope to owner
+            { $set: { data: compose, metadata: metadata, updatedAt: Date.now() } }
         );
         if (updateResult.matchedCount > 0) {
             result = objectId.toString();
         } else {
-            throw new Error("Could not update document");
+            throw new Error("Could not update document: not found or not owned by user.");
         }
     } else {
-        console.debug('create document')
         const r = await collection.insertOne({
-            userId: user?._id,
+            userId: userId,
             data: compose,
             metadata: metadata,
             createdAt: Date.now(),
             updatedAt: Date.now()
         });
-        result = r.insertedId.toString()
+        result = r.insertedId.toString();
     }
-    if (result) {
-        return result
-    } else {
-        throw Error("could not register")
-    }
+    if (result) return result;
+    throw Error("could not register");
 };
 
-export const registerComposeWithoutMetadata = async (compose: object,userId:ObjectId) => {
-    await client.connect()
-    const db = client.db("compose_craft")
-    const user_collection = db.collection("users")
-    const user = await user_collection.findOne({_id: userId});
-    const collection = db.collection("composes")
-    let result = ""
+export const registerComposeWithoutMetadata = async (compose: object, userId: ObjectId) => {
+    const db = await getDb();
+    const collection = db.collection("composes");
     const r = await collection.insertOne({
-            userId: user?._id,
-            data: compose,
-            metadata: null,
-            createdAt: Date.now(),
-            updatedAt: Date.now()});
-    result = r.insertedId.toString()
-    if (result) {
-        return result
-    } else {
-        throw Error("could not register")
-    }
+        userId: userId,
+        data: compose,
+        metadata: null,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    });
+    const result = r.insertedId.toString();
+    if (result) return result;
+    throw Error("could not register");
 };
 
 export const getAllMyComposeOrderByEditDate = async () => {
-    const payload = await ensureAuth()
-
-    const cli = await client.connect();
-    const db = cli.db("compose_craft");
+    const payload = await ensureAuth();
+    const db = await getDb();
     const collection = db.collection("composes");
-
-    // Convert user ID from JWT payload to ObjectId
     const userId = new ObjectId(payload.userId as string);
 
     try {
-        // Find all documents for the user, sort by updatedAt in descending order
         const composes = await collection
-            .find({userId: userId})
-            .sort({updatedAt: -1})
+            .find({ userId: userId })
+            .sort({ updatedAt: -1 })
             .toArray();
 
         return composes.map(compose => ({
             id: compose._id.toString(),
             data: compose.data,
+            metadata: compose.metadata,
             createdAt: compose.createdAt,
             updatedAt: compose.updatedAt
         }));
     } catch (error) {
-        console.error(error)
+        console.error(error);
         throw new Error("Failed to fetch composes");
     }
 };
@@ -199,129 +180,93 @@ export const getAllMyComposeOrderByEditDate = async () => {
 export async function loginUser(prevState: any, formData: FormData) {
     const loginSchema = zfd.formData({
         email: z.string().email(),
-        password: z.string().min(6).max(100)
+        password: z.string().min(6).max(100),
+        data: z.string().optional()
     });
 
     try {
-        const { email, password } = loginSchema.parse({
+        const secretKey = process.env.SECRET_KEY;
+        if (!secretKey) return { error: "Server configuration error." };
+
+        const { email, password, data } = loginSchema.parse({
             email: formData.get('email'),
-            password: formData.get('password')
+            password: formData.get('password'),
+            data: formData.get('data') || undefined
         });
 
-        await client.connect();
-        const db = client.db("compose_craft");
-
-        // Find the user in the database by email
+        const db = await getDb();
         const collection = db.collection("users");
-        const user = await collection.findOne({email: email});
+        const user = await collection.findOne({ email: email });
 
-        // If the user doesn't exist, throw an error
-        if (!user) {
-            throw new Error("Invalid email or password");
-        }
+        if (!user) throw new Error("Invalid email or password");
 
-        // Compare the hashed password with the input password
         const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) throw new Error("Invalid email or password");
 
-        // If the password doesn't match, throw an error
-        if (!passwordMatch) {
-            throw new Error("Invalid email or password");
-        }
-
-        const secretKey = process.env.SECRET_KEY;
-        if (!secretKey) {
-            return {failure: "error on our admin system"};
-        }
-
-        // Generate a JWT token upon successful login
-        const token = await new SignJWT({userId: user._id, email: user.email})
-            .setProtectedHeader({alg: 'HS256'})
-            .setExpirationTime('31d') // Set token expiration to 31 days
+        const token = await new SignJWT({ userId: user._id, email: user.email })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime(SESSION_DURATION_STR)
             .sign(new TextEncoder().encode(secretKey));
 
-        // Set the JWT token in an HTTP-only cookie
         (await cookies()).set({
             name: "token",
-            expires: new Date(Date.now() + 29 * 24 * 60 * 60 * 1000),
             value: token,
+            expires: new Date(Date.now() + SESSION_DURATION_MS),
             httpOnly: true,
-            path: "/"
+            path: "/",
         });
 
-        // Return success response instead of redirecting
+        if (data) {
+            const parsedData = JSON.parse(data);
+            if (Object.keys(parsedData)?.length > 0) {
+                const encoded = Buffer.from(JSON.stringify(parsedData)).toString('base64url');
+                return { success: true, data: encoded };
+            }
+        }
+
         return { success: true };
 
     } catch (e) {
-        if (e instanceof Error) {
-            return { error: e.message };
-        }
+        if (e instanceof Error) return { error: e.message };
         return { error: "An unknown error occurred" };
     }
 }
 
-export async function getApiToken(email:string,password:string):Promise<string>{
-    // eslint-disable-next-line no-useless-catch
-    try {
-        await client.connect()
-        const db = client.db("compose_craft")
+export async function getApiToken(email: string, password: string): Promise<string> {
+    const secretKey = process.env.SECRET_KEY;
+    if (!secretKey) throw new Error("Server configuration error.");
 
-        // Find the user in the database by email
-        const collection = db.collection("users")
-        const user = await collection.findOne({email: email});
+    const db = await getDb();
+    const collection = db.collection("users");
+    const user = await collection.findOne({ email: email });
 
-        // If the user doesn't exist, throw an error
-        if (!user) {
-            throw new Error("Invalid email or password");
-        }
+    if (!user) throw new Error("Invalid email or password");
 
-        // Compare the hashed password with the input password
-        const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) throw new Error("Invalid email or password");
 
-        // If the password doesn't match, throw an error
-        if (!passwordMatch) {
-            throw new Error("Invalid email or password");
-        }
+    const token = await new SignJWT({ userId: user._id, email: user.email })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setExpirationTime(SESSION_DURATION_STR)
+        .sign(new TextEncoder().encode(secretKey));
 
-        const secretKey = process.env.SECRET_KEY
-        if (!secretKey) {
-            throw new Error("error on our admin system")
-        }
-
-        // Generate a JWT token upon successful login
-        const token = await new SignJWT({userId: user._id, email: user.email})
-            .setProtectedHeader({alg: 'HS256'})
-            .setExpirationTime('31d') // Set token expiration to 31 days
-            .sign(new TextEncoder().encode(secretKey));
-
-        return token.toString()
-    } catch (e) {
-        throw e;
-    }
+    return token;
 }
 
 export const getComposeById = async (composeId: string) => {
-    const payload = await ensureAuth()
-
-    await client.connect();
-    const db = client.db("compose_craft");
+    const payload = await ensureAuth();
+    const db = await getDb();
     const collection = db.collection("composes");
-
-    // Convert user ID from JWT payload and compose ID to ObjectId
     const userId = new ObjectId(payload.userId as string);
 
     try {
-        // Convert the composeId string to ObjectId
         const compose = await collection.findOne({
             _id: new ObjectId(composeId),
-            userId: userId  // Ensure the compose belongs to the authenticated user
+            userId: userId
         });
 
-        // Return undefined if no compose is found
-        if (!compose) {
-            return undefined;
-        }
+        if (!compose) return undefined;
 
-        // Return the formatted compose data
         return {
             id: compose._id.toString(),
             data: compose.data,
@@ -336,22 +281,13 @@ export const getComposeById = async (composeId: string) => {
 };
 
 export const getComposeByIdPublic = async (composeId: string) => {
-    await client.connect();
-    const db = client.db("compose_craft");
+    const db = await getDb();
     const collection = db.collection("composes");
 
     try {
-        // Convert the composeId string to ObjectId
-        const compose = await collection.findOne({
-            _id: new ObjectId(composeId)
-        });
+        const compose = await collection.findOne({ _id: new ObjectId(composeId) });
+        if (!compose) return undefined;
 
-        // Return undefined if no compose is found
-        if (!compose) {
-            return undefined;
-        }
-
-        // Return the formatted compose data
         return {
             id: compose._id.toString(),
             data: compose.data,
@@ -366,102 +302,60 @@ export const getComposeByIdPublic = async (composeId: string) => {
 };
 
 export const getMyInfos = async () => {
-    const payload = await ensureAuth()
-
-    await client.connect();
-    const db = client.db("compose_craft");
+    const payload = await ensureAuth();
+    const db = await getDb();
     const collection = db.collection("users");
-
-    // Convert user ID from JWT payload and compose ID to ObjectId
     const userId = new ObjectId(payload.userId as string);
 
     try {
-        const user = await collection.findOne({
-            _id: userId
-            },{ projection: { email: 1 }
-        });
-
-        if (!user) {
-            return undefined;
-        }
-
-        return {
-            email: user.email
-        }
+        const user = await collection.findOne({ _id: userId }, { projection: { email: 1 } });
+        if (!user) return undefined;
+        return { email: user.email };
     } catch (error) {
         console.error(error);
-        throw new Error("Failed to fetch compose");
+        throw new Error("Failed to fetch user info");
     }
 };
 
 export const deleteUser = async () => {
-        // eslint-disable-next-line no-useless-catch
-        try {
-            await client.connect();
-            const db = client.db("compose_craft");
+    const payload = await ensureAuth();
+    const db = await getDb();
+    const userId = new ObjectId(payload.userId as string);
 
-            // Find the user in the database by email from the cookie
-            const payload = await ensureAuth()
-            const userId = new ObjectId(payload.userId as string);
+    const userCollection = db.collection("users");
+    const composeCollection = db.collection("composes");
 
-            const userCollection = db.collection("users");
+    // Anonymize user's composes
+    await composeCollection.updateMany({ userId: userId }, { $set: { userId: null } });
 
-            // Set all the user's compose userId to null
-            const composeCollection = db.collection("composes");
-            await composeCollection.updateMany(
-                { userId: userId },
-                { $set: { userId: null } }
-            );
+    const user = await userCollection.findOne({ _id: userId }, { projection: { email: 1 } });
+    if (user?.email) {
+        await updateUserList(user.email, [], [9]);
+    }
 
-            const user = await userCollection.findOne({
-                _id: userId
-            },{ projection: { email: 1 }
-            });
-
-            if (user?.email) {
-                await updateUserList(user.email,[],[9])
-            }
-
-            // Delete the user from the database
-            await userCollection.deleteOne({ _id: userId });
-            (await cookies()).delete("token")
-            console.log("account " + userId.toString() + " deleted")
-            redirect("https://form.composecraft.com/s/cm40i9zod000hwl0z6005uvwp")
-        } catch (e) {
-            throw e;
-        }
+    await userCollection.deleteOne({ _id: userId });
+    (await cookies()).delete("token");
+    console.log("account " + userId.toString() + " deleted");
+    redirect("https://form.composecraft.com/s/cm40i9zod000hwl0z6005uvwp");
 }
 
 export const logout = async () => {
-    // eslint-disable-next-line no-useless-catch
-    try {
-        await client.connect();
-        (await cookies()).delete("token")
-        redirect("/")
-    } catch (e) {
-        throw e;
-    }
-}
+    (await cookies()).delete("token");
+    redirect("/");
+};
 
-export const deleteCompose = async (composeId:string) => {
-    // eslint-disable-next-line no-useless-catch
-    try {
-        await client.connect();
-        const db = client.db("compose_craft");
-        const payload = await ensureAuth()
+export const deleteCompose = async (composeId: string) => {
+    const payload = await ensureAuth();
+    const db = await getDb();
+    const composeCollection = db.collection("composes");
 
-        // Set all the user's compose userId to null
-        const composeCollection = db.collection("composes");
-        await composeCollection.deleteOne({
-            _id: new ObjectId(composeId),
-            userId: new ObjectId(payload.userId as string)
-        })
+    await composeCollection.deleteOne({
+        _id: new ObjectId(composeId),
+        userId: new ObjectId(payload.userId as string)
+    });
 
-        revalidatePath("/dashboard","page")
-        return true
-    } catch (e) {
-        throw e;
-    }
+    revalidatePath("/dashboard", "page");
+    return true;
 }
 
 export async function askPasswordReset(prevState: any, formData: FormData) {
@@ -470,47 +364,40 @@ export async function askPasswordReset(prevState: any, formData: FormData) {
     });
 
     try {
-        const { email } = passwordAskSchema.parse({
-            email: formData.get('email')
+        const { email } = passwordAskSchema.parse({ email: formData.get('email') });
+        const db = await getDb();
+        const collection = db.collection("users");
+        const user = await collection.findOne({ email: email });
+
+        // Return success even if user not found to prevent email enumeration
+        if (!user) {
+            return { success: true };
+        }
+
+        const code = generateRandomString();
+        const code_collec = db.collection("reset_code");
+        const inserted = await code_collec.insertOne({
+            code: code,
+            type: email,
+            createdAt: new Date().getTime(),
+            userId: user._id
         });
 
-        await client.connect();
-        const db = client.db("compose_craft");
-
-        // Find the user in the database by email
-        const collection = db.collection("users");
-        const user = await collection.findOne({email: email});
-
-        if(!user){
-            throw new Error("This email is not associated with any account");
-        }else{
-            const code = generateRandomString();
-            const code_collec = db.collection("reset_code");
-            const inserted = await code_collec.insertOne({
-                code : code,
-                type: email,
-                createdAt: new Date().getTime(),
-                userId: user._id
-            });
-            if(inserted){
-                sendRecoverPassdEmail(email,code);
-                return { success: true };
-            }
-            else{
-                throw new Error("server side error");
-            }
+        if (inserted) {
+            sendRecoverPassdEmail(email, code);
+            return { success: true };
         }
+
+        throw new Error("server side error");
     } catch (e) {
-        if (e instanceof Error) {
-            return { error: e.message };
-        }
+        if (e instanceof Error) return { error: e.message };
         return { error: "An unknown error occurred" };
     }
 }
 
 export async function passwordReset(prevState: any, formData: FormData) {
     const passwordResetSchema = zfd.formData({
-        password: z.string().min(5, "Password length > 6"),
+        password: z.string().min(6, "Password must be at least 6 characters"),
         password2: z.string(),
         code: z.string(),
     });
@@ -522,41 +409,27 @@ export async function passwordReset(prevState: any, formData: FormData) {
             code: formData.get('code')
         });
 
-        if (password !== password2) {
-            throw new Error("Passwords are not the same");
-        }
+        if (password !== password2) throw new Error("Passwords are not the same");
 
-        await client.connect();
-        const db = client.db("compose_craft");
+        const db = await getDb();
         const code_collec = db.collection("reset_code");
-        const resetCode = await code_collec.findOne({code: code});
+        const resetCode = await code_collec.findOne({ code: code });
 
-        if (!resetCode) {
-            throw new Error("The code is invalid");
-        }
+        if (!resetCode) throw new Error("The code is invalid");
 
         if (!isWithinOneDay(Number(resetCode?.createdAt), new Date().getTime())) {
             throw new Error("The code is outdated");
         }
 
-        //here everything has been checked
-        await code_collec.deleteOne({code: code});
+        await code_collec.deleteOne({ code: code });
         const user_collec = db.collection("users");
         const hashedPassword = await bcrypt.hash(password, 10);
-        const res = await user_collec.updateOne({_id: resetCode.userId}, {
-            $set: {password: hashedPassword}
-        });
+        await user_collec.updateOne({ _id: resetCode.userId }, { $set: { password: hashedPassword } });
 
-        if (res) {
-            return { success: true };
-        }
-
-        throw new Error("Can't change password for unknown reason, server error");
+        return { success: true };
 
     } catch (e) {
-        if (e instanceof Error) {
-            return { error: e.message };
-        }
+        if (e instanceof Error) return { error: e.message };
         return { error: "An unknown error occurred" };
     }
 }
