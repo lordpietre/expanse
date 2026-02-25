@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import useSelectionStore from "@/store/selection";
 import { useComposeStore } from "@/store/compose";
 import {
@@ -14,20 +15,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Eraser, EthernetPort, FolderTree, Tag, ListPlus, Box, Database } from "lucide-react";
+import { Eraser, EthernetPort, FolderTree, Tag, ListPlus, Box, Database, Zap } from "lucide-react";
 import QuickToolType from "@/components/ui/quickToolType";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import DurationInput from "@/components/playground/editor/durationInput";
-import { addExtraDots } from "@/lib/utils";
+import { addExtraDots, cn } from "@/lib/utils";
 import useUIStore from "@/store/ui";
 import { libraryServices } from "@/lib/library_data";
+import { useExecutionStore } from "@/store/execution";
+import { ChevronDown, ChevronUp, Menu } from "lucide-react";
 
 export default function ServiceEditor() {
 
     const { selectedId } = useSelectionStore();
     const { compose, setCompose } = useComposeStore();
     const { setIsLibraryOpen } = useUIStore();
+    const { serviceStatuses } = useExecutionStore();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     function getService(): Service {
         const service = compose.services.get("id", selectedId)
@@ -37,30 +42,61 @@ export default function ServiceEditor() {
         throw Error(`${selectedId} service is not found`)
     }
 
+    const serviceName = getService().name;
+    const isRunning = serviceStatuses[serviceName]?.status === 'running';
+
     return (
         <form className="flex flex-col gap-6 p-6 bg-[#0a0d14]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500 text-slate-300">
-            <h2 className="text-3xl font-black tracking-tighter text-white flex items-center gap-2 drop-shadow-md">
-                <Box className="w-8 h-8 text-blue-500" />
-                Service
-            </h2>
+            <div className="flex items-center justify-between">
+                <h2 className="text-3xl font-black tracking-tighter text-white flex items-center gap-2 drop-shadow-md">
+                    <Box className="w-8 h-8 text-blue-500" />
+                    Service
+                </h2>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="flex items-center gap-2 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
+                >
+                    <Menu className="w-4 h-4" />
+                    Menu
+                    {isMenuOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                </Button>
+            </div>
 
             <Tabs defaultValue="general" className="w-full">
-                <TabsList className="flex flex-wrap h-auto w-full bg-slate-900/50 p-1 border border-white/5 rounded-xl shadow-inner mb-4">
-                    <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-blue-400 rounded-lg" value="general">General</TabsTrigger>
-                    <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-amber-400 rounded-lg" value="volume">Volumes</TabsTrigger>
-                    <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-orange-400 rounded-lg" value="network">Networking</TabsTrigger>
-                    <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-cyan-400 rounded-lg" value="db">DB</TabsTrigger>
-                    <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-violet-400 rounded-lg" value="env">Env</TabsTrigger>
-                    <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-emerald-400 rounded-lg" value="health">Health</TabsTrigger>
-                </TabsList>
+                {isMenuOpen && (
+                    <TabsList className="flex flex-wrap h-auto w-full bg-slate-900/50 p-1 border border-white/5 rounded-xl shadow-inner mb-4 animate-in slide-in-from-top-2 duration-300">
+                        <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-blue-400 rounded-lg" value="general">General</TabsTrigger>
+                        <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-amber-400 rounded-lg" value="volume">Volumes</TabsTrigger>
+                        <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-orange-400 rounded-lg" value="network">Networking</TabsTrigger>
+                        <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-cyan-400 rounded-lg" value="db">DB</TabsTrigger>
+                        <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-violet-400 rounded-lg" value="env">Env</TabsTrigger>
+                        <TabsTrigger className="w-full data-[state=active]:bg-white/10 data-[state=active]:shadow-md transition-all font-bold text-slate-500 data-[state=active]:text-emerald-400 rounded-lg" value="health">Health</TabsTrigger>
+                    </TabsList>
+                )}
                 <TabsContent className="flex flex-col gap-6 w-full mt-2" value="general">
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="name">Name</label>
-                        <Input name="name" value={getService().name}
+                        <label htmlFor="name" className="text-sm font-bold text-slate-400">Name</label>
+                        <Input
+                            name="name"
+                            value={getService().name}
+                            disabled={isRunning}
+                            className={cn(
+                                isRunning ? "opacity-60 cursor-not-allowed bg-white/5 border-amber-500/20" : "bg-white/5 border-white/10",
+                                "text-white focus:ring-blue-500/40"
+                            )}
                             onChange={(e) => {
                                 setCompose(() => getService().name = e.target.value)
                             }}
                         />
+                        {isRunning && (
+                            <p className="text-xs font-medium text-amber-400 flex items-center gap-1.5 mt-1 animate-pulse">
+                                <Zap className="w-3 h-3" />
+                                Container is running. Stop the deployment to change the name.
+                            </p>
+                        )}
                     </div>
                     <div className="flex flex-row justify-between">
                         <div className="flex flex-col gap-2">

@@ -133,8 +133,9 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                     });
                 }
 
+                const baseName = template.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
                 const newService = new Service({
-                    name: template.name.toLowerCase() + "_" + generateRandomName().substring(0, 4),
+                    name: baseName + "_" + generateRandomName().substring(0, 4),
                     image: new Image({ name: imageName, tag: imageTag }),
                     environment: newEnvironment.size > 0 ? newEnvironment : undefined,
                     ports: newPorts.length > 0 ? newPorts : undefined,

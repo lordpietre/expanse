@@ -21,6 +21,7 @@ services:
       - expanse-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/library:/app/data/library
 
   db:
     image: mongo:8.2-rc-noble
