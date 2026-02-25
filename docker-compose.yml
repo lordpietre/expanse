@@ -1,42 +1,40 @@
-name: compose-craft
+name: expanse
 
 services:
-  saas:
+  app:
     build: .
-    image: composecraft:local
+    image: expanse:local
     ports:
-      - "4000:3000"           # ← ¡cambio importante! host:4000 → contenedor:3000
+      - "4000:3000"
     environment:
       - CORE_ONLY=true
-      - URL=http://192.168.1.128:4000
-      - SECRET_KEY=changeme           # cámbialo por algo largo y aleatorio
-      - MONGODB_URI=mongodb://dev:dev@db:27017/?authSource=admin
+      - URL=${APP_URL:-http://localhost:4000}
+      - SECRET_KEY=${SECRET_KEY:-please_change_me_to_something_secure}
+      - MONGODB_URI=mongodb://${DB_USER:-dev}:${DB_PASS:-dev}@db:27017/expanse?authSource=admin
     depends_on:
       - db
     restart: unless-stopped
+    # We need root or being in docker group to access the socket
     user: root
     networks:
-      - internal
+      - expanse-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
   db:
-    image: mongo:latest
+    image: mongo:6-jammy
     environment:
-      # IMPORTANT: Ensure these match MONGODB_URI in the saas service
-      MONGO_INITDB_ROOT_USERNAME: dev
-      MONGO_INITDB_ROOT_PASSWORD: dev
-      # Puedes agregar si quieres:
-      # MONGO_INITDB_DATABASE: composecraft
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER:-dev}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS:-dev}
     volumes:
-      - mongo_data:/data/db
+      - expanse_db_data:/data/db
     networks:
-      - internal
+      - expanse-net
     restart: unless-stopped
 
 networks:
-  internal:
+  expanse-net:
     driver: bridge
 
 volumes:
-  mongo_data:
+  expanse_db_data:

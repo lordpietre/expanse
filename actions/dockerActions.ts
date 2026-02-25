@@ -76,7 +76,7 @@ function patchComposeYaml(yamlText: string): string {
 
 /** Expose the generated YAML for debugging */
 export async function getComposeYaml(composeId: string): Promise<string | null> {
-    const yamlPath = path.join(os.tmpdir(), `composecraft-${composeId}`, 'docker-compose.yaml')
+    const yamlPath = path.join(os.tmpdir(), `expanse-${composeId}`, 'docker-compose.yaml')
     try {
         return await fs.readFile(yamlPath, 'utf-8')
     } catch {
@@ -85,7 +85,7 @@ export async function getComposeYaml(composeId: string): Promise<string | null> 
 }
 
 export async function runCompose(composeId: string, yamlContent: string) {
-    const tempDir = path.join(os.tmpdir(), `composecraft-${composeId}`);
+    const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     await fs.mkdir(tempDir, { recursive: true });
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
     // Patch YAML: inject DB healthchecks + depends_on service_healthy
@@ -111,7 +111,7 @@ export async function runCompose(composeId: string, yamlContent: string) {
 }
 
 export async function stopCompose(composeId: string) {
-    const tempDir = path.join(os.tmpdir(), `composecraft-${composeId}`);
+    const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
     try {
@@ -131,7 +131,7 @@ export async function stopCompose(composeId: string) {
 }
 
 export async function restartCompose(composeId: string, yamlContent: string) {
-    const tempDir = path.join(os.tmpdir(), `composecraft-${composeId}`);
+    const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     await fs.mkdir(tempDir, { recursive: true });
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
     // Patch YAML: inject DB healthchecks + depends_on service_healthy
@@ -158,7 +158,7 @@ export async function restartCompose(composeId: string, yamlContent: string) {
 }
 
 export async function getComposeStatus(composeId: string) {
-    const tempDir = path.join(os.tmpdir(), `composecraft-${composeId}`);
+    const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
     try {
@@ -191,7 +191,7 @@ export async function getComposeStatus(composeId: string) {
 }
 
 export async function getComposeLogs(composeId: string) {
-    const tempDir = path.join(os.tmpdir(), `composecraft-${composeId}`);
+    const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
     try {

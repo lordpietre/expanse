@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === "development") {
     clientPromise = client.connect();
 }
 
-export const DB_NAME = "compose_craft";
+export const DB_NAME = "expanse";
 
 export async function getDb() {
     const client = await clientPromise;
