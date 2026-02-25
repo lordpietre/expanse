@@ -101,18 +101,21 @@ export default function ComposeSettingEditor() {
                 name: generateRandomName()
             }))
         })
+        toast.success("Service added to playground", { icon: '🚀' });
     }
 
     function net() {
         setCompose((current) => {
             current.addNetwork(new Network({ name: generateRandomName() }))
         })
+        toast.success("Network added to playground", { icon: '🌐' });
     }
 
     function env() {
         setCompose((current) => {
             current.envs.add(new Env(generateRandomName().toUpperCase(), ""))
         })
+        toast.success("Environment variable added", { icon: '🔑' });
     }
 
     async function handleSave() {

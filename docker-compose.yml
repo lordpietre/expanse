@@ -22,7 +22,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   db:
-    image: mongo:6-jammy
+    image: mongo:8.2-rc-noble
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USER:-dev}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS:-dev}

@@ -210,10 +210,11 @@ export async function getComposeLogs(composeId: string) {
 
 export async function getGlobalDockerStats() {
     try {
-        const [projectsRes, containersRes, volumesRes] = await Promise.all([
+        const [projectsRes, containersRes, volumesRes, dfRes] = await Promise.all([
             execAsync('docker compose ls --format json'),
             execAsync('docker ps -a --format json'),
-            execAsync('docker volume ls --format json')
+            execAsync('docker volume ls --format json'),
+            execAsync('docker system df -v').catch(() => ({ stdout: '' }))
         ]);
 
         const parseJson = (stdout: string) => {
@@ -232,10 +233,49 @@ export async function getGlobalDockerStats() {
             }
         };
 
+        const volumes = parseJson(volumesRes.stdout);
+        const dfOutput = dfRes.stdout;
+
+        // Simple regex to find volume sizes in 'docker system df -v' output
+        // It looks for the "Local Volumes" section and captures name + size
+        if (dfOutput) {
+            const volumeLines = dfOutput.split('\n');
+            let inVolumesSection = false;
+            const sizeMap: Record<string, string> = {};
+
+            for (const line of volumeLines) {
+                if (line.includes('VOLUME NAME') && line.includes('SIZE')) {
+                    inVolumesSection = true;
+                    continue;
+                }
+                if (inVolumesSection) {
+                    if (line.trim() === '') {
+                        // End of section if we hit an empty line after starting
+                        if (Object.keys(sizeMap).length > 0) break;
+                        continue;
+                    }
+                    // Match "NAME   LINKS   SIZE"
+                    const parts = line.trim().split(/\s+/);
+                    if (parts.length >= 3) {
+                        const name = parts[0];
+                        const size = parts[parts.length - 1]; // Size is usually the last column
+                        sizeMap[name] = size;
+                    }
+                }
+            }
+
+            // Inject sizes into volume objects
+            for (const vol of volumes) {
+                if (sizeMap[vol.Name]) {
+                    vol.Size = sizeMap[vol.Name];
+                }
+            }
+        }
+
         return {
             projects: parseJson(projectsRes.stdout),
             containers: parseJson(containersRes.stdout),
-            volumes: parseJson(volumesRes.stdout)
+            volumes
         };
     } catch (error: any) {
         console.error('Global Docker Stats Error:', error);
@@ -381,6 +421,16 @@ export async function removeContainer(containerId: string) {
     }
 }
 
+export async function removeVolume(volumeName: string) {
+    try {
+        const { stdout } = await execAsync(`docker volume rm -f ${volumeName}`);
+        console.log('Remove volume:', stdout);
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
 export async function getProjectContainers(projectName: string) {
     try {
         const { stdout } = await execAsync(
@@ -406,6 +456,35 @@ export async function getProjectContainers(projectName: string) {
         ).catch(() => ({ stdout: '' }));
 
         const volumes = volOut.trim() ? parseJson(volOut) : [];
+
+        // Fetch sizes for these volumes
+        try {
+            const { stdout: dfOut } = await execAsync('docker system df -v');
+            const volumeLines = dfOut.split('\n');
+            let inVolumesSection = false;
+            const sizeMap: Record<string, string> = {};
+            for (const line of volumeLines) {
+                if (line.includes('VOLUME NAME') && line.includes('SIZE')) {
+                    inVolumesSection = true;
+                    continue;
+                }
+                if (inVolumesSection) {
+                    if (line.trim() === '') {
+                        if (Object.keys(sizeMap).length > 0) break;
+                        continue;
+                    }
+                    const parts = line.trim().split(/\s+/);
+                    if (parts.length >= 3) {
+                        sizeMap[parts[0]] = parts[parts.length - 1];
+                    }
+                }
+            }
+            for (const vol of volumes) {
+                if (sizeMap[vol.Name]) vol.Size = sizeMap[vol.Name];
+            }
+        } catch (e) {
+            console.error("Error fetching volume sizes in project containers:", e);
+        }
 
         return { containers, volumes };
     } catch (error: any) {

@@ -5,12 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     getGlobalDockerStats, getSystemInfo,
     stopProjectByName, removeProjectByName,
-    stopContainer, removeContainer, getProjectContainers
+    stopContainer, removeContainer, getProjectContainers,
+    removeVolume
 } from "@/actions/dockerActions";
 import {
     Layers, Database, Activity, RefreshCw, HardDrive, Cpu,
     Container, ArrowLeft, ChevronRight, Square, Trash2, X,
-    Lock, AlertTriangle, Box, Boxes, MemoryStick, Network
+    Lock, AlertTriangle, Box, Boxes, MemoryStick, Network,
+    Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -329,9 +331,27 @@ function ProjectDetail({
                                                 <div className="font-bold text-sm text-white truncate">{v.Name}</div>
                                                 <div className="text-[10px] text-slate-500 font-mono truncate">{v.Mountpoint}</div>
                                             </div>
-                                            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 shrink-0">
-                                                {v.Driver}
-                                            </span>
+                                            <div className="flex items-center gap-3 shrink-0">
+                                                {v.Size && (
+                                                    <div className="flex flex-col items-end mr-1">
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Tamaño</span>
+                                                        <span className="text-xs font-black text-purple-400">{v.Size}</span>
+                                                    </div>
+                                                )}
+                                                <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 shrink-0">
+                                                    {v.Driver}
+                                                </span>
+                                                <button
+                                                    onClick={() => runWithPassword(
+                                                        "Eliminar volumen",
+                                                        `Eliminar permanentemente "${v.Name}"`,
+                                                        () => removeVolume(v.Name)
+                                                    )}
+                                                    className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
+                                                    title="Eliminar">
+                                                    <Trash2 className="w-3 h-3" />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -351,6 +371,10 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
     const [selectedProject, setSelectedProject] = useState<any>(null);
+
+    // Global action state
+    const [modalAction, setModalAction] = useState<null | { label: string; desc: string; fn: () => Promise<any> }>(null);
+    const [actionLoading, setActionLoading] = useState(false);
 
     const fetchData = useCallback(async () => {
         try {
@@ -420,8 +444,34 @@ export default function DashboardPage() {
         return `${d}d ${h}h ${m}m`;
     };
 
+    const runWithPassword = (label: string, desc: string, fn: () => Promise<any>) => {
+        setModalAction({ label, desc, fn });
+    };
+
+    const handlePasswordConfirm = async () => {
+        if (!modalAction) return;
+        setActionLoading(true);
+        setModalAction(null);
+        const res = await modalAction.fn();
+        setActionLoading(false);
+        if (res?.success) {
+            toast.success("Operación completada");
+            fetchData();
+        } else {
+            toast.error(res?.error || "Error en la operación");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[hsl(222,47%,5%)] text-white">
+            <PasswordModal
+                open={!!modalAction}
+                title={modalAction?.label || ""}
+                description={modalAction?.desc || ""}
+                onConfirm={handlePasswordConfirm}
+                onCancel={() => setModalAction(null)}
+            />
+
             {/* Project Detail Drawer */}
             {selectedProject && (
                 <ProjectDetail
@@ -631,6 +681,26 @@ export default function DashboardPage() {
                                                 )}>
                                                     {c.State}
                                                 </span>
+                                                <button
+                                                    onClick={() => runWithPassword(
+                                                        "Detener contenedor",
+                                                        `Detener "${c.Names}"`,
+                                                        () => stopContainer(c.ID)
+                                                    )}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
+                                                    title="Detener">
+                                                    <Square className="w-3 h-3 fill-amber-400" />
+                                                </button>
+                                                <button
+                                                    onClick={() => runWithPassword(
+                                                        "Eliminar contenedor",
+                                                        `Eliminar permanentemente "${c.Names}"`,
+                                                        () => removeContainer(c.ID)
+                                                    )}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
+                                                    title="Eliminar">
+                                                    <Trash2 className="w-3 h-3" />
+                                                </button>
                                             </div>
                                         </div>
                                     );
@@ -647,7 +717,7 @@ export default function DashboardPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {stats.volumes.map((v: any) => (
                                     <div key={v.Name}
-                                        className="flex items-center gap-4 p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-white/10 transition-all">
+                                        className="flex items-center gap-4 p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
                                         <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/10">
                                             <HardDrive className="w-4 h-4 text-purple-400" />
                                         </div>
@@ -655,9 +725,27 @@ export default function DashboardPage() {
                                             <div className="font-bold text-sm text-white truncate">{v.Name}</div>
                                             <div className="text-[10px] text-slate-600 font-mono truncate">{v.Mountpoint}</div>
                                         </div>
-                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 shrink-0">
-                                            {v.Driver}
-                                        </span>
+                                        <div className="flex items-center gap-3 shrink-0">
+                                            {v.Size && (
+                                                <div className="flex flex-col items-end mr-1">
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Tamaño</span>
+                                                    <span className="text-xs font-black text-purple-400">{v.Size}</span>
+                                                </div>
+                                            )}
+                                            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                                                {v.Driver}
+                                            </span>
+                                            <button
+                                                onClick={() => runWithPassword(
+                                                    "Eliminar volumen",
+                                                    `Eliminar permanentemente "${v.Name}"`,
+                                                    () => removeVolume(v.Name)
+                                                )}
+                                                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
+                                                title="Eliminar">
+                                                <Trash2 className="w-3 h-3" />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

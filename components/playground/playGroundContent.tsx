@@ -60,10 +60,10 @@ import usePositionMap from "@/store/metadataMap";
 
 import { useSearchParams } from "next/navigation";
 import { getComposeById } from "@/actions/userActions";
-import { reHydrateComposeIds, recreatePositionMap } from "@/lib/metadata";
+import { reHydrateComposeIds, recreatePositionMap, recreateConnectionMap } from "@/lib/metadata";
 
 export default function PlaygroundContent({ inviteMode = false }: { inviteMode?: boolean }) {
-    const { compose, setCompose } = useComposeStore();
+    const { compose, setCompose, replaceCompose } = useComposeStore();
     const { id: composeId } = useComposeIdStore();
     const { setSelectedString } = useSelectionStore();
     const { isExecuting, setExecuting, clearStatuses, updateStatuses, setLogs } = useExecutionStore();
@@ -85,12 +85,12 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                             reHydrateComposeIds(newCompose, loadedCompose.metadata);
                             usePositionMap.getState().setPositionMap(recreatePositionMap(loadedCompose.metadata.positionMap));
                             if (loadedCompose.metadata.connectionMap) {
-                                // Rehydrate connection map as well
-                                const connections = new Map<string, string>(Object.entries(loadedCompose.metadata.connectionMap) as [string, string][]);
+                                // Rehydrate connection map correctly using helper
+                                const connections = recreateConnectionMap(loadedCompose.metadata.connectionMap);
                                 usePositionMap.getState().setConnectionMap(connections);
                             }
                         }
-                        await setCompose(() => newCompose);
+                        replaceCompose(newCompose, { disableSave: true });
                         useComposeIdStore.getState().setId(idParam);
 
                         // Wait for nodes to be rendered and layed out if there was no metadata
@@ -104,12 +104,45 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     toast.error("Failed to load compose.");
                     console.error(error);
                 }
+            } else {
+                const dataParam = searchParams.get('data');
+                if (dataParam) {
+                    try {
+                        // Decode Base64URL
+                        const base64 = dataParam.replace(/-/g, '+').replace(/_/g, '/');
+                        const json = decodeURIComponent(atob(base64).split('').map(function (c) {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                        }).join(''));
+                        const decoded = JSON.parse(json);
+
+                        if (decoded && decoded.compose) {
+                            const newCompose = Translator.fromDict(decoded.compose);
+                            if (decoded.metadata) {
+                                reHydrateComposeIds(newCompose, decoded.metadata);
+                                usePositionMap.getState().setPositionMap(recreatePositionMap(decoded.metadata.positionMap));
+                                if (decoded.metadata.connectionMap) {
+                                    const connections = recreateConnectionMap(decoded.metadata.connectionMap);
+                                    usePositionMap.getState().setConnectionMap(connections);
+                                }
+                            }
+                            replaceCompose(newCompose);
+
+                            // Clean up URL
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.delete('data');
+                            window.history.replaceState({}, '', newUrl.toString());
+                        }
+                    } catch (error) {
+                        console.error("Failed to load data from URL", error);
+                        toast.error("Failed to recover data from redirect");
+                    }
+                }
             }
         };
 
         loadCompose();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [idParam]);
+    }, [idParam, searchParams]);
 
     React.useEffect(() => {
         let interval: NodeJS.Timeout;

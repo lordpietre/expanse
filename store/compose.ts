@@ -22,13 +22,22 @@ interface ComposeState {
 
 export async function save(compose: Compose) {
     const { id: composeId, setId } = useComposeIdStore.getState();
-    const translator = new Translator(compose)
+    const translator = new Translator(compose);
     const id = await registerCompose(
         translator.toDict(),
         extractMetadata(compose, usePositionMap.getState().positionMap),
         composeId
-    )
-    setId(id)
+    );
+    setId(id);
+
+    // Persist ID in URL to ensure F5 doesn't lose the project
+    if (typeof window !== 'undefined' && id) {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('id') !== id) {
+            url.searchParams.set('id', id);
+            window.history.pushState({}, '', url.toString());
+        }
+    }
 }
 
 // Debounce helper for saving

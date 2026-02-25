@@ -6,7 +6,8 @@ import {
     Edge, OnSelectionChangeParams, EdgeChange, Controls, Background, BackgroundVariant,
     ReactFlow,
     useReactFlow,
-    MiniMap
+    MiniMap,
+    useNodes
 } from "@xyflow/react";
 import { useComposeStore } from "@/store/compose";
 import ServiceNode from "@/components/playground/node/serviceNode";
@@ -55,6 +56,24 @@ const AutoCenter = () => {
             }
         }
     }, [selectedId, setCenter, getNode]);
+
+    return null;
+};
+
+const FitViewOnAdd = () => {
+    const { fitView } = useReactFlow();
+    const nodes = useNodes();
+    const prevCount = React.useRef(nodes.length);
+
+    useEffect(() => {
+        if (nodes.length > prevCount.current) {
+            // Slight delay to ensure new node is rendered with its dimensions
+            setTimeout(() => {
+                fitView({ padding: 0.2, duration: 800 });
+            }, 50);
+        }
+        prevCount.current = nodes.length;
+    }, [nodes.length, fitView]);
 
     return null;
 };
@@ -162,7 +181,7 @@ const handleDbAutoInject = (source: Service, target: Service) => {
 
 const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControlsByDefault = false }, ref) => {
 
-    const { compose, setCompose } = useComposeStore();
+    const { compose, setCompose, tick } = useComposeStore();
     const [select, setSelect] = useState("")
     const { positionMap, setPositionMap, connectionMap } = usePositionMap()
     const { setSelectedString } = useSelectionStore()
@@ -229,7 +248,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
         if (hasChanges) {
             setPositionMap(newMap);
         }
-    }, [compose, positionMap, setPositionMap]);
+    }, [compose, positionMap, setPositionMap, tick]);
 
     const nodeTypes = useMemo(() => (
         {
@@ -585,6 +604,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
             className="bg-[#070b0f]"
         >
             <AutoCenter />
+            <FitViewOnAdd />
             <MiniMap
                 className="bg-[#0a0d14] border border-white/10 rounded-xl overflow-hidden shadow-2xl"
                 maskColor="rgba(255, 255, 255, 0.05)"
