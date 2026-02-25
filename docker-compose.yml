@@ -4,6 +4,7 @@ services:
   app:
     build: .
     image: expanse:local
+    pull_policy: build
     ports:
       - "4000:3000"
     environment:

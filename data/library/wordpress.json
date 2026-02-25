@@ -1,0 +1,16 @@
+{
+    "name": "WordPress",
+    "image": "wordpress:latest",
+    "category": "Applications",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/wordpress/logo.png",
+    "description": "The world's most popular website builder and content management system.",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "WORDPRESS_DB_HOST": "db:3306",
+        "WORDPRESS_DB_USER": "wordpress",
+        "WORDPRESS_DB_PASSWORD": "password",
+        "WORDPRESS_DB_NAME": "wordpress"
+    }
+}

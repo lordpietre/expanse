@@ -11,10 +11,11 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { libraryServices } from "@/lib/library_data";
+import { getLibraryServices } from "@/actions/libraryActions";
+import { TemplateService } from "@/types/library";
 import { useComposeStore } from "@/store/compose";
 import useUIStore from "@/store/ui";
-import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid } from "lucide-react";
+import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LibraryModalProps {
@@ -28,45 +29,144 @@ const categoryIcons = {
     'Cache': <Zap className="w-4 h-4" />,
     'Queue': <MessageSquare className="w-4 h-4" />,
     'Applications': <LayoutGrid className="w-4 h-4" />,
+    'Development': <Code2 className="w-4 h-4" />,
+    'OS': <Monitor className="w-4 h-4" />,
     'Other': <Box className="w-4 h-4" />
 };
 
 export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) {
     const { addServiceFromTemplate } = useComposeStore();
     const { libraryCategory, setIsLibraryOpen } = useUIStore();
-    const categories = Array.from(new Set(libraryServices.map(s => s.category)));
-    const [activeCategory, setActiveCategory] = useState(categories[0]);
+    const [services, setServices] = useState<TemplateService[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [activeCategory, setActiveCategory] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedService, setSelectedService] = useState<TemplateService | null>(null);
 
-    // Sync active category if the library overrides it
-    React.useEffect(() => {
-        if (open && libraryCategory && categories.includes(libraryCategory as any)) {
-            setActiveCategory(libraryCategory as any);
+    const categories = Array.from(new Set(services.map(s => s.category)));
+
+    const fetchServices = async () => {
+        setLoading(true);
+        console.log("[Library] Calling getLibraryServices...");
+        try {
+            const data = await getLibraryServices();
+            console.log(`[Library] Received ${data?.length || 0} services`);
+            setServices(data || []);
+
+            if (data && data.length > 0) {
+                // Set initial category and selection
+                const initialCat = (libraryCategory && data.some(s => s.category === libraryCategory))
+                    ? libraryCategory
+                    : (data[0]?.category || "");
+
+                setActiveCategory(initialCat);
+
+                const firstService = data.find(s => s.category === initialCat);
+                setSelectedService(firstService || null);
+            }
+        } catch (error) {
+            console.error("[Library] Error in fetchServices:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [open, libraryCategory]);
+    };
+
+    // Initial fetch
+    React.useEffect(() => {
+        if (open) {
+            fetchServices();
+        }
+    }, [open]);
+
+    // Sync category when libraryCategory override changes while open
+    React.useEffect(() => {
+        if (open && libraryCategory && services.some(s => s.category === libraryCategory)) {
+            setActiveCategory(libraryCategory);
+            const first = services.find(s => s.category === libraryCategory);
+            setSelectedService(first || null);
+        }
+    }, [libraryCategory]);
 
     const handleOpenChange = (newOpen: boolean) => {
         onOpenChange(newOpen);
         if (!newOpen) {
-            setIsLibraryOpen(false, undefined); // clear override when closed
+            setIsLibraryOpen(false, undefined);
         }
     };
 
     const handleAdd = async (service: any) => {
+        if (!service) return;
         await addServiceFromTemplate(service);
         onOpenChange(false);
     };
 
-    const filteredServices = libraryServices.filter(s => {
+    const filteredServices = services.filter(s => {
         const matchesCategory = s.category === activeCategory;
         const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             s.description?.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
 
+    const categoriesList = categories.map(cat => (
+        <button
+            key={cat}
+            onClick={() => {
+                setActiveCategory(cat);
+                const first = services.find(s => s.category === cat);
+                setSelectedService(first || null);
+            }}
+            className={cn(
+                "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                activeCategory === cat
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                    : "text-slate-400 hover:bg-white/10 hover:text-white"
+            )}
+        >
+            <div className="flex items-center gap-3">
+                <span className={cn(
+                    activeCategory === cat ? "text-white" : "text-slate-500 group-hover:text-blue-400"
+                )}>
+                    {categoryIcons[cat as keyof typeof categoryIcons]}
+                </span>
+                {cat}
+            </div>
+            <ChevronRight className={cn(
+                "w-4 h-4 transition-transform",
+                activeCategory === cat ? "opacity-100" : "opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+            )} />
+        </button>
+    ));
+
+    const servicesSubmenu = filteredServices.map(service => (
+        <button
+            key={service.name}
+            onClick={() => setSelectedService(service)}
+            className={cn(
+                "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                selectedService?.name === service.name
+                    ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent"
+            )}
+        >
+            <div className="flex items-center gap-3 overflow-hidden">
+                <div className="flex-shrink-0 w-6 h-6 rounded bg-slate-800 flex items-center justify-center overflow-hidden">
+                    {service.logo ? (
+                        <img src={service.logo} alt={service.name} className="w-4 h-4 object-contain" />
+                    ) : (
+                        <span className="text-[10px] text-slate-500 font-bold">
+                            {service.name.substring(0, 2).toUpperCase()}
+                        </span>
+                    )}
+                </div>
+                <span className="truncate">{service.name}</span>
+            </div>
+            {selectedService?.name === service.name && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm shadow-blue-500" />}
+        </button>
+    ));
+
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-5xl h-[85vh] p-0 gap-0 overflow-hidden flex flex-col bg-[#0d1117] border-white/10 text-slate-300">
+            <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 overflow-hidden flex flex-col bg-[#0d1117] border-white/10 text-slate-300">
                 <DialogHeader className="p-6 border-b border-white/10 bg-[#0a0d14]">
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-2xl font-bold flex items-center gap-3 text-white">
@@ -89,83 +189,81 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                 </DialogHeader>
 
                 <div className="flex flex-1 overflow-hidden">
-                    {/* Sidebar */}
-                    <aside className="w-64 border-r border-white/5 bg-white/5 p-4 space-y-1 overflow-y-auto">
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-2">Categories</p>
-                        {categories.map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => setActiveCategory(cat)}
-                                className={cn(
-                                    "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
-                                    activeCategory === cat
-                                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                                        : "text-slate-400 hover:bg-white/10 hover:text-white"
-                                )}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <span className={cn(
-                                        activeCategory === cat ? "text-white" : "text-slate-500 group-hover:text-blue-400"
-                                    )}>
-                                        {categoryIcons[cat as keyof typeof categoryIcons]}
-                                    </span>
-                                    {cat}
-                                </div>
-                                <ChevronRight className={cn(
-                                    "w-4 h-4 transition-transform",
-                                    activeCategory === cat ? "opacity-100" : "opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                                )} />
-                            </button>
-                        ))}
+                    {/* Left Column (Categories) */}
+                    <aside className="w-64 border-r border-white/5 bg-[#0a0d14] p-4 space-y-1 overflow-y-auto">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Categories</p>
+                        <div className="space-y-1">
+                            {categoriesList}
+                        </div>
                     </aside>
 
-                    {/* Content */}
-                    <main className="flex-1 p-6 overflow-y-auto bg-[#0d1117] custom-scrollbar">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {filteredServices.length > 0 ? (
-                                filteredServices.map(service => (
-                                    <Card key={service.name} className="flex flex-col bg-white/5 border-white/10 hover:border-blue-500/50 hover:bg-white/10 transition-all duration-300 group shadow-none">
-                                        <CardHeader className="pb-3 border-none">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <CardTitle className="text-xl font-bold group-hover:text-blue-400 text-white transition-colors">
-                                                        {service.name}
-                                                    </CardTitle>
-                                                    <CardDescription className="font-mono text-xs mt-1 text-slate-400">
-                                                        {service.image}
-                                                    </CardDescription>
-                                                </div>
-                                                <div className="p-2 bg-slate-900 rounded-md text-slate-400 border border-white/10">
-                                                    {categoryIcons[service.category as keyof typeof categoryIcons]}
-                                                </div>
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent className="flex-grow pb-4 border-none">
-                                            <p className="text-sm text-slate-400 leading-relaxed">
-                                                {service.description}
-                                            </p>
-                                        </CardContent>
-                                        <CardFooter className="pt-0 border-none">
-                                            <Button
-                                                onClick={() => handleAdd(service)}
-                                                className="w-full bg-blue-600 hover:bg-blue-700 text-white flex gap-2 transition-colors py-6 shadow-lg shadow-blue-500/20"
-                                            >
-                                                <Plus className="w-5 h-5" />
-                                                Add to Compose
-                                            </Button>
-                                        </CardFooter>
-                                    </Card>
-                                ))
-                            ) : (
-                                <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-500 gap-4">
-                                    <Search className="w-12 h-12 stroke-1" />
-                                    <p className="text-lg">No services found in this category</p>
-                                </div>
+                    {/* Middle Column (Submenu) */}
+                    <aside className="w-64 border-r border-white/5 bg-[#0a0d14]/50 p-4 space-y-1 overflow-y-auto">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Services</p>
+                        <div className="space-y-1">
+                            {servicesSubmenu.length > 0 ? servicesSubmenu : (
+                                <p className="text-xs text-slate-600 px-2 italic">
+                                    {loading ? "..." : "No results found"}
+                                </p>
                             )}
                         </div>
+                    </aside>
+
+                    {/* Right Column (Details) */}
+                    <main className="flex-1 p-8 overflow-y-auto bg-[#0d1117] custom-scrollbar flex items-center justify-center">
+                        {loading ? (
+                            <div className="flex flex-col items-center gap-4 text-slate-500">
+                                <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+                                <p className="animate-pulse">Loading library...</p>
+                            </div>
+                        ) : selectedService ? (
+                            <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <h2 className="text-5xl font-bold text-white tracking-tight">{selectedService.name}</h2>
+                                        <p className="font-mono text-blue-400 text-sm bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20 inline-block">
+                                            {selectedService.image}
+                                        </p>
+                                    </div>
+                                    <p className="text-xl text-slate-400 leading-relaxed">
+                                        {selectedService.description}
+                                    </p>
+                                    <div className="pt-4">
+                                        <Button
+                                            onClick={() => handleAdd(selectedService)}
+                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white flex gap-3 transition-all py-8 text-xl font-bold shadow-2xl shadow-blue-600/20 rounded-xl"
+                                        >
+                                            <Plus className="w-6 h-6" />
+                                            Add to Deployment
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-center">
+                                    <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center p-12 shadow-2xl overflow-hidden relative group">
+                                        <div className="absolute inset-0 bg-blue-600/5 group-hover:bg-blue-600/10 transition-colors" />
+                                        {selectedService.logo ? (
+                                            <img src={selectedService.logo} alt={selectedService.name} className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
+                                        ) : (
+                                            <div className="text-7xl relative z-10">
+                                                {categoryIcons[selectedService.category as keyof typeof categoryIcons] || <Box className="w-32 h-32" />}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-slate-500 flex flex-col items-center gap-4">
+                                <Search className="w-16 h-16 opacity-20" />
+                                <p>Select a service to see details</p>
+                            </div>
+                        )}
                     </main>
                 </div>
+
             </DialogContent>
         </Dialog>
     );
 }
+
+

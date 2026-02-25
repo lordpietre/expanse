@@ -5,6 +5,7 @@ export const libraryServices: TemplateService[] = [
         name: "Nginx",
         image: "nginx:alpine",
         category: "Web Server",
+        logo: "https://raw.githubusercontent.com/docker-library/docs/master/nginx/logo.png",
         description: "High-performance HTTP server and reverse proxy, known for its stability and low resource consumption.",
         default_ports: ["80:80"]
     },
@@ -19,6 +20,7 @@ export const libraryServices: TemplateService[] = [
         name: "PostgreSQL",
         image: "postgres:18-alpine",
         category: "Database",
+        logo: "https://raw.githubusercontent.com/docker-library/docs/master/postgres/logo.png",
         description: "Powerful, open source object-relational database system with a strong reputation for reliability.",
         default_ports: ["5432:5432"],
         env_vars: {
@@ -31,6 +33,7 @@ export const libraryServices: TemplateService[] = [
         name: "MySQL",
         image: "mysql:8.0",
         category: "Database",
+        logo: "https://raw.githubusercontent.com/docker-library/docs/master/mysql/logo.png",
         description: "The world's most popular open source database, widely used for web applications.",
         default_ports: ["3306:3306"],
         env_vars: {
@@ -55,6 +58,7 @@ export const libraryServices: TemplateService[] = [
         name: "Redis",
         image: "redis:7-alpine",
         category: "Cache",
+        logo: "https://raw.githubusercontent.com/docker-library/docs/master/redis/logo.png",
         description: "Extraordinarily fast in-memory data structure store, used as a database, cache, and broker.",
         default_ports: ["6379:6379"]
     },
@@ -80,6 +84,7 @@ export const libraryServices: TemplateService[] = [
         name: "WordPress",
         image: "wordpress:latest",
         category: "Applications",
+        logo: "https://raw.githubusercontent.com/docker-library/docs/master/wordpress/logo.png",
         description: "The world's most popular website builder and content management system.",
         default_ports: ["8080:80"],
         env_vars: {

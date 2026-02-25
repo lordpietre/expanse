@@ -1,0 +1,8 @@
+{
+    "name": "Go",
+    "image": "golang:tip-trixie",
+    "category": "Development",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/golang/logo.png",
+    "description": "An open-source programming language that makes it easy to build simple, reliable, and efficient software.",
+    "default_ports": []
+}

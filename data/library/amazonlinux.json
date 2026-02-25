@@ -1,0 +1,8 @@
+{
+    "name": "Amazon Linux",
+    "image": "amazonlinux",
+    "category": "OS",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/amazonlinux/logo.png",
+    "description": "Amazon Linux is a secure, high-performance, and managed Linux distribution from Amazon Web Services (AWS).",
+    "default_ports": []
+}

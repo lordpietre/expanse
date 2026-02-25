@@ -1,0 +1,8 @@
+{
+    "name": "Ruby",
+    "image": "ruby:trixie",
+    "category": "Development",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/ruby/logo.png",
+    "description": "A dynamic, open source programming language with a focus on simplicity and productivity.",
+    "default_ports": []
+}

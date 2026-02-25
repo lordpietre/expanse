@@ -1,0 +1,8 @@
+{
+    "name": "Rocky Linux",
+    "image": "rockylinux:9.3",
+    "category": "OS",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/rockylinux/logo.png",
+    "description": "Rocky Linux is a community-driven, enterprise-grade Linux distribution that is 100% bug-for-bug compatible with RHEL.",
+    "default_ports": []
+}

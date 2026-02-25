@@ -1,0 +1,14 @@
+{
+    "name": "MariaDB",
+    "image": "mariadb:10.11",
+    "category": "Database",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/mariadb/logo.png",
+    "description": "An open source relational database created by the original developers of MySQL.",
+    "default_ports": [
+        "3306:3306"
+    ],
+    "env_vars": {
+        "MARIADB_ROOT_PASSWORD": "password",
+        "MARIADB_DATABASE": "composecraft"
+    }
+}

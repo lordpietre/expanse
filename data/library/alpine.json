@@ -1,0 +1,8 @@
+{
+    "name": "Alpine",
+    "image": "alpine",
+    "category": "OS",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/alpine/logo.png",
+    "description": "A security-oriented, lightweight Linux distribution based on musl libc and busybox.",
+    "default_ports": []
+}

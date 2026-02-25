@@ -1,0 +1,10 @@
+{
+    "name": "PHP",
+    "image": "php:zts-trixie",
+    "category": "Development",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/php/logo.png",
+    "description": "A popular general-purpose scripting language that is especially suited to web development.",
+    "default_ports": [
+        "80:80"
+    ]
+}

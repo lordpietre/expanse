@@ -1,0 +1,8 @@
+{
+    "name": "Rust",
+    "image": "rust:trixie",
+    "category": "Development",
+    "logo": "https://www.rust-lang.org/static/images/rust-logo-blk.svg",
+    "description": "A language empowering everyone to build reliable and efficient software.",
+    "default_ports": []
+}

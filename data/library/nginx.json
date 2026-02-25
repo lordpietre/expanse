@@ -1,0 +1,10 @@
+{
+    "name": "Nginx",
+    "image": "nginx:alpine",
+    "category": "Web Server",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/nginx/logo.png",
+    "description": "High-performance HTTP server and reverse proxy, known for its stability and low resource consumption.",
+    "default_ports": [
+        "80:80"
+    ]
+}

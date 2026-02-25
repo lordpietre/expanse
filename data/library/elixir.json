@@ -1,0 +1,8 @@
+{
+    "name": "Elixir",
+    "image": "elixir:otp-28",
+    "category": "Development",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/elixir/logo.png",
+    "description": "Elixir is a dynamic, functional language for building scalable and maintainable applications.",
+    "default_ports": []
+}

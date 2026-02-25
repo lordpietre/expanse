@@ -1,0 +1,15 @@
+{
+    "name": "PostgreSQL",
+    "image": "postgres:18-alpine",
+    "category": "Database",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/postgres/logo.png",
+    "description": "Powerful, open source object-relational database system with a strong reputation for reliability.",
+    "default_ports": [
+        "5432:5432"
+    ],
+    "env_vars": {
+        "POSTGRES_PASSWORD": "password",
+        "POSTGRES_USER": "admin",
+        "POSTGRES_DB": "composecraft"
+    }
+}
