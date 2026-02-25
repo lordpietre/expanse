@@ -31,78 +31,56 @@ export async function save(compose: Compose) {
     setId(id)
 }
 
-export const useComposeStore = create<ComposeState>((set) => {
-    let lastCallTime = Date.now()
+// Debounce helper for saving
+let saveTimeout: NodeJS.Timeout | null = null;
+const debouncedSave = (compose: Compose) => {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        toast.promise(
+            save(compose),
+            {
+                loading: 'Saving...',
+                success: "Saved",
+                error: "Error on save"
+            }
+        );
+    }, 2000);
+};
 
-    const shouldPerformCustom = () => {
-        return Date.now() - lastCallTime > 3000;
-    };
-
+export const useComposeStore = create<ComposeState>((set, get) => {
     return {
         compose: new Compose({ name: generateRandomName() }),
         tick: 0,
-        setCompose: (updater: (currentCompose: Compose) => void) => {
-            return new Promise((resolve) => {
-                set((state) => {
-                    const { state: disabledSave } = useDisableStateStore.getState();
-                    const previousHash = state.compose.hash()
-                    updater(state.compose);
-                    const newHash = state.compose.hash()
-                    const hasCHanged = newHash !== previousHash
-                    // Only save if not explicitly disabled
-                    if (!disabledSave) {
-                        setTimeout(() => {
-                            const a = shouldPerformCustom()
-                            if (a && hasCHanged) {
-                                toast.promise(
-                                    save(state.compose),
-                                    {
-                                        loading: 'Saving...',
-                                        success: "Saved",
-                                        error: "Error on save"
-                                    }
-                                )
-                            }
-                        }, 3000)
-                    }
+        setCompose: async (updater: (currentCompose: Compose) => void) => {
+            const { state: disabledSave } = useDisableStateStore.getState();
+            const { compose, tick } = get();
 
-                    lastCallTime = Date.now();
-                    // Resolve the promise immediately with the hasCHanged value
-                    resolve(hasCHanged);
-                    return { compose: state.compose, tick: state.tick + 1 };
-                });
-            });
-        },
-        replaceCompose: (newCompose: Compose) => {
-            set((state) => {
-                const { state: disabledSave } = useDisableStateStore.getState();
-                const previousHash = state.compose.hash()
-                const hasCHanged = newCompose.hash() === previousHash
-                lastCallTime = Date.now();
+            const previousHash = compose.hash();
+            updater(compose);
+            const newHash = compose.hash();
+            const hasChanged = newHash !== previousHash;
 
-                if (!newCompose.name) {
-                    newCompose.name = generateRandomName()
-                }
-
-                // Only save if not explicitly disabled
+            if (hasChanged) {
+                set({ tick: tick + 1 });
                 if (!disabledSave) {
-                    if (hasCHanged) {
-                        setTimeout(() => {
-                            toast.promise(
-                                save(newCompose),
-                                {
-                                    loading: 'Saving...',
-                                    success: "Saved",
-                                    error: "Error on save"
-                                }
-                            )
-                        }, 3000)
-                    }
+                    debouncedSave(compose);
                 }
+            }
+            return hasChanged;
+        },
+        replaceCompose: (newCompose: Compose, options?: { disableSave?: boolean }) => {
+            const { state: disabledSaveGlobal } = useDisableStateStore.getState();
+            const disableSave = options?.disableSave ?? disabledSaveGlobal;
 
-                // Return the new state
-                return { compose: newCompose, tick: state.tick + 1 };
-            });
+            if (!newCompose.name) {
+                newCompose.name = generateRandomName();
+            }
+
+            set({ compose: newCompose, tick: get().tick + 1 });
+
+            if (!disableSave) {
+                debouncedSave(newCompose);
+            }
         },
         addServiceFromTemplate: async (template: TemplateService) => {
             const { setCompose } = useComposeStore.getState();

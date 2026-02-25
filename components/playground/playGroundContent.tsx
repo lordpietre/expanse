@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity } from "lucide-react";
+import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity, CheckCircle2, Loader2 } from "lucide-react";
 import Playground, { PlaygroundHandle } from "@/components/playground/playground";
 import { useComposeStore } from "@/store/compose";
 import useSelectionStore from "@/store/selection";
@@ -20,6 +20,41 @@ import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+// ── Deploy Phase Types ──────────────────────────────────────────────────────
+type DeployPhase = null | 'validating' | 'writing' | 'starting' | 'done';
+
+const PHASE_CONFIG: Record<Exclude<DeployPhase, null>, { label: string; detail: string; progress: number; color: string }> = {
+    validating: { label: 'Validando puertos...', detail: 'Comprobando conflictos con puertos en uso', progress: 20, color: 'from-blue-500 to-indigo-500' },
+    writing: { label: 'Escribiendo configuración...', detail: 'Generando docker-compose.yaml con parches', progress: 50, color: 'from-indigo-500 to-purple-500' },
+    starting: { label: 'Iniciando contenedores...', detail: 'Ejecutando docker compose up -d', progress: 80, color: 'from-purple-500 to-emerald-500' },
+    done: { label: '¡Listo!', detail: 'Contendores arrancados correctamente', progress: 100, color: 'from-emerald-400 to-teal-500' },
+};
+
+function DeployProgress({ phase }: { phase: DeployPhase }) {
+    if (!phase) return null;
+    const cfg = PHASE_CONFIG[phase];
+    return (
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 bg-[#0d1117] border border-white/10 rounded-2xl p-4 flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+                {phase === 'done'
+                    ? <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    : <Loader2 className="w-4 h-4 text-blue-400 shrink-0 animate-spin" />}
+                <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-black text-white">{cfg.label}</span>
+                    <span className="text-[10px] text-slate-500 truncate">{cfg.detail}</span>
+                </div>
+            </div>
+            {/* Progress bar */}
+            <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div
+                    className={cn("h-full rounded-full bg-gradient-to-r transition-all duration-700 ease-out", cfg.color)}
+                    style={{ width: `${cfg.progress}%` }}
+                />
+            </div>
+        </div>
+    );
+}
+
 import useUIStore from "@/store/ui";
 import usePositionMap from "@/store/metadataMap";
 
@@ -34,6 +69,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
     const { isExecuting, setExecuting, clearStatuses, updateStatuses, setLogs } = useExecutionStore();
     const { isLibraryOpen, setIsLibraryOpen } = useUIStore();
     const playgroundRef = useRef<PlaygroundHandle>(null);
+    const [deployPhase, setDeployPhase] = useState<DeployPhase>(null);
 
     const searchParams = useSearchParams();
     const idParam = searchParams.get('id');
@@ -105,6 +141,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
         }
         try {
             setExecuting(true);
+            setDeployPhase('validating');
             const translator = new Translator(compose);
             let yaml = YAML.stringify(translator.toDict());
 
@@ -137,15 +174,22 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 ), { duration: 6000, icon: '🔄' });
             }
 
+            setDeployPhase('writing');
+            // Small yield so React can paint the progress bar before the heavy call
+            await new Promise(r => setTimeout(r, 80));
+
             let retries = 0;
             let success = false;
             let currentYaml = yaml;
 
             while (retries < 5 && !success) {
+                setDeployPhase('starting');
                 const res = await executeCompose(composeId, currentYaml);
                 if (res.success) {
+                    setDeployPhase('done');
+                    setTimeout(() => setDeployPhase(null), 2500);
                     toast.success(
-                        (t) => (
+                        (_t: any) => (
                             <div className="flex flex-col gap-1 w-full min-w-[200px]">
                                 <span className="font-bold">Compose execution started</span>
                                 {Array.from(useComposeStore.getState().compose.services).some(s => s.ports && s.ports.length > 0) && (
@@ -186,6 +230,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     retries++;
                 } else {
                     toast.error(res.error || "Failed to start compose");
+                    setDeployPhase(null);
                     setExecuting(false);
                     return;
                 }
@@ -193,10 +238,12 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
 
             if (!success) {
                 toast.error("Exceeded maximum retries for port fixing.");
+                setDeployPhase(null);
                 setExecuting(false);
             }
         } catch (error) {
             toast.error("An unexpected error occurred");
+            setDeployPhase(null);
             setExecuting(false);
         }
     };
@@ -205,6 +252,8 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
         if (!composeId) return;
         setExecuting(true);
         clearStatuses();
+        setDeployPhase('writing');
+        await new Promise(r => setTimeout(r, 80));
 
         let yaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
 
@@ -214,10 +263,13 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
             let currentYaml = yaml;
 
             while (retries < 5 && !success) {
+                setDeployPhase('starting');
                 const res = await restartCompose(composeId, currentYaml);
                 if (res.success) {
+                    setDeployPhase('done');
+                    setTimeout(() => setDeployPhase(null), 2500);
                     toast.success(
-                        (t) => (
+                        (_t: any) => (
                             <div className="flex flex-col gap-1 w-full min-w-[200px]">
                                 <span className="font-bold">Compose restarted</span>
                                 {Array.from(useComposeStore.getState().compose.services).some(s => s.ports && s.ports.length > 0) && (
@@ -258,16 +310,19 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     retries++;
                 } else {
                     toast.error(res.error || "Failed to restart compose");
+                    setDeployPhase(null);
                     setExecuting(false);
                     return;
                 }
             }
             if (!success) {
                 toast.error("Exceeded max retries for port fixing.");
+                setDeployPhase(null);
                 setExecuting(false);
             }
         } catch (error) {
             toast.error("An unexpected error occurred");
+            setDeployPhase(null);
             setExecuting(false);
         }
     };
@@ -388,8 +443,12 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
 
                     <div className="bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-5 shadow-2xl flex flex-col gap-4 mt-auto">
                         <div className="flex flex-col gap-3">
+                            {/* Deploy progress bar — shown during launch */}
+                            <DeployProgress phase={deployPhase} />
+
                             <Button
                                 onClick={isExecuting ? handleStop : handleExecute}
+                                disabled={!!deployPhase && deployPhase !== 'done'}
                                 className={cn(
                                     "w-full py-5 rounded-2xl font-black text-base uppercase tracking-widest transition-all duration-500 scale-100 active:scale-95 shadow-2xl relative overflow-hidden group",
                                     isExecuting ? "bg-rose-500 hover:bg-rose-600 shadow-rose-500/30" : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/30"
@@ -397,7 +456,9 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                             >
                                 <div className="absolute inset-0 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity animate-liquid" />
                                 <div className="relative z-10 flex items-center justify-center gap-3">
-                                    {isExecuting ? <Square className="fill-white" /> : <Play className="fill-white" />}
+                                    {deployPhase && deployPhase !== 'done'
+                                        ? <Loader2 className="w-5 h-5 animate-spin" />
+                                        : isExecuting ? <Square className="fill-white" /> : <Play className="fill-white" />}
                                     <span>{isExecuting ? "Detener" : "Ejecutar"}</span>
                                 </div>
                             </Button>
@@ -405,6 +466,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                             {isExecuting && (
                                 <Button
                                     onClick={handleRestart}
+                                    disabled={!!deployPhase && deployPhase !== 'done'}
                                     variant="outline"
                                     className="w-full py-5 rounded-xl font-black text-sm uppercase tracking-widest transition-all duration-300 hover:bg-amber-500/10 border-amber-500/30 text-amber-400 relative overflow-hidden group"
                                 >

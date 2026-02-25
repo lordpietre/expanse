@@ -21,6 +21,8 @@ export default function VolumeNode({ data }: { data: { volume: Volume } }) {
         )
     );
 
+    const isExpanded = connectedServices.length > 0;
+
     return (
         <Selectable id={data.volume.id}>
             <div className={cn(
@@ -45,11 +47,31 @@ export default function VolumeNode({ data }: { data: { volume: Volume } }) {
                                 {data.volume?.name}
                             </h4>
                         </div>
+
+                        {/* Connectors anchored to header when collapsed */}
+                        {!isExpanded && (
+                            <>
+                                <Handle
+                                    id='volume-target'
+                                    type="target"
+                                    position={Position.Left}
+                                    isConnectable
+                                    className="!w-4 !h-4 !rounded-full !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] !-left-3.5 hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                                />
+                                <Handle
+                                    id='volume'
+                                    type="source"
+                                    position={Position.Right}
+                                    isConnectable
+                                    className="!w-4 !h-4 !rounded-full !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] !-right-3.5 hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                                />
+                            </>
+                        )}
                     </div>
 
-                    {/* Connected Services */}
-                    {connectedServices.length > 0 && (
-                        <div className="px-3 py-1.5 flex flex-col gap-1 bg-white/5 rounded-b-[0.65rem]">
+                    {/* Connected Services — expanded section */}
+                    {isExpanded && (
+                        <div className="relative px-3 py-1.5 flex flex-col gap-1 bg-white/5 rounded-b-[0.65rem]">
                             <span className="text-[7px] font-black uppercase tracking-[0.2em] text-slate-500 leading-none">Mounted by</span>
                             <div className="flex flex-wrap gap-1 mt-0.5">
                                 {connectedServices.map(service => (
@@ -58,12 +80,25 @@ export default function VolumeNode({ data }: { data: { volume: Volume } }) {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Connectors anchored to the expanded section */}
+                            <Handle
+                                id='volume-target'
+                                type="target"
+                                position={Position.Left}
+                                isConnectable
+                                className="!w-4 !h-4 !rounded-full !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] !-left-3.5 hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                            />
+                            <Handle
+                                id='volume'
+                                type="source"
+                                position={Position.Right}
+                                isConnectable
+                                className="!w-4 !h-4 !rounded-full !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] !-right-3.5 hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                            />
                         </div>
                     )}
                 </div>
-
-                <Handle id='volume-target' type="target" position={Position.Left} isConnectable className="!w-4 !h-4 !rounded-full !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] !-left-3.5 hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer" />
-                <Handle id='volume' type="source" position={Position.Right} isConnectable className="!w-4 !h-4 !rounded-full !bg-amber-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(245,158,11,0.5)] !-right-3.5 hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer" />
             </div>
         </Selectable>
     );

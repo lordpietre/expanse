@@ -115,7 +115,12 @@ export async function stopCompose(composeId: string) {
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
     try {
-        const { stdout, stderr } = await execAsync(`docker compose -f ${yamlPath} -p expanse-project_${composeId} down`);
+        const fileExists = await fs.access(yamlPath).then(() => true).catch(() => false);
+        const cmd = fileExists
+            ? `docker compose -f ${yamlPath} -p expanse-project_${composeId} down`
+            : `docker compose -p expanse-project_${composeId} down`;
+
+        const { stdout, stderr } = await execAsync(cmd);
         console.log('Docker Compose Down:', stdout);
         if (stderr) console.error('Docker Compose Down Stderr:', stderr);
         return { success: true, message: 'Services stopped successfully' };
@@ -157,16 +162,27 @@ export async function getComposeStatus(composeId: string) {
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
     try {
-        // docker compose ps --format json returns a list of containers and their status
-        const { stdout } = await execAsync(`docker compose -f ${yamlPath} -p expanse-project_${composeId} ps --format json`);
+        const fileExists = await fs.access(yamlPath).then(() => true).catch(() => false);
+        const cmd = fileExists
+            ? `docker compose -f ${yamlPath} -p expanse-project_${composeId} ps --format json`
+            : `docker compose -p expanse-project_${composeId} ps --format json`;
+
+        const { stdout } = await execAsync(cmd);
         if (!stdout.trim()) return [];
 
         // The output can be multiple JSON objects or a list depending on version
         try {
-            return JSON.parse(stdout);
+            const res = JSON.parse(stdout);
+            return Array.isArray(res) ? res : [res];
         } catch {
             // If it's line-delimited JSON
-            return stdout.trim().split('\n').map(line => JSON.parse(line));
+            return stdout.trim().split('\n').map(line => {
+                try {
+                    return JSON.parse(line);
+                } catch {
+                    return null;
+                }
+            }).filter(Boolean);
         }
     } catch (error: any) {
         console.error('Docker Compose PS Error:', error);
@@ -179,8 +195,12 @@ export async function getComposeLogs(composeId: string) {
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
     try {
-        // Get last 50 lines of logs
-        const { stdout } = await execAsync(`docker compose -f ${yamlPath} -p expanse-project_${composeId} logs --tail=50 --no-color`);
+        const fileExists = await fs.access(yamlPath).then(() => true).catch(() => false);
+        const cmd = fileExists
+            ? `docker compose -f ${yamlPath} -p expanse-project_${composeId} logs --tail=50 --no-color`
+            : `docker compose -p expanse-project_${composeId} logs --tail=50 --no-color`;
+
+        const { stdout } = await execAsync(cmd);
         return { success: true, logs: stdout };
     } catch (error: any) {
         console.error('Docker Compose Logs Error:', error);
@@ -199,7 +219,8 @@ export async function getGlobalDockerStats() {
         const parseJson = (stdout: string) => {
             if (!stdout.trim()) return [];
             try {
-                return JSON.parse(stdout);
+                const res = JSON.parse(stdout);
+                return Array.isArray(res) ? res : [res];
             } catch {
                 return stdout.trim().split('\n').map(line => {
                     try {
@@ -368,7 +389,11 @@ export async function getProjectContainers(projectName: string) {
         if (!stdout.trim()) return { containers: [], volumes: [] };
 
         const parseJson = (s: string) => {
-            try { return JSON.parse(s); } catch {
+            if (!s.trim()) return [];
+            try {
+                const res = JSON.parse(s);
+                return Array.isArray(res) ? res : [res];
+            } catch {
                 return s.trim().split('\n').map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
             }
         };

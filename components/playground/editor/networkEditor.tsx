@@ -4,16 +4,18 @@ import { Network } from "@composecraft/docker-compose-lib";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
-import { Unlink, Link, Blocks, Grid2x2, Router, Shield, ShieldOff, Cpu, Globe } from "lucide-react";
+import { Unlink, Link, Blocks, Grid2x2, Router, Shield, ShieldOff, Cpu, Globe, GitBranch } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { NetworkDriver } from "@composecraft/docker-compose-lib";
+import usePositionMap, { NetworkNodeType, GatewayImpl } from "@/store/metadataMap";
 
 export default function NetowrkEditor() {
 
     const { selectedId } = useSelectionStore();
-    const { compose, setCompose } = useComposeStore()
+    const { compose, setCompose } = useComposeStore();
+    const { networkNodeMeta, setNetworkNodeMeta } = usePositionMap();
 
     function getNetwork(): Network {
         const net = compose.networks.get("id", selectedId)
@@ -24,6 +26,7 @@ export default function NetowrkEditor() {
     }
 
     const network = getNetwork();
+    const meta = networkNodeMeta.get(network.id) || { type: 'switch' as NetworkNodeType };
 
     return (
         <form className="flex flex-col gap-6 p-6 bg-[#0a0d14]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500 text-slate-300">
@@ -31,7 +34,62 @@ export default function NetowrkEditor() {
                 <Router className="w-8 h-8 text-orange-500" />
                 Network
             </h2>
-            <div className="flex flex-col gap-6 w-full mt-2">
+
+            {/* ── Node Type Selector ───────────────────────────────────────── */}
+            <div className="flex flex-col gap-3 p-4 bg-blue-500/5 rounded-2xl border border-blue-500/15">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-blue-400 flex items-center gap-2">
+                    <GitBranch className="w-3.5 h-3.5" />
+                    Node Type
+                </Label>
+
+                {/* Type radio-style buttons */}
+                <div className="grid grid-cols-3 gap-2">
+                    {([
+                        { value: 'switch', label: 'Switch Virtual', icon: GitBranch, color: 'text-blue-400', activeBg: 'bg-blue-500/20 border-blue-500/40' },
+                        { value: 'gateway-l7', label: 'Gateway L7', icon: Globe, color: 'text-emerald-400', activeBg: 'bg-emerald-500/20 border-emerald-500/40' },
+                        { value: 'router-l3', label: 'Router L3', icon: Router, color: 'text-amber-400', activeBg: 'bg-amber-500/20 border-amber-500/40' },
+                    ] as const).map(({ value, label, icon: Icon, color, activeBg }) => {
+                        const isActive = meta.type === value;
+                        return (
+                            <button
+                                key={value}
+                                type="button"
+                                onClick={() => setNetworkNodeMeta(network.id, { type: value as NetworkNodeType })}
+                                className={`flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-xl border transition-all duration-200 cursor-pointer select-none ${isActive ? activeBg : 'bg-white/3 border-white/10 hover:bg-white/6'}`}
+                            >
+                                <Icon className={`w-4 h-4 ${isActive ? color : 'text-slate-600'}`} />
+                                <span className={`text-[7px] font-black uppercase tracking-wider leading-tight text-center ${isActive ? color : 'text-slate-600'}`}>
+                                    {label}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Sub-option: nginx / traefik — only when gateway-l7 */}
+                {meta.type === 'gateway-l7' && (
+                    <div className="flex flex-col gap-2 mt-1">
+                        <Label className="text-xs text-slate-400">Gateway Implementation</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {(['nginx', 'traefik'] as GatewayImpl[]).map(impl => {
+                                const isActive = (meta.gatewayImpl || 'nginx') === impl;
+                                return (
+                                    <button
+                                        key={impl}
+                                        type="button"
+                                        onClick={() => setNetworkNodeMeta(network.id, { gatewayImpl: impl })}
+                                        className={`py-2 px-3 rounded-xl border transition-all duration-200 cursor-pointer select-none ${isActive ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400' : 'bg-white/3 border-white/10 text-slate-600 hover:bg-white/6'}`}
+                                    >
+                                        <span className="text-[9px] font-black uppercase tracking-widest">{impl}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="flex flex-col gap-6 w-full">
                 <div className="flex flex-col gap-2">
                     <Label className="text-sm font-bold text-slate-400" htmlFor="name">Name</Label>
                     <Input name="name" value={network.name}

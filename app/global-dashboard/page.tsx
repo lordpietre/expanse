@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     getGlobalDockerStats, getSystemInfo,
@@ -10,12 +10,53 @@ import {
 import {
     Layers, Database, Activity, RefreshCw, HardDrive, Cpu,
     Container, ArrowLeft, ChevronRight, Square, Trash2, X,
-    Lock, AlertTriangle, Box, Boxes, MemoryStick
+    Lock, AlertTriangle, Box, Boxes, MemoryStick, Network
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+
+// ── Port parsing util ──────────────────────────────────────────────────────────
+/** Parse Docker Ports string e.g. "0.0.0.0:8080->80/tcp, :::443->443/tcp, 3306/tcp" into chips */
+function parsePorts(portsStr: string | undefined): { host: string; container: string }[] {
+    if (!portsStr || typeof portsStr !== 'string') return [];
+    const result: { host: string; container: string }[] = [];
+    const parts = portsStr.split(',');
+    for (const part of parts) {
+        const m = part.trim().match(/:(\d+)->([\d]+)/);
+        if (m) {
+            const entry = { host: m[1], container: m[2] };
+            // Deduplicate by host:container pair
+            if (!result.some(r => r.host === entry.host && r.container === entry.container)) {
+                result.push(entry);
+            }
+        } else {
+            const mUnmapped = part.trim().match(/^(\d+)\//);
+            if (mUnmapped) {
+                const entry = { host: '-', container: mUnmapped[1] };
+                if (!result.some(r => r.host === entry.host && r.container === entry.container)) {
+                    result.push(entry);
+                }
+            }
+        }
+    }
+    return result;
+}
+
+function PortChips({ ports }: { ports: { host: string; container: string }[] }) {
+    if (!ports.length) return null;
+    return (
+        <div className="flex flex-wrap gap-1 mt-1">
+            {ports.map((p, i) => (
+                <span key={i} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[9px] font-mono font-bold text-cyan-400">
+                    <Network className="w-2.5 h-2.5 shrink-0" />
+                    {p.host === '-' ? p.container : `${p.host}:${p.container}`}
+                </span>
+            ))}
+        </div>
+    );
+}
 
 // ─── Password Modal ───────────────────────────────────────────────────────────
 function PasswordModal({
@@ -103,10 +144,16 @@ function ProjectDetail({
     const [actionLoading, setActionLoading] = useState(false);
 
     const fetchDetail = useCallback(async () => {
-        setLoadingDetail(true);
-        const res = await getProjectContainers(project.Name);
-        if (!('error' in res)) setDetail(res as any);
-        setLoadingDetail(false);
+        try {
+            setLoadingDetail(true);
+            const res = await getProjectContainers(project.Name);
+            if (!('error' in res)) setDetail(res as any);
+            else console.error('getProjectContainers error:', (res as any).error);
+        } catch (err) {
+            console.error('fetchDetail threw:', err);
+        } finally {
+            setLoadingDetail(false);
+        }
     }, [project.Name]);
 
     useEffect(() => { fetchDetail(); }, [fetchDetail]);
@@ -209,49 +256,53 @@ function ProjectDetail({
                                 <div className="py-8 text-center text-slate-600 text-xs">Sin contenedores</div>
                             ) : (
                                 <div className="space-y-2">
-                                    {detail?.containers.map((c: any) => (
-                                        <div key={c.ID}
-                                            className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-xl hover:border-indigo-500/20 transition-colors group">
-                                            <div className="flex items-center gap-3 min-w-0">
-                                                <div className={cn(
-                                                    "w-2 h-2 rounded-full shrink-0",
-                                                    c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-400/50" : "bg-slate-600"
-                                                )} />
-                                                <div className="min-w-0">
-                                                    <div className="font-bold text-sm text-white truncate">{c.Names}</div>
-                                                    <div className="text-[10px] text-slate-500 font-mono">{c.Image}</div>
+                                    {detail?.containers.map((c: any) => {
+                                        const ports = parsePorts(c.Ports);
+                                        return (
+                                            <div key={c.ID}
+                                                className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-xl hover:border-indigo-500/20 transition-colors group">
+                                                <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                    <div className={cn(
+                                                        "w-2 h-2 rounded-full shrink-0",
+                                                        c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-400/50" : "bg-slate-600"
+                                                    )} />
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="font-bold text-sm text-white truncate">{c.Names}</div>
+                                                        <div className="text-[10px] text-slate-500 font-mono">{c.Image}</div>
+                                                        <PortChips ports={ports} />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                    <span className={cn(
+                                                        "px-2 py-0.5 rounded-full font-black uppercase tracking-widest text-[9px] border",
+                                                        c.State === "running"
+                                                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                                            : "bg-slate-800 border-slate-700 text-slate-500"
+                                                    )}>{c.State}</span>
+                                                    <button
+                                                        onClick={() => runWithPassword(
+                                                            "Detener contenedor",
+                                                            `Detener "${c.Names}"`,
+                                                            () => stopContainer(c.ID)
+                                                        )}
+                                                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all"
+                                                        title="Detener">
+                                                        <Square className="w-3 h-3 fill-amber-400" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => runWithPassword(
+                                                            "Eliminar contenedor",
+                                                            `Eliminar permanentemente "${c.Names}"`,
+                                                            () => removeContainer(c.ID)
+                                                        )}
+                                                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all"
+                                                        title="Eliminar">
+                                                        <Trash2 className="w-3 h-3" />
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2 shrink-0">
-                                                <span className={cn(
-                                                    "px-2 py-0.5 rounded-full font-black uppercase tracking-widest text-[9px] border",
-                                                    c.State === "running"
-                                                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                                        : "bg-slate-800 border-slate-700 text-slate-500"
-                                                )}>{c.State}</span>
-                                                <button
-                                                    onClick={() => runWithPassword(
-                                                        "Detener contenedor",
-                                                        `Detener "${c.Names}"`,
-                                                        () => stopContainer(c.ID)
-                                                    )}
-                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all"
-                                                    title="Detener">
-                                                    <Square className="w-3 h-3 fill-amber-400" />
-                                                </button>
-                                                <button
-                                                    onClick={() => runWithPassword(
-                                                        "Eliminar contenedor",
-                                                        `Eliminar permanentemente "${c.Names}"`,
-                                                        () => removeContainer(c.ID)
-                                                    )}
-                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all"
-                                                    title="Eliminar">
-                                                    <Trash2 className="w-3 h-3" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -301,22 +352,58 @@ export default function DashboardPage() {
     const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
     const [selectedProject, setSelectedProject] = useState<any>(null);
 
-    const fetchData = async () => {
-        const [dockerStats, systemStats] = await Promise.all([
-            getGlobalDockerStats(),
-            getSystemInfo()
-        ]);
-        if (!dockerStats.error) setStats(dockerStats);
-        if (!systemStats.error) setSysInfo(systemStats);
-        setLastUpdated(new Date());
-        setLoading(false);
-    };
+    const fetchData = useCallback(async () => {
+        try {
+            const [dockerStats, systemStats] = await Promise.all([
+                getGlobalDockerStats(),
+                getSystemInfo()
+            ]);
+            if (!('error' in dockerStats)) setStats(dockerStats);
+            if (!('error' in systemStats)) setSysInfo(systemStats);
+            setLastUpdated(new Date());
+        } catch (err) {
+            console.error('fetchData error:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         fetchData();
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchData]);
+
+    // Build a map of projectName -> all port mappings across its containers
+    const portsByProject = useMemo(() => {
+        const map: Record<string, { host: string; container: string }[]> = {};
+        if (!stats?.containers) return map;
+        for (const c of stats.containers) {
+            try {
+                let projectName: string | null = null;
+                const labels = c.Labels;
+
+                if (typeof labels === 'object' && labels !== null) {
+                    projectName = labels['com.docker.compose.project'];
+                } else if (typeof labels === 'string') {
+                    const m = labels.match(/(?:^|,)com\.docker\.compose\.project=([^,]+)/);
+                    projectName = m ? m[1].trim() : null;
+                }
+
+                if (!projectName) continue;
+                const ports = parsePorts(c.Ports);
+                if (!map[projectName]) map[projectName] = [];
+                for (const p of ports) {
+                    if (!map[projectName].some(existing => existing.host === p.host && existing.container === p.container)) {
+                        map[projectName].push(p);
+                    }
+                }
+            } catch (err) {
+                console.error("Error grouping ports by project:", err);
+            }
+        }
+        return map;
+    }, [stats]);
 
     const formatBytes = (bytes: number) => {
         if (bytes === 0) return '0 B';
@@ -437,73 +524,78 @@ export default function DashboardPage() {
                             <EmptyState icon={<Layers className="w-12 h-12" />} label="Sin proyectos activos" />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {stats.projects.map((proj: any) => (
-                                    <div
-                                        key={proj.Name}
-                                        className="flex items-center justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-blue-500/30 hover:bg-[#0d1117] transition-all group"
-                                    >
-                                        <button
-                                            onClick={() => setSelectedProject(proj)}
-                                            className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                                {stats.projects.map((proj: any) => {
+                                    const projPorts = portsByProject[proj.Name] || [];
+                                    return (
+                                        <div
+                                            key={proj.Name}
+                                            className="flex items-start justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-blue-500/30 hover:bg-[#0d1117] transition-all group"
                                         >
-                                            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/10 group-hover:border-blue-500/30 transition-colors">
-                                                <Boxes className="w-4 h-4 text-blue-400" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <div className="font-bold text-sm text-white truncate">{proj.Name}</div>
-                                                <div className="text-[10px] text-slate-600 font-mono truncate max-w-[200px]">{proj.ConfigFiles}</div>
-                                            </div>
-                                        </button>
-                                        <div className="flex items-center gap-2 shrink-0 ml-3">
-                                            <span className={cn(
-                                                "px-2 py-0.5 rounded-full font-black uppercase tracking-widest text-[9px] border",
-                                                proj.Status?.includes("running")
-                                                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                                    : "bg-slate-800 border-slate-700 text-slate-500"
-                                            )}>
-                                                {proj.Status}
-                                            </span>
-                                            {/* Quick-action buttons visible on hover */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toast.promise(
-                                                        stopProjectByName(proj.Name).then(r => {
-                                                            if (r.success) fetchData(); else throw new Error(r.error);
-                                                        }),
-                                                        { loading: 'Deteniendo...', success: 'Detenido', error: (e: Error) => e.message || 'Error' }
-                                                    );
-                                                }}
-                                                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
-                                                title="Detener proyecto"
-                                            >
-                                                <Square className="w-3 h-3 fill-amber-400" />
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    if (!confirm(`¿Eliminar completamente "${proj.Name}"? Esto borrará todos los contenedores y volúmenes.`)) return;
-                                                    toast.promise(
-                                                        removeProjectByName(proj.Name).then(r => {
-                                                            if (r.success) fetchData(); else throw new Error(r.error);
-                                                        }),
-                                                        { loading: 'Eliminando...', success: 'Eliminado', error: (e: Error) => e.message || 'Error' }
-                                                    );
-                                                }}
-                                                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
-                                                title="Eliminar proyecto"
-                                            >
-                                                <Trash2 className="w-3 h-3" />
-                                            </button>
                                             <button
                                                 onClick={() => setSelectedProject(proj)}
-                                                className="p-1.5 rounded-lg text-slate-600 hover:text-white transition-colors"
+                                                className="flex items-start gap-3 min-w-0 flex-1 text-left"
                                             >
-                                                <ChevronRight className="w-4 h-4" />
+                                                <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/10 group-hover:border-blue-500/30 transition-colors shrink-0 mt-0.5">
+                                                    <Boxes className="w-4 h-4 text-blue-400" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="font-bold text-sm text-white truncate">{proj.Name}</div>
+                                                    <div className="text-[10px] text-slate-600 font-mono truncate max-w-[200px]">{proj.ConfigFiles}</div>
+                                                    {/* Port badges for this project */}
+                                                    <PortChips ports={projPorts} />
+                                                </div>
                                             </button>
+                                            <div className="flex items-center gap-2 shrink-0 ml-3">
+                                                <span className={cn(
+                                                    "px-2 py-0.5 rounded-full font-black uppercase tracking-widest text-[9px] border",
+                                                    proj.Status?.includes("running")
+                                                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                                        : "bg-slate-800 border-slate-700 text-slate-500"
+                                                )}>
+                                                    {proj.Status}
+                                                </span>
+                                                {/* Quick-action buttons visible on hover */}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        toast.promise(
+                                                            stopProjectByName(proj.Name).then(r => {
+                                                                if (r.success) fetchData(); else throw new Error(r.error);
+                                                            }),
+                                                            { loading: 'Deteniendo...', success: 'Detenido', error: (e: Error) => e.message || 'Error' }
+                                                        );
+                                                    }}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
+                                                    title="Detener proyecto"
+                                                >
+                                                    <Square className="w-3 h-3 fill-amber-400" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (!confirm(`¿Eliminar completamente "${proj.Name}"? Esto borrará todos los contenedores y volúmenes.`)) return;
+                                                        toast.promise(
+                                                            removeProjectByName(proj.Name).then(r => {
+                                                                if (r.success) fetchData(); else throw new Error(r.error);
+                                                            }),
+                                                            { loading: 'Eliminando...', success: 'Eliminado', error: (e: Error) => e.message || 'Error' }
+                                                        );
+                                                    }}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
+                                                    title="Eliminar proyecto"
+                                                >
+                                                    <Trash2 className="w-3 h-3" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setSelectedProject(proj)}
+                                                    className="p-1.5 rounded-lg text-slate-600 hover:text-white transition-colors"
+                                                >
+                                                    <ChevronRight className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </TabsContent>
@@ -514,31 +606,35 @@ export default function DashboardPage() {
                             <EmptyState icon={<Container className="w-12 h-12" />} label="Sin contenedores" />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {stats.containers.map((c: any) => (
-                                    <div key={c.ID}
-                                        className="flex items-center justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className={cn(
-                                                "w-2 h-2 rounded-full shrink-0",
-                                                c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-500/50" : "bg-slate-600"
-                                            )} />
-                                            <div className="min-w-0">
-                                                <div className="font-bold text-sm text-white truncate">{c.Names}</div>
-                                                <div className="text-[10px] text-slate-500">{c.Image}</div>
+                                {stats.containers.map((c: any) => {
+                                    const ports = parsePorts(c.Ports);
+                                    return (
+                                        <div key={c.ID}
+                                            className="flex items-start justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
+                                            <div className="flex items-start gap-3 min-w-0 flex-1">
+                                                <div className={cn(
+                                                    "w-2 h-2 rounded-full shrink-0 mt-2",
+                                                    c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-500/50" : "bg-slate-600"
+                                                )} />
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="font-bold text-sm text-white truncate">{c.Names}</div>
+                                                    <div className="text-[10px] text-slate-500">{c.Image}</div>
+                                                    <PortChips ports={ports} />
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                <span className={cn(
+                                                    "px-2 py-0.5 rounded-full font-black uppercase tracking-widest text-[9px] border",
+                                                    c.State === "running"
+                                                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                                        : "bg-slate-800 border-slate-700 text-slate-500"
+                                                )}>
+                                                    {c.State}
+                                                </span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <span className={cn(
-                                                "px-2 py-0.5 rounded-full font-black uppercase tracking-widest text-[9px] border",
-                                                c.State === "running"
-                                                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                                    : "bg-slate-800 border-slate-700 text-slate-500"
-                                            )}>
-                                                {c.State}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </TabsContent>

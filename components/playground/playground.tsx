@@ -11,7 +11,7 @@ import {
 import { useComposeStore } from "@/store/compose";
 import ServiceNode from "@/components/playground/node/serviceNode";
 import NetworkNode from "@/components/playground/node/networkNode";
-import { Binding, Compose, Env, KeyValue, Network, SuperSet, Volume } from "@composecraft/docker-compose-lib";
+import { Binding, Compose, Env, KeyValue, Network, SuperSet, Volume, Service } from "@composecraft/docker-compose-lib";
 import { dependencyEdgeStyle, envEdgeStyle, networkEdgeStyle, volumeEdgeStyle, labelEdgeStyle } from "@/components/playground/node/utils";
 import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -57,6 +57,107 @@ const AutoCenter = () => {
     }, [selectedId, setCenter, getNode]);
 
     return null;
+};
+
+const getDbEnvVars = (source: Service, dbServiceName: string): Record<string, string> | null => {
+    const image = (source.image?.name || "").toLowerCase();
+
+    const getSourceEnv = (keys: string[]): string => {
+        if (!source.environment) return "";
+        for (const k of keys) {
+            const found = Array.from(source.environment).find(e => e.key === k);
+            if (found?.value) return found.value;
+        }
+        return "";
+    };
+
+    if (image.includes("mariadb") || image.includes("mysql")) {
+        const rootPwd = getSourceEnv(["MARIADB_ROOT_PASSWORD", "MYSQL_ROOT_PASSWORD"]);
+        const dbName = getSourceEnv(["MARIADB_DATABASE", "MYSQL_DATABASE"]);
+        const dbUser = getSourceEnv(["MARIADB_USER", "MYSQL_USER"]) || "root";
+        const dbPwd = getSourceEnv(["MARIADB_USER", "MYSQL_USER"])
+            ? getSourceEnv(["MARIADB_PASSWORD", "MYSQL_PASSWORD"])
+            : rootPwd;
+        const resolvedDb = dbName || "app";
+
+        return {
+            WORDPRESS_DB_HOST: dbServiceName,
+            WORDPRESS_DB_USER: dbUser,
+            WORDPRESS_DB_PASSWORD: dbPwd || rootPwd,
+            WORDPRESS_DB_NAME: resolvedDb,
+            DB_SERVER: dbServiceName,
+            DB_USER: dbUser,
+            DB_PASSWD: dbPwd || rootPwd,
+            DB_NAME: resolvedDb,
+            MYSQL_HOST: dbServiceName,
+            MYSQL_USER: dbUser,
+            MYSQL_PASSWORD: dbPwd || rootPwd,
+            MYSQL_DATABASE: resolvedDb,
+        };
+    }
+    if (image.includes("postgres")) {
+        const pgUser = getSourceEnv(["POSTGRES_USER"]) || "postgres";
+        const pgPwd = getSourceEnv(["POSTGRES_PASSWORD"]);
+        const pgDb = getSourceEnv(["POSTGRES_DB"]) || pgUser;
+        return {
+            POSTGRES_HOST: dbServiceName,
+            POSTGRES_USER: pgUser,
+            POSTGRES_PASSWORD: pgPwd,
+            POSTGRES_DB: pgDb,
+            DATABASE_URL: `postgresql://${pgUser}:${pgPwd}@${dbServiceName}:5432/${pgDb}`,
+        };
+    }
+    if (image.includes("mongo")) {
+        const mongoUser = getSourceEnv(["MONGO_INITDB_ROOT_USERNAME", "MONGO_USER"]);
+        const mongoPwd = getSourceEnv(["MONGO_INITDB_ROOT_PASSWORD", "MONGO_PASSWORD"]);
+        const mongoDb = getSourceEnv(["MONGO_INITDB_DATABASE"]) || "app";
+        const auth = mongoUser ? `${mongoUser}:${mongoPwd}@` : "";
+        return {
+            MONGO_HOST: dbServiceName,
+            MONGO_PORT: "27017",
+            MONGODB_URI: `mongodb://${auth}${dbServiceName}:27017/${mongoDb}`,
+            MONGO_INITDB_DATABASE: mongoDb,
+        };
+    }
+    if (image.includes("redis")) {
+        const redisPwd = getSourceEnv(["REDIS_PASSWORD", "REQUIREPASS"]);
+        return {
+            REDIS_HOST: dbServiceName,
+            REDIS_PORT: "6379",
+            REDIS_URL: redisPwd
+                ? `redis://:${redisPwd}@${dbServiceName}:6379`
+                : `redis://${dbServiceName}:6379`,
+        };
+    }
+    return null;
+};
+
+const handleDbAutoInject = (source: Service, target: Service) => {
+    const sourceImage = (source.image?.name || "").toLowerCase();
+    const isDatabase = sourceImage.includes('db') || sourceImage.includes('sql') ||
+        sourceImage.includes('mongo') || sourceImage.includes('redis') ||
+        sourceImage.includes('postgres') || sourceImage.includes('maria') ||
+        sourceImage.includes('mysql');
+
+    if (isDatabase) {
+        const envVars = getDbEnvVars(source, source.name);
+        if (envVars) {
+            if (!target.environment) {
+                target.environment = new SuperSet<Readonly<Env>>();
+            }
+            const dbKeys = new Set(Object.keys(envVars));
+            const toRemove = Array.from(target.environment).filter(e => dbKeys.has(e.key));
+            toRemove.forEach(e => target.environment!.delete(e));
+
+            Object.entries(envVars).forEach(([key, value]) => {
+                if (value !== "") {
+                    target.environment!.add(new Env(key, value));
+                }
+            });
+            return true;
+        }
+    }
+    return false;
 };
 
 const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControlsByDefault = false }, ref) => {
@@ -155,272 +256,6 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
         'elk.portConstraints': 'FIXED_SIDE',
         'elk.ports.fixedSide': 'WEST'
     };
-
-    function onLayout() {
-        // First ensure all nodes are in the DOM and measured
-        const nodes = composeToNodes(compose);
-
-        // Wait a tick for DOM to update
-        setTimeout(() => {
-            const graph = {
-                id: 'root',
-                layoutOptions: defaultOptions,
-                children: nodes.map((node) => {
-                    const element = window.document.getElementById(node.id);
-                    const width = element?.offsetWidth || 200;  // Increased default size
-                    const height = element?.offsetHeight || 200;
-                    return {
-                        id: node.id,
-                        width,
-                        height,
-                        x: node.position.x,
-                        y: node.position.y,
-                    };
-                }),
-                edges: composeToEdge(compose).map((edge) => ({
-                    id: edge.id,
-                    sources: [edge.source],
-                    targets: [edge.target]
-                }))
-            };
-
-            elk.layout(graph).then(({ children }) => {
-                if (children) {
-                    // Create a batch of all position updates
-                    const updates = new Map();
-                    children.forEach((node) => {
-                        updates.set(node.id, {
-                            position: {
-                                x: node.x || 0,
-                                y: node.y || 0
-                            }
-                        });
-                    });
-
-                    // Apply all updates at once
-                    setPositionMap(updates);
-                }
-            }).catch(error => {
-                console.error('ELK layout error:', error);
-            });
-        }, 0);
-    }
-
-
-    useImperativeHandle(ref, () => ({
-        onLayout,
-        setHideControls
-    }));
-
-    const onNodesChanges = useCallback(
-        // eslint-disable-next-line
-        (changes: any[]) => {
-            if (!isDraggable) {
-                return;
-            }
-
-            changes.forEach((change) => {
-                if (change?.type === "position") {
-                    if (change?.position?.x && change?.position?.y) {
-                        //console.log(change.position)
-                        updatePosition(change.id, change.position)
-                    }
-                }
-            })
-        },
-        [updatePosition, isDraggable]
-    )
-
-    // eslint-disable-next-line
-    async function onNodesConnect(params: any) {
-        const handleConnection = async (handler: (compose: Compose) => void, forceSuccess = false) => {
-            const result = await setCompose(handler)
-            if (!result && !forceSuccess) {
-                toast.error(`can't assign ${params.targetHandle} handle with ${params.sourceHandle} handle`)
-            }
-        }
-
-        if (params.sourceHandle === "network") {
-            await handleConnection((compose) => {
-                const service = compose.services.get("id", params.source)
-                const network = compose.networks.get("id", params.target)
-                // Accept any port-1 to port-7 connection on a network node
-                if (service && network && params.targetHandle?.startsWith("port-")) {
-                    service.networks.add(network)
-                    // Persist the port mapping
-                    const { connectionMap, setConnectionMap } = usePositionMap.getState();
-                    const newMap = new Map(connectionMap);
-                    newMap.set(`${params.source}:${params.target}`, params.targetHandle);
-                    setConnectionMap(newMap);
-                } else if (service && network && !params.targetHandle) {
-                    // Fallback for legacy network connections if any
-                    service.networks.add(network)
-                }
-            }, true) // Force success to allow port re-assignment
-        } else if (params.sourceHandle === "service") {
-            await handleConnection((compose) => {
-                const source = compose.services.get("id", params.source)
-                const target = compose.services.get("id", params.target)
-                if (source && target) {
-                    target.depends_on.add(source)
-
-                    // ─── DB env auto-inject ───────────────────────────────────────
-                    const sourceImage = source.image?.name?.toLowerCase() || ""
-
-                    // Helper: get a value from the DB service's own env vars
-                    const getSourceEnv = (keys: string[]): string => {
-                        if (!source.environment) return ""
-                        for (const k of keys) {
-                            const found = Array.from(source.environment).find(e => e.key === k)
-                            if (found?.value) return found.value
-                        }
-                        return ""
-                    }
-
-                    const getDbEnvVars = (image: string, dbServiceName: string): Record<string, string> | null => {
-                        if (image.includes("mariadb") || image.includes("mysql")) {
-                            // Read actual password/user/db from source MariaDB/MySQL service
-                            const rootPwd = getSourceEnv(["MARIADB_ROOT_PASSWORD", "MYSQL_ROOT_PASSWORD"])
-                            const dbName = getSourceEnv(["MARIADB_DATABASE", "MYSQL_DATABASE"])
-                            const dbUser = getSourceEnv(["MARIADB_USER", "MYSQL_USER"]) || "root"
-                            const dbPwd = getSourceEnv(["MARIADB_USER", "MYSQL_USER"])
-                                ? getSourceEnv(["MARIADB_PASSWORD", "MYSQL_PASSWORD"])
-                                : rootPwd
-                            const resolvedDb = dbName || "app"
-
-                            return {
-                                // WordPress
-                                WORDPRESS_DB_HOST: dbServiceName,
-                                WORDPRESS_DB_USER: dbUser,
-                                WORDPRESS_DB_PASSWORD: dbPwd || rootPwd,
-                                WORDPRESS_DB_NAME: resolvedDb,
-                                // PrestaShop
-                                DB_SERVER: dbServiceName,
-                                DB_USER: dbUser,
-                                DB_PASSWD: dbPwd || rootPwd,
-                                DB_NAME: resolvedDb,
-                                // Generic MySQL
-                                MYSQL_HOST: dbServiceName,
-                                MYSQL_USER: dbUser,
-                                MYSQL_PASSWORD: dbPwd || rootPwd,
-                                MYSQL_DATABASE: resolvedDb,
-                            }
-                        }
-                        if (image.includes("postgres")) {
-                            const pgUser = getSourceEnv(["POSTGRES_USER"]) || "postgres"
-                            const pgPwd = getSourceEnv(["POSTGRES_PASSWORD"])
-                            const pgDb = getSourceEnv(["POSTGRES_DB"]) || pgUser
-                            return {
-                                POSTGRES_HOST: dbServiceName,
-                                POSTGRES_USER: pgUser,
-                                POSTGRES_PASSWORD: pgPwd,
-                                POSTGRES_DB: pgDb,
-                                DATABASE_URL: `postgresql://${pgUser}:${pgPwd}@${dbServiceName}:5432/${pgDb}`,
-                            }
-                        }
-                        if (image.includes("mongo")) {
-                            const mongoUser = getSourceEnv(["MONGO_INITDB_ROOT_USERNAME", "MONGO_USER"])
-                            const mongoPwd = getSourceEnv(["MONGO_INITDB_ROOT_PASSWORD", "MONGO_PASSWORD"])
-                            const mongoDb = getSourceEnv(["MONGO_INITDB_DATABASE"]) || "app"
-                            const auth = mongoUser ? `${mongoUser}:${mongoPwd}@` : ""
-                            return {
-                                MONGO_HOST: dbServiceName,
-                                MONGO_PORT: "27017",
-                                MONGODB_URI: `mongodb://${auth}${dbServiceName}:27017/${mongoDb}`,
-                                MONGO_INITDB_DATABASE: mongoDb,
-                            }
-                        }
-                        if (image.includes("redis")) {
-                            const redisPwd = getSourceEnv(["REDIS_PASSWORD", "REQUIREPASS"])
-                            return {
-                                REDIS_HOST: dbServiceName,
-                                REDIS_PORT: "6379",
-                                REDIS_URL: redisPwd
-                                    ? `redis://:${redisPwd}@${dbServiceName}:6379`
-                                    : `redis://${dbServiceName}:6379`,
-                            }
-                        }
-                        return null
-                    }
-
-                    const isDatabase = sourceImage.includes('db') || sourceImage.includes('sql') ||
-                        sourceImage.includes('mongo') || sourceImage.includes('redis') ||
-                        sourceImage.includes('postgres') || sourceImage.includes('maria') ||
-                        sourceImage.includes('mysql')
-
-                    if (isDatabase) {
-                        const envVars = getDbEnvVars(sourceImage, source.name)
-                        if (envVars) {
-                            if (!target.environment) {
-                                target.environment = new SuperSet<Readonly<Env>>()
-                            }
-                            // Remove stale keys for this DB before re-injecting
-                            const dbKeys = new Set(Object.keys(envVars))
-                            const toRemove = Array.from(target.environment).filter(e => dbKeys.has(e.key))
-                            toRemove.forEach(e => target.environment!.delete(e))
-
-                            Object.entries(envVars).forEach(([key, value]) => {
-                                if (value !== "") {
-                                    target.environment!.add(new Env(key, value))
-                                }
-                            })
-                            toast.success(`✅ DB env vars from ${source.name} → ${target.name}`)
-                        }
-                    }
-                    // ─────────────────────────────────────────────────────────────
-                }
-            })
-        } else if (params.sourceHandle === "volume") {
-            await handleConnection((compose) => {
-                // Determine if Service -> Volume or Volume -> Service
-                const sourceService = compose.services.get("id", params.source)
-                const targetVolume = compose.volumes.get("id", params.target)
-
-                const sourceVolume = compose.volumes.get("id", params.source)
-                const targetService = compose.services.get("id", params.target)
-
-                if (sourceService && targetVolume) {
-                    sourceService.bindings.add(new Binding({
-                        source: targetVolume,
-                        target: "/data"
-                    }))
-                } else if (sourceVolume && targetService) {
-                    targetService.bindings.add(new Binding({
-                        source: sourceVolume,
-                        target: "/data"
-                    }))
-                }
-            })
-        } else if (params.sourceHandle === "env") {
-            await handleConnection((compose) => {
-                const service = compose.services.get("id", params.source)
-                const env = compose.envs.get("id", params.target)
-                if (service && env) {
-                    if (!service.environment) {
-                        service.environment = new SuperSet<Readonly<Env>>()
-                    }
-                    service.environment.add(env)
-                }
-            })
-        } else if (params.sourceHandle === "label") {
-            await handleConnection((compose) => {
-                const service = compose.services.get("id", params.source)
-                const resultNodes = composeToNodes(compose);
-                // Note: Labels are currently stored as an array in Service. 
-                // Finding the specific label instance from the playground target.
-                const targetLabel = resultNodes.find(n => n.id === params.target)?.data.label;
-                if (service && targetLabel) {
-                    const label = targetLabel as KeyValue;
-                    if (!service.labels) service.labels = [];
-                    if (!service.labels.find(l => l.id === label.id)) {
-                        service.labels.push(label);
-                    }
-                }
-            })
-        } else {
-            toast.error(`can't assign ${params.targetHandle} handle with ${params.sourceHandle} handle`)
-        }
-    }
 
     function composeToNodes(compose: Compose): Node[] {
         const result: Node[] = []
@@ -562,32 +397,170 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
         return result
     }
 
-    function handleSelection(data: OnSelectionChangeParams | EdgeChange[]) {
+    function onLayout() {
+        const nodes = composeToNodes(compose);
+
+        setTimeout(() => {
+            const graph = {
+                id: 'root',
+                layoutOptions: defaultOptions,
+                children: nodes.map((node) => {
+                    const element = window.document.getElementById(node.id);
+                    const width = element?.offsetWidth || 200;
+                    const height = element?.offsetHeight || 200;
+                    return {
+                        id: node.id,
+                        width,
+                        height,
+                        x: node.position.x,
+                        y: node.position.y,
+                    };
+                }),
+                edges: composeToEdge(compose).map((edge) => ({
+                    id: edge.id,
+                    sources: [edge.source],
+                    targets: [edge.target]
+                }))
+            };
+
+            elk.layout(graph).then(({ children }) => {
+                if (children) {
+                    const updates = new Map();
+                    children.forEach((node) => {
+                        updates.set(node.id, {
+                            position: {
+                                x: node.x || 0,
+                                y: node.y || 0
+                            }
+                        });
+                    });
+                    setPositionMap(updates);
+                }
+            }).catch(error => {
+                console.error('ELK layout error:', error);
+            });
+        }, 0);
+    }
+
+    useImperativeHandle(ref, () => ({
+        onLayout,
+        setHideControls
+    }));
+
+    const onNodesChanges = useCallback(
+        (changes: any[]) => {
+            if (!isDraggable) return;
+
+            changes.forEach((change) => {
+                if (change?.type === "position") {
+                    if (change?.position?.x && change?.position?.y) {
+                        updatePosition(change.id, change.position)
+                    }
+                }
+            })
+        },
+        [updatePosition, isDraggable]
+    )
+
+    const onNodesConnect = async (params: any) => {
+        const handleConnection = async (handler: (compose: Compose) => void, forceSuccess = false) => {
+            const result = await setCompose(handler)
+            if (!result && !forceSuccess) {
+                toast.error(`can't assign ${params.targetHandle} handle with ${params.sourceHandle} handle`)
+            }
+        }
+
+        if (params.sourceHandle === "network") {
+            await handleConnection((compose) => {
+                const service = compose.services.get("id", params.source)
+                const network = compose.networks.get("id", params.target)
+                if (service && network && params.targetHandle?.startsWith("port-")) {
+                    service.networks.add(network)
+                    const { connectionMap, setConnectionMap } = usePositionMap.getState();
+                    const newMap = new Map(connectionMap);
+                    newMap.set(`${params.source}:${params.target}`, params.targetHandle);
+                    setConnectionMap(newMap);
+                } else if (service && network && !params.targetHandle) {
+                    service.networks.add(network)
+                }
+            }, true)
+        } else if (params.sourceHandle === "service") {
+            await handleConnection((compose) => {
+                const source = compose.services.get("id", params.source)
+                const target = compose.services.get("id", params.target)
+                if (source && target) {
+                    target.depends_on.add(source);
+                    if (handleDbAutoInject(source, target)) {
+                        toast.success(`✅ DB env vars from ${source.name} → ${target.name}`);
+                    }
+                }
+            })
+        } else if (params.sourceHandle === "volume") {
+            await handleConnection((compose) => {
+                const sourceService = compose.services.get("id", params.source)
+                const targetVolume = compose.volumes.get("id", params.target)
+                const sourceVolume = compose.volumes.get("id", params.source)
+                const targetService = compose.services.get("id", params.target)
+
+                if (sourceService && targetVolume) {
+                    sourceService.bindings.add(new Binding({ source: targetVolume, target: "/data" }))
+                } else if (sourceVolume && targetService) {
+                    targetService.bindings.add(new Binding({ source: sourceVolume, target: "/data" }))
+                }
+            })
+        } else if (params.sourceHandle === "env") {
+            await handleConnection((compose) => {
+                const service = compose.services.get("id", params.source)
+                const env = compose.envs.get("id", params.target)
+                if (service && env) {
+                    if (!service.environment) service.environment = new SuperSet<Readonly<Env>>()
+                    service.environment.add(env)
+                }
+            })
+        } else if (params.sourceHandle === "label") {
+            await handleConnection((compose) => {
+                const service = compose.services.get("id", params.source)
+                const resultNodes = composeToNodes(compose);
+                const targetLabel = resultNodes.find(n => n.id === params.target)?.data.label;
+                if (service && targetLabel) {
+                    const label = targetLabel as KeyValue;
+                    if (!service.labels) service.labels = [];
+                    if (!service.labels.find(l => l.id === label.id)) {
+                        service.labels.push(label);
+                    }
+                }
+            })
+        } else {
+            toast.error(`can't assign ${params.targetHandle} handle with ${params.sourceHandle} handle`)
+        }
+    }
+
+    const handleSelection = (data: OnSelectionChangeParams | EdgeChange[]) => {
         if (Object.prototype.hasOwnProperty.call(data, "nodes")) {
             const selectionParam = data as OnSelectionChangeParams
             if ((selectionParam.nodes.length >= 1)) {
                 setSelect(selectionParam.nodes[0].id)
             }
         } else {
-            // eslint-disable-next-line
             const edgeChange = (data as any[])[0]
-            if (edgeChange) {
-                setSelect(edgeChange.id)
-            }
+            if (edgeChange) setSelect(edgeChange.id)
         }
     }
 
-    function handleKeyPress(event: KeyboardEvent) {
-        const keyPressed = event.key;
+    const handleKeyPress = (event: KeyboardEvent) => {
+        // Ignore if user is typing in an input or textarea
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+            return;
+        }
 
-        // Handle specific keys
+        const keyPressed = event.key;
         switch (keyPressed) {
             case 'Backspace':
             case 'Delete':
                 handleBackspacePress(select, setCompose, setSelectedString)
                 break;
             default:
-                //console.log(`${keyPressed} key pressed`);
                 break;
         }
     }

@@ -1,21 +1,72 @@
 import { Network as NetworkType } from "@composecraft/docker-compose-lib";
 import { Handle, Position, useEdges } from "@xyflow/react";
 import { CardContent } from "@/components/ui/card";
-import { Globe, Activity, Signal, Link, Router, Zap } from "lucide-react";
+import { Globe, Activity, Signal, Link, Router, Zap, GitBranch, Shield } from "lucide-react";
 import { useComposeStore } from "@/store/compose";
 import { useExecutionStore } from "@/store/execution";
 import { cn } from "@/lib/utils";
 import Selectable from "@/components/playground/node/Selectable";
 import { useMemo } from "react";
+import usePositionMap, { NetworkNodeType, GatewayImpl } from "@/store/metadataMap";
+
+// ─── Node type config ─────────────────────────────────────────────────────────
+type NodeTypeMeta = {
+    label: string;
+    subLabel?: string;
+    Icon: React.ElementType;
+    badgeBg: string;
+    badgeText: string;
+    glowColor: string;
+    gradient: string;
+};
+
+function getNodeTypeMeta(type: NetworkNodeType, gatewayImpl?: GatewayImpl): NodeTypeMeta {
+    switch (type) {
+        case 'gateway-l7':
+            return {
+                label: 'Gateway',
+                subLabel: gatewayImpl === 'traefik' ? 'Traefik' : 'Nginx',
+                Icon: Globe,
+                badgeBg: 'bg-emerald-500/15 border-emerald-500/25',
+                badgeText: 'text-emerald-400',
+                glowColor: 'rgba(16,185,129,0.5)',
+                gradient: 'from-emerald-400 via-teal-500 to-cyan-600',
+            };
+        case 'router-l3':
+            return {
+                label: 'Router L3',
+                Icon: Router,
+                badgeBg: 'bg-amber-500/15 border-amber-500/25',
+                badgeText: 'text-amber-400',
+                glowColor: 'rgba(245,158,11,0.5)',
+                gradient: 'from-amber-400 via-orange-500 to-red-500',
+            };
+        case 'switch':
+        default:
+            return {
+                label: 'Switch',
+                Icon: GitBranch,
+                badgeBg: 'bg-blue-500/15 border-blue-500/25',
+                badgeText: 'text-blue-400',
+                glowColor: 'rgba(59,130,246,0.5)',
+                gradient: 'from-blue-400 via-indigo-500 to-purple-600',
+            };
+    }
+}
 
 export default function NetworkNode({ data, selected }: { data: { network: NetworkType }, selected?: boolean }) {
     const { compose, tick } = useComposeStore();
     const { serviceStatuses } = useExecutionStore();
+    const { networkNodeMeta } = usePositionMap();
     const edges = useEdges();
 
     const subnet = data.network.ipam?.config?.[0]?.subnet;
     const explicitGateway = data.network.ipam?.config?.[0]?.gateway;
     const gatewayIp = explicitGateway || (subnet ? subnet.split('/')[0].split('.').slice(0, 3).join('.') + '.1' : null);
+
+    const meta = networkNodeMeta.get(data.network.id) || { type: 'switch' as NetworkNodeType };
+    const typeMeta = getNodeTypeMeta(meta.type, meta.gatewayImpl);
+    const NodeIcon = typeMeta.Icon;
 
     const portConnections = useMemo(() => {
         const connections: Record<string, boolean> = {};
@@ -38,7 +89,7 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
             <div className={cn(
                 "group relative flex flex-col transition-all duration-500 overflow-visible",
                 selected
-                    ? "p-[1.5px] rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 scale-[1.03] z-50 shadow-xl shadow-indigo-500/25"
+                    ? `p-[1.5px] rounded-xl bg-gradient-to-br ${typeMeta.gradient} scale-[1.03] z-50 shadow-xl`
                     : "p-[1px] rounded-xl bg-white/5 hover:bg-white/10 shadow-lg"
             )}>
                 <div className="bg-[#0d1117]/95 backdrop-blur-3xl rounded-[0.7rem] overflow-visible flex flex-col min-w-[260px]">
@@ -46,17 +97,25 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                     {/* Header — dark chassis */}
                     <div className="px-5 py-3 flex items-center justify-between relative overflow-hidden bg-slate-950 rounded-t-[0.7rem]">
                         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-                        <div className="absolute -right-10 -top-10 w-32 h-32 bg-blue-600/15 rounded-full blur-[60px] animate-pulse" />
+                        <div className={cn("absolute -right-10 -top-10 w-32 h-32 rounded-full blur-[60px] animate-pulse opacity-15")}
+                            style={{ background: typeMeta.glowColor }} />
 
                         <div className="flex flex-col z-10 gap-1 min-w-0">
                             <div className="flex items-center gap-2">
                                 <div className="w-5 h-0.5 bg-blue-500 rounded-full shadow-[0_0_6px_rgba(59,130,246,0.9)]" />
-                                <span className="text-[8px] font-black uppercase tracking-[0.35em] text-blue-400">Network Hub</span>
+                                <span className={cn("text-[8px] font-black uppercase tracking-[0.35em]", typeMeta.badgeText)}>
+                                    {typeMeta.label}{typeMeta.subLabel ? ` · ${typeMeta.subLabel}` : ''}
+                                </span>
                             </div>
                             <h3 className="text-white font-black text-lg tracking-tight uppercase truncate max-w-[140px] drop-shadow-lg leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
                                 {data.network.name}
                             </h3>
-                            <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                {/* Network type badge */}
+                                <div className={cn("px-1.5 py-0.5 rounded border text-[7px] font-black uppercase tracking-widest", typeMeta.badgeBg, typeMeta.badgeText)}>
+                                    {meta.type === 'switch' ? 'Switch Virtual' : meta.type === 'gateway-l7' ? `L7 · ${meta.gatewayImpl || 'nginx'}` : 'Router L3'}
+                                </div>
+                                {/* Driver badge */}
                                 <div className="px-1.5 py-0.5 rounded bg-blue-500/15 border border-blue-500/25 text-[7px] font-black text-blue-400 uppercase tracking-widest">
                                     {data.network.driver?.toUpperCase() || "BRIDGE"}
                                 </div>
@@ -67,7 +126,7 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                             <div className="bg-slate-900 shadow-inner p-3 rounded-xl border border-white/5 flex items-center justify-center group-hover:rotate-12 transition-transform duration-700">
                                 {isHostMode
                                     ? <Zap className="w-7 h-7 text-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]" />
-                                    : <Router className="w-7 h-7 text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                                    : <NodeIcon className={cn("w-7 h-7 drop-shadow", typeMeta.badgeText)} style={{ filter: `drop-shadow(0 0 10px ${typeMeta.glowColor})` }} />
                                 }
                             </div>
                         </div>

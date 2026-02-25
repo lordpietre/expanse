@@ -17,7 +17,7 @@ export const libraryServices: TemplateService[] = [
     },
     {
         name: "PostgreSQL",
-        image: "postgres:15-alpine",
+        image: "postgres:18-alpine",
         category: "Database",
         description: "Powerful, open source object-relational database system with a strong reputation for reliability.",
         default_ports: ["5432:5432"],
