@@ -32,12 +32,9 @@ RUN npm install -g corepack@latest && corepack enable pnpm && pnpm run build;
 FROM base AS runner
 WORKDIR /app
 
-# Install Chrome dependencies and Puppeteer before switching users
-RUN apk add --no-cache chromium ca-certificates docker-cli docker-cli-compose
+# Install Docker CLI and Compose
+RUN apk add --no-cache ca-certificates docker-cli docker-cli-compose
 
-# Set Puppeteer to use the system Chromium
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 

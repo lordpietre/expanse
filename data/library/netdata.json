@@ -1,0 +1,15 @@
+{
+    "name": "Netdata",
+    "image": "netdata/netdata:latest",
+    "category": "Network",
+    "description": "High-performance, real-time health monitoring and performance troubleshooting for systems and applications. Stunning 1s-granularity dashboards.",
+    "default_ports": [
+        "19999:19999"
+    ],
+    "volumes": [
+        "/var/run/docker.sock:/var/run/docker.sock:ro",
+        "netdata_cache:/var/cache/netdata",
+        "netdata_lib:/var/lib/netdata"
+    ],
+    "logo": "https://raw.githubusercontent.com/netdata/netdata/master/web/gui/images/logo.svg"
+}

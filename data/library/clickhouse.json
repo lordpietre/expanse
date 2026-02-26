@@ -1,0 +1,10 @@
+{
+    "name": "ClickHouse",
+    "image": "clickhouse/clickhouse-server:latest",
+    "category": "Database",
+    "description": "Columnar Analytics. Data Warehouse, real-time analytics. Fastest for OLAP.",
+    "default_ports": [
+        "8123:8123",
+        "9000:9000"
+    ]
+}

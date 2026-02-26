@@ -1,0 +1,10 @@
+{
+    "name": "SurrealDB",
+    "image": "surrealdb/surrealdb:latest",
+    "category": "Database",
+    "description": "Multi-model (2025). SQL + Graph + Document. Promising and fast-growing.",
+    "default_ports": [
+        "8000:8000"
+    ],
+    "command": "start --user root --pass root"
+}

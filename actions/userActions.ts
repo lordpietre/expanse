@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { SignJWT } from "jose";
 import { ObjectId } from "bson";
 import { composeMetadata } from "@/lib/metadata";
+import { processAndSaveClientExport } from "@/app/actions/exportActions";
 import { revalidatePath } from "next/cache";
 import { ensureAuth } from "@/lib/auth";
 import { generateRandomString, isWithinOneDay } from "@/lib/utils";
@@ -106,7 +107,7 @@ export async function registerUser(email: string, password: string, company: str
     return true
 }
 
-export const registerCompose = async (compose: object, metadata: composeMetadata, id?: string | undefined) => {
+export const registerCompose = async (compose: object, metadata: composeMetadata, id?: string | undefined, imageBase64?: string) => {
     const payload = await ensureAuth();
     const db = await getDb();
     const userId = new ObjectId(payload.userId as string);
@@ -133,7 +134,26 @@ export const registerCompose = async (compose: object, metadata: composeMetadata
         });
         result = r.insertedId.toString();
     }
-    if (result) return result;
+    if (result) {
+        if (imageBase64) {
+            try {
+                const { createHash } = await import("crypto");
+                const { promises: fs } = await import("fs");
+                const path = await import("path");
+                const pngBuffer = await processAndSaveClientExport(result, imageBase64);
+                const dataString = JSON.stringify(compose) + JSON.stringify(metadata);
+                const checksum = createHash('sha256').update(dataString).digest('hex').substring(0, 16);
+                const filename = `playground-${checksum}.png`;
+                const filepath = path.join(process.cwd(), 'public', 'exports', filename);
+                const exportsDir = path.dirname(filepath);
+                await fs.mkdir(exportsDir, { recursive: true });
+                await fs.writeFile(filepath, pngBuffer);
+            } catch (error) {
+                console.error("Failed to save client-side thumbnail:", error);
+            }
+        }
+        return result;
+    }
     throw Error("could not register");
 };
 

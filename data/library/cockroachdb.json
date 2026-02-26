@@ -1,0 +1,11 @@
+{
+    "name": "CockroachDB",
+    "image": "cockroachdb/cockroach:latest",
+    "category": "Database",
+    "description": "Distributed Relational. Horizontal scalability, Postgres-wire compatible.",
+    "default_ports": [
+        "26257:26257",
+        "8080:8080"
+    ],
+    "command": "start-single-node --insecure"
+}

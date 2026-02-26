@@ -297,7 +297,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                     } as Node)
                 }
             })
-            service.labels?.forEach(label => {
+            service.labels?.filter(label => !label.key.startsWith('com.composecraft.')).forEach(label => {
                 result.push({
                     id: label.id,
                     position: positionMap.get(label.id)?.position || { x: 10, y: 10 },
@@ -360,7 +360,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                     ...networkEdgeStyle
                 } as Edge)
             })
-            service.labels?.forEach(label => {
+            service.labels?.filter(label => !label.key.startsWith('com.composecraft.')).forEach(label => {
                 result.push({
                     id: "edg-" + label.id + service.id,
                     source: service.id,

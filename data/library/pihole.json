@@ -1,0 +1,20 @@
+{
+    "name": "Pi-hole",
+    "image": "pihole/pihole:latest",
+    "category": "Network",
+    "description": "Network-wide ad and tracker blocking via DNS sinkholing. Protect your devices and speed up your network without installing client-side software.",
+    "default_ports": [
+        "53:53/tcp",
+        "53:53/udp",
+        "80:80"
+    ],
+    "env_vars": {
+        "TZ": "Etc/UTC",
+        "WEBPASSWORD": "admin"
+    },
+    "volumes": [
+        "./pihole:/etc/pihole",
+        "./dnsmasq.d:/etc/dnsmasq.d"
+    ],
+    "logo": "https://raw.githubusercontent.com/pi-hole/pi-hole/master/advanced/Resources/vortex.svg"
+}

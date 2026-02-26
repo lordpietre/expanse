@@ -1,0 +1,17 @@
+{
+    "name": "AdGuard Home",
+    "image": "adguard/adguardhome:latest",
+    "category": "Network",
+    "description": "Modern network-wide software for blocking ads and tracking. Supports DNS-over-HTTPS, DNS-over-TLS, and advanced parental control features.",
+    "default_ports": [
+        "53:53/udp",
+        "80:80",
+        "443:443",
+        "3000:3000"
+    ],
+    "volumes": [
+        "./adguard_work:/opt/adguardhome/work",
+        "./adguard_conf:/opt/adguardhome/conf"
+    ],
+    "logo": "https://cdn.adguard.com/public/Adguard/Common/adguard_logo.svg"
+}

@@ -11,11 +11,11 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getLibraryServices } from "@/actions/libraryActions";
 import { TemplateService } from "@/types/library";
 import { useComposeStore } from "@/store/compose";
 import useUIStore from "@/store/ui";
-import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor } from "lucide-react";
+import useLibraryStore from "@/store/library";
+import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor, Share2, Cloud } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LibraryModalProps {
@@ -31,52 +31,41 @@ const categoryIcons = {
     'Applications': <LayoutGrid className="w-4 h-4" />,
     'Development': <Code2 className="w-4 h-4" />,
     'OS': <Monitor className="w-4 h-4" />,
+    'Messaging': <MessageSquare className="w-4 h-4" />,
+    'Network': <Share2 className="w-4 h-4" />,
+    'Cloud': <Cloud className="w-4 h-4" />,
     'Other': <Box className="w-4 h-4" />
 };
 
 export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) {
+    const { services, loading, fetchServices } = useLibraryStore();
     const { addServiceFromTemplate } = useComposeStore();
     const { libraryCategory, setIsLibraryOpen } = useUIStore();
-    const [services, setServices] = useState<TemplateService[]>([]);
-    const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedService, setSelectedService] = useState<TemplateService | null>(null);
 
     const categories = Array.from(new Set(services.map(s => s.category)));
 
-    const fetchServices = async () => {
-        setLoading(true);
-        console.log("[Library] Calling getLibraryServices...");
-        try {
-            const data = await getLibraryServices();
-            console.log(`[Library] Received ${data?.length || 0} services`);
-            setServices(data || []);
-
-            if (data && data.length > 0) {
-                // Set initial category and selection
-                const initialCat = (libraryCategory && data.some(s => s.category === libraryCategory))
-                    ? libraryCategory
-                    : (data[0]?.category || "");
-
-                setActiveCategory(initialCat);
-
-                const firstService = data.find(s => s.category === initialCat);
-                setSelectedService(firstService || null);
-            }
-        } catch (error) {
-            console.error("[Library] Error in fetchServices:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     // Initial fetch
     React.useEffect(() => {
-        if (open) {
+        if (open && services.length === 0) {
             fetchServices();
         }
-    }, [open]);
+    }, [open, services.length]);
+
+    // Handle initial selection when services are loaded
+    React.useEffect(() => {
+        if (services.length > 0) {
+            const initialCat = (libraryCategory && services.some(s => s.category === libraryCategory))
+                ? libraryCategory
+                : (services[0]?.category || "");
+
+            setActiveCategory(initialCat);
+            const firstService = services.find(s => s.category === initialCat);
+            setSelectedService(firstService || null);
+        }
+    }, [services, libraryCategory]);
 
     // Sync category when libraryCategory override changes while open
     React.useEffect(() => {

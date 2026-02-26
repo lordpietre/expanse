@@ -22,17 +22,24 @@ import { Separator } from "@/components/ui/separator";
 import DurationInput from "@/components/playground/editor/durationInput";
 import { addExtraDots, cn } from "@/lib/utils";
 import useUIStore from "@/store/ui";
-import { libraryServices } from "@/lib/library_data";
+import useLibraryStore from "@/store/library";
 import { useExecutionStore } from "@/store/execution";
 import { ChevronDown, ChevronUp, Menu } from "lucide-react";
 
 export default function ServiceEditor() {
 
+    const { services, fetchServices } = useLibraryStore();
     const { selectedId } = useSelectionStore();
     const { compose, setCompose } = useComposeStore();
     const { setIsLibraryOpen } = useUIStore();
     const { serviceStatuses } = useExecutionStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    React.useEffect(() => {
+        if (services.length === 0) {
+            fetchServices();
+        }
+    }, [services.length]);
 
     function getService(): Service {
         const service = compose.services.get("id", selectedId)
@@ -134,11 +141,15 @@ export default function ServiceEditor() {
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="flex flex-row justify-between">
-                            Restart
+                        <label className="flex flex-row justify-between text-sm font-bold text-slate-400">
+                            Restart Policy
                             <QuickToolType className=""
-                                message={"Configure if and how to restart containers when they exit"} />
+                                message={"Define la estrategia de reinicio: 'no' es la predeterminada, 'always' reinicia siempre, 'on-failure' solo si falla, y 'unless-stopped' reinicia siempre excepto si se detuvo manualmente."} />
                         </label>
+                        <p className="text-[10px] text-slate-500 leading-tight">
+                            Determina si Docker debe reiniciar automáticamente los contenedores cuando se detienen o fallan.
+                            <strong> unless-stopped</strong> es ideal para servicios de larga duración.
+                        </p>
                         {/* @ts-expect-error tkt*/}
                         <Select value={RestartPolicyCondition[getService().restart]}
                             onValueChange={(value) => {
@@ -165,22 +176,30 @@ export default function ServiceEditor() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div>
-                        <label className="flex flex-row justify-between" htmlFor="command">
+                    <div className="flex flex-col gap-2">
+                        <label className="flex flex-row justify-between text-sm font-bold text-slate-400" htmlFor="command">
                             Command
-                            <QuickToolType className="" message={"Override command run by the container"} />
+                            <QuickToolType className=""
+                                message={"Proporciona argumentos predeterminados al Entrypoint. Si no hay Entrypoint, define el proceso principal que corre en el contenedor."} />
                         </label>
+                        <p className="text-[10px] text-slate-500 leading-tight">
+                            Sobrescribe el comando por defecto definido en la imagen. Se usa para pasar parámetros o cambiar el comportamiento inicial.
+                        </p>
                         <Input name="command" value={getService().command?.join(" ")}
                             onChange={(e) => {
                                 setCompose(() => getService().command = e.target.value.split(" "))
                             }}
                         />
                     </div>
-                    <div>
-                        <label className="flex flex-row justify-between" htmlFor="entryPoint">
-                            Entry point
-                            <QuickToolType className="" message={"Override container's default executable"} />
+                    <div className="flex flex-col gap-2">
+                        <label className="flex flex-row justify-between text-sm font-bold text-slate-400" htmlFor="entryPoint">
+                            Entry Point
+                            <QuickToolType className=""
+                                message={"Configura el ejecutable que se inicia primero. Es el 'padre' de los procesos del contenedor y convierte al contenedor en un ejecutable ejecutable."} />
                         </label>
+                        <p className="text-[10px] text-slate-500 leading-tight">
+                            El ejecutable base. Si se define, el campo 'Command' se tratará como parámetros añadidos a este binario. Ideal para scripts de inicio.
+                        </p>
                         <Input name="entryPoint" value={getService().entrypoint}
                             onChange={(e) => {
                                 setCompose(() => getService().entrypoint = e.target.value)
@@ -392,7 +411,7 @@ export default function ServiceEditor() {
                                         if (targetDb) {
                                             service.depends_on.add(targetDb)
                                             // Auto-inject env configurations from template if applicable
-                                            const templateApp = libraryServices.find(t =>
+                                            const templateApp = services.find(t =>
                                                 service.image?.name?.toLowerCase().includes(t.image.split(":")[0])
                                             );
                                             // Use specific database connection ENV map if it's defined in the app template
@@ -401,8 +420,9 @@ export default function ServiceEditor() {
                                                     // Only auto-add if it doesn't exist
                                                     const exists = Array.from(service.environment!).some(env => env.key === key);
                                                     if (!exists) {
-                                                        service.environment!.add(new Env(key, value));
-                                                        compose.envs.add(new Env(key, value));
+                                                        const valStr = String(value);
+                                                        service.environment!.add(new Env(key, valStr));
+                                                        compose.envs.add(new Env(key, valStr));
                                                     }
                                                 });
                                             }
@@ -603,7 +623,7 @@ export default function ServiceEditor() {
                     </div>
                 </TabsContent>
             </Tabs>
-        </form>
+        </form >
     )
 
 }

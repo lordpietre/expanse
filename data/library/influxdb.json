@@ -1,0 +1,16 @@
+{
+    "name": "InfluxDB",
+    "image": "influxdb:latest",
+    "category": "Database",
+    "description": "Time Series. Monitoring, IoT, metrics. Classic in observability (v2.x).",
+    "default_ports": [
+        "8086:8086"
+    ],
+    "env_vars": {
+        "DOCKER_INFLUXDB_INIT_MODE": "setup",
+        "DOCKER_INFLUXDB_INIT_USERNAME": "admin",
+        "DOCKER_INFLUXDB_INIT_PASSWORD": "passwordpassword",
+        "DOCKER_INFLUXDB_INIT_ORG": "my-org",
+        "DOCKER_INFLUXDB_INIT_BUCKET": "my-bucket"
+    }
+}

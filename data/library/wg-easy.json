@@ -1,0 +1,18 @@
+{
+    "name": "WG-Easy",
+    "image": "weejewel/wg-easy:latest",
+    "category": "Network",
+    "description": "The easiest way to install and manage WireGuard VPN. Includes a simple web UI for managing clients and generating QR codes.",
+    "default_ports": [
+        "51820:51820/udp",
+        "51821:51821"
+    ],
+    "env_vars": {
+        "WG_HOST": "your-public-ip-or-host",
+        "PASSWORD_HASH": "$2y$10$hBC87G/6mS6Z.Z7b7Z7b7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u"
+    },
+    "volumes": [
+        "./wg-easy:/etc/wireguard"
+    ],
+    "logo": "https://raw.githubusercontent.com/wg-easy/wg-easy/master/src/public/favicon.ico"
+}

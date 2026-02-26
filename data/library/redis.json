@@ -1,7 +1,7 @@
 {
     "name": "Redis",
     "image": "redis:7-alpine",
-    "category": "Cache",
+    "category": "Database",
     "logo": "https://raw.githubusercontent.com/docker-library/docs/master/redis/logo.png",
     "description": "Extraordinarily fast in-memory data structure store, used as a database, cache, and broker.",
     "default_ports": [

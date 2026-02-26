@@ -533,3 +533,16 @@ export async function validateComposePorts(yamlContent: string) {
 
     return { hasChanges, reassignments };
 }
+
+export async function execDockerCommand(containerId: string, command: string) {
+    try {
+        // Execute the command inside the container. We use -i for non-interactive mode with output.
+        // Note: For a real terminal, we'd want a specialized TTY handler, but for this web UI, 
+        // a simple exec with output capture is the first stable step.
+        const { stdout, stderr } = await execAsync(`docker exec ${containerId} ${command}`);
+        return { success: true, output: stdout || stderr || "Command executed" };
+    } catch (error: any) {
+        console.error('Docker Exec Error:', error);
+        return { success: false, error: error.message || error.stderr || "Execution failed" };
+    }
+}

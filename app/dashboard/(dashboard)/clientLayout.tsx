@@ -13,7 +13,7 @@ export default function ClientLayout({ children, version }: { children: ReactNod
     const pathname = usePathname();
 
     return (
-        <div className="min-h-screen bg-slate-50/50 pb-20">
+        <div className="min-h-screen bg-transparent pb-20">
             {/* Dark Horizon Header Navigation */}
             <div className="bg-slate-950 p-6 flex flex-col relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />

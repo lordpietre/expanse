@@ -1,0 +1,14 @@
+{
+    "name": "WireGuard-UI",
+    "image": "ngoduyduyet/wireguard-ui:latest",
+    "category": "Network",
+    "description": "Alternative web-based user interface for managing WireGuard VPN configurations. Simple, clean, and intuitive.",
+    "default_ports": [
+        "5000:5000"
+    ],
+    "volumes": [
+        "./wg-ui-data:/app/db",
+        "/etc/wireguard:/etc/wireguard"
+    ],
+    "logo": "https://www.wireguard.com/img/wireguard.svg"
+}

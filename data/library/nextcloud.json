@@ -1,0 +1,13 @@
+{
+    "name": "Nextcloud",
+    "image": "nextcloud:latest",
+    "category": "Cloud",
+    "description": "The self-hosted productivity platform that keeps you in control. File sync & share, mail, calendar, contacts and more.",
+    "default_ports": [
+        "8080:80"
+    ],
+    "volumes": [
+        "./nextcloud_data:/var/www/html"
+    ],
+    "logo": "https://raw.githubusercontent.com/nextcloud/nextcloud/master/docs/logo.png"
+}

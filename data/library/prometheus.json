@@ -1,0 +1,13 @@
+{
+    "name": "Prometheus",
+    "image": "prom/prometheus:latest",
+    "category": "Network",
+    "description": "Standard monitoring and alerting toolkit for cloud-native applications. Features a multi-dimensional data model and powerful query language (PromQL).",
+    "default_ports": [
+        "9090:9090"
+    ],
+    "volumes": [
+        "./prometheus:/etc/prometheus"
+    ],
+    "logo": "https://raw.githubusercontent.com/prometheus/prometheus/main/docs/static/prometheus_logo.svg"
+}

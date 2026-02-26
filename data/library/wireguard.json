@@ -1,0 +1,20 @@
+{
+    "name": "WireGuard (LinuxServer)",
+    "image": "linuxserver/wireguard:latest",
+    "category": "Network",
+    "description": "Fast, modern, and secure VPN tunnel. This image by LinuxServer.io is a robust implementation of the WireGuard protocol server.",
+    "default_ports": [
+        "51820:51820/udp"
+    ],
+    "env_vars": {
+        "PUID": "1000",
+        "PGID": "1000",
+        "TZ": "Etc/UTC",
+        "SERVERURL": "wireguard.domain.com",
+        "PEERS": "1"
+    },
+    "volumes": [
+        "./wireguard:/config"
+    ],
+    "logo": "https://www.wireguard.com/img/wireguard.svg"
+}

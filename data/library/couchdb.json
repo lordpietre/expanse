@@ -1,0 +1,13 @@
+{
+    "name": "CouchDB",
+    "image": "couchdb:latest",
+    "category": "Database",
+    "description": "Documents + REST. Offline-first sync. Great for multi-master replication.",
+    "default_ports": [
+        "5984:5984"
+    ],
+    "env_vars": {
+        "COUCHDB_USER": "admin",
+        "COUCHDB_PASSWORD": "password"
+    }
+}

@@ -3,10 +3,13 @@
 import React from "react";
 import { useExecutionStore } from "@/store/execution";
 import { cn } from "@/lib/utils";
-import { Activity, Terminal, CheckCircle2, AlertCircle, Loader2, PlayCircle, StopCircle } from "lucide-react";
+import { Activity, Terminal, CheckCircle2, AlertCircle, Loader2, PlayCircle, StopCircle, Command } from "lucide-react";
+import TerminalDialog from "./terminalDialog";
 
 export default function ExecutionPanel() {
     const { isExecuting, serviceStatuses, logs } = useExecutionStore();
+    const [terminalOpen, setTerminalOpen] = React.useState(false);
+    const [activeContainer, setActiveContainer] = React.useState<{ id: string; name: string } | null>(null);
 
     if (!isExecuting && Object.keys(serviceStatuses).length === 0) {
         return (
@@ -19,6 +22,11 @@ export default function ExecutionPanel() {
 
     const services = Object.values(serviceStatuses);
 
+    const openTerminal = (id: string, name: string) => {
+        setActiveContainer({ id, name });
+        setTerminalOpen(true);
+    };
+
     return (
         <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Services Status */}
@@ -26,11 +34,11 @@ export default function ExecutionPanel() {
                 {services.map((service) => (
                     <div
                         key={service.id}
-                        className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 shadow-sm"
+                        className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 shadow-sm group/svc"
                     >
                         <div className="flex items-center gap-3">
                             <div className={cn(
-                                "p-2 rounded-lg",
+                                "p-2 rounded-lg transition-colors",
                                 service.status === 'running' ? "bg-emerald-50 text-emerald-600" :
                                     service.status === 'exited' ? "bg-rose-50 text-rose-600" : "bg-slate-50 text-slate-600"
                             )}>
@@ -38,21 +46,40 @@ export default function ExecutionPanel() {
                                     service.status === 'exited' ? <StopCircle className="w-4 h-4" /> : <Loader2 className="w-4 h-4 animate-spin" />}
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-xs font-bold text-slate-900 truncate max-w-[150px]">{service.name}</span>
+                                <span className="text-xs font-bold text-slate-900 truncate max-w-[120px]">{service.name}</span>
                                 <span className="text-[10px] text-slate-500 uppercase font-black">{service.status}</span>
                             </div>
                         </div>
-                        {service.health && (
-                            <div className={cn(
-                                "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider",
-                                service.health === 'healthy' ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-                            )}>
-                                {service.health}
-                            </div>
-                        )}
+
+                        <div className="flex items-center gap-2">
+                            {service.status === 'running' && (
+                                <button
+                                    onClick={() => openTerminal(service.id, service.name)}
+                                    className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 transition-all opacity-0 group-hover/svc:opacity-100"
+                                    title="Open Terminal"
+                                >
+                                    <Command className="w-4 h-4" />
+                                </button>
+                            )}
+                            {service.health && (
+                                <div className={cn(
+                                    "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider",
+                                    service.health === 'healthy' ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                                )}>
+                                    {service.health}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
+
+            <TerminalDialog
+                open={terminalOpen}
+                onOpenChange={setTerminalOpen}
+                containerId={activeContainer?.id || ""}
+                containerName={activeContainer?.name || ""}
+            />
 
             {/* Terminal Logs */}
             <div className="flex flex-col bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">

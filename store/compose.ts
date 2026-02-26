@@ -1,9 +1,10 @@
 "use client"
 
 import { create } from 'zustand';
-import { Compose, Translator, Service, Env, Binding, Image, PortMapping, SuperSet } from "@composecraft/docker-compose-lib";
+import { Compose, Translator, Service, Env, Binding, Image, PortMapping, SuperSet, KeyValue } from "@composecraft/docker-compose-lib";
 import { generateRandomName } from "@/lib/utils";
 import { registerCompose } from "@/actions/userActions";
+import { toPng } from 'html-to-image';
 import useComposeIdStore from "@/store/composeId";
 import toast from "react-hot-toast";
 import usePositionMap from "@/store/metadataMap";
@@ -23,10 +24,31 @@ interface ComposeState {
 export async function save(compose: Compose) {
     const { id: composeId, setId } = useComposeIdStore.getState();
     const translator = new Translator(compose);
+    // Capture screenshot client-side
+    let imageBase64: string | undefined = undefined;
+    if (typeof document !== 'undefined') {
+        try {
+            const playgroundElement = document.querySelector('.react-flow__renderer') as HTMLElement;
+            if (playgroundElement) {
+                imageBase64 = await toPng(playgroundElement, {
+                    backgroundColor: '#0a0d14',
+                    width: 1200,
+                    height: 800,
+                    style: {
+                        transform: 'scale(1)',
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("Failed to capture playground screenshot:", error);
+        }
+    }
+
     const id = await registerCompose(
         translator.toDict(),
         extractMetadata(compose, usePositionMap.getState().positionMap),
-        composeId
+        composeId,
+        imageBase64
     );
     setId(id);
 
@@ -118,7 +140,6 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                             while (usedPorts.includes(newPort)) {
                                 newPort++;
                             }
-                            console.log(`Port ${hostPort} in use. Reassigning to ${newPort}`);
                             hostPort = newPort;
                             useSystemStore.setState({ usedPorts: [...usedPorts, hostPort] });
                         }
@@ -139,7 +160,8 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                     image: new Image({ name: imageName, tag: imageTag }),
                     environment: newEnvironment.size > 0 ? newEnvironment : undefined,
                     ports: newPorts.length > 0 ? newPorts : undefined,
-                    bindings: newBindings.size > 0 ? newBindings : undefined
+                    bindings: newBindings.size > 0 ? newBindings : undefined,
+                    labels: template.logo ? [new KeyValue("com.composecraft.logo", template.logo)] : undefined
                 });
 
                 compose.addService(newService);

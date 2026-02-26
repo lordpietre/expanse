@@ -1,0 +1,14 @@
+{
+    "name": "MongoDB",
+    "image": "mongo:latest",
+    "category": "Database",
+    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/mongo/logo.png",
+    "description": "Document (NoSQL). Applications with unstructured data. Popular in agile dev.",
+    "default_ports": [
+        "27017:27017"
+    ],
+    "env_vars": {
+        "MONGO_INITDB_ROOT_USERNAME": "admin",
+        "MONGO_INITDB_ROOT_PASSWORD": "password"
+    }
+}

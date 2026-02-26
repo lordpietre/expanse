@@ -1,0 +1,13 @@
+{
+    "name": "ownCloud (Infinite Scale)",
+    "image": "owncloud/ocis:latest",
+    "category": "Cloud",
+    "description": "A collaborative platform for your data. Infinite Scale is a lightweight and blazing fast rewrite in Go.",
+    "default_ports": [
+        "9200:9200"
+    ],
+    "env_vars": {
+        "OCIS_INSECURE": "true"
+    },
+    "logo": "https://owncloud.com/wp-content/uploads/2020/09/owncloud-logo-blue.svg"
+}

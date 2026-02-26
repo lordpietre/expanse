@@ -1,0 +1,11 @@
+{
+    "name": "NetBird",
+    "image": "netbirdio/netbird:latest",
+    "category": "Network",
+    "description": "Zero-trust mesh VPN that connects devices in a flat network. Includes SSO, access control, and a management dashboard.",
+    "default_ports": [
+        "80:80",
+        "443:443",
+        "33073:33073"
+    ]
+}

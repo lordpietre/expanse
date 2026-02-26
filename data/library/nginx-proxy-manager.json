@@ -1,0 +1,16 @@
+{
+    "name": "Nginx Proxy Manager",
+    "image": "jc21/nginx-proxy-manager:latest",
+    "category": "Network",
+    "description": "Expose your services easily and securely with a powerful web UI. Manage SSL certificates, proxy hosts, and access lists without touching Nginx configs.",
+    "default_ports": [
+        "80:80",
+        "443:443",
+        "81:81"
+    ],
+    "volumes": [
+        "./npm_data:/data",
+        "./npm_letsencrypt:/etc/letsencrypt"
+    ],
+    "logo": "https://nginxproxymanager.com/logo.png"
+}

@@ -1,0 +1,10 @@
+{
+    "name": "Rocket.Chat",
+    "image": "rocketchat/rocket.chat:latest",
+    "category": "Messaging",
+    "logo": "https://assets-global.website-files.com/618a80491008f533a39e8e50/61c0705a61e7e72796030c6a_RocketChat-Logo-1.png",
+    "description": "Discord-like team chat and omnichannel platform. Highly customizable, video/voice support, and mobile apps.",
+    "default_ports": [
+        "3000:3000"
+    ]
+}

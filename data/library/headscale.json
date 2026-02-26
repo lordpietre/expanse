@@ -1,0 +1,13 @@
+{
+    "name": "Headscale",
+    "image": "headscale/headscale:latest",
+    "category": "Network",
+    "description": "An open source, self-hosted implementation of the Tailscale coordination server. Create a secure mesh VPN for all your devices.",
+    "default_ports": [
+        "8080:8080"
+    ],
+    "volumes": [
+        "./headscale:/etc/headscale"
+    ],
+    "command": "headscale serve"
+}

@@ -32,8 +32,12 @@ It is not just a diagramming tool; it is a **live execution wrapper** that talks
 
 ### 📊 Global Management
 - **Centralized Dashboard**: Monitor all global Docker projects, containers, and system resources (CPU, RAM, Disk) in real-time.
+- **Dynamic Service Library**: Extensible JSON-based library with categorized templates (Databases, OS, Development, Web Servers).
+- **Official Logos & Visuals**: Services automatically display their official logos (Nginx, Ubuntu, Redis, etc.) for better identification.
+- **One-Click Import**: Instantly load existing `docker-compose.yaml` files into the visual canvas.
+- **Pro Service Editor**: Redesigned for focus, with real-time container status detection and integrated technical documentation/tooltips.
+- **High-Accessibility Controls**: Refined playground controls with 3x larger buttons for easier interaction.
 - **Live Logs**: Integrated terminal for real-time log streaming from any running container.
-- **Service Library**: Instantly drop optimized templates for popular stacks (Nginx, Redis, WordPress, Neo4j, etc.).
 
 ## 🛠️ Technology Stack
 

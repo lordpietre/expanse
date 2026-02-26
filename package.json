@@ -48,7 +48,6 @@
     "next-mdx-remote": "^5.0.0",
     "posthog-js": "^1.260.2",
     "posthog-node": "^5.7.0",
-    "puppeteer": "^23.10.1",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "react-hook-form": "^7.53.1",
@@ -86,7 +85,6 @@
       "@types/react-dom": "19.1.7"
     },
     "onlyBuiltDependencies": [
-      "puppeteer",
       "sharp"
     ],
     "patchedDependencies": {

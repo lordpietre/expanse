@@ -1,0 +1,15 @@
+{
+    "name": "Seafile",
+    "image": "seafileltd/seafile-mc:latest",
+    "category": "Cloud",
+    "description": "High-performance file sync and share system. Focused on speed, reliability, and enterprise-grade features.",
+    "default_ports": [
+        "80:80"
+    ],
+    "env_vars": {
+        "SEAFILE_SERVER_HOSTNAME": "seafile.example.com",
+        "SEAFILE_ADMIN_EMAIL": "admin@example.com",
+        "SEAFILE_ADMIN_PASSWORD": "password"
+    },
+    "logo": "https://www.seafile.com/en/static/seafile/img/seafile-logo.png"
+}

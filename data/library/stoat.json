@@ -1,0 +1,9 @@
+{
+    "name": "Stoat (Revolt)",
+    "image": "stoatchat/self-hosted:latest",
+    "category": "Messaging",
+    "description": "Modern Discord-like chat platform for communities and gaming. Fast, lightweight, and privacy-focused.",
+    "default_ports": [
+        "8000:8000"
+    ]
+}

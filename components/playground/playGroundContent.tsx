@@ -69,7 +69,30 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
     const { isExecuting, setExecuting, clearStatuses, updateStatuses, setLogs } = useExecutionStore();
     const { isLibraryOpen, setIsLibraryOpen } = useUIStore();
     const playgroundRef = useRef<PlaygroundHandle>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [deployPhase, setDeployPhase] = useState<DeployPhase>(null);
+
+    const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const content = event.target?.result as string;
+                const dict = YAML.parse(content);
+                const newCompose = Translator.fromDict(dict);
+                replaceCompose(newCompose);
+                toast.success("Project imported successfully");
+            } catch (error) {
+                console.error("Import failed:", error);
+                toast.error("Failed to parse YAML file");
+            }
+        };
+        reader.readAsText(file);
+        // Reset input
+        e.target.value = '';
+    };
 
     const searchParams = useSearchParams();
     const idParam = searchParams.get('id');
@@ -394,7 +417,18 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
 
             <div className="flex z-10 p-3 px-8 border-b border-white/5 relative justify-between backdrop-blur-3xl bg-[#0a0d14]/80 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
                 <div className="flex gap-4 items-center pl-8">
-                    <Button variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm font-bold flex gap-2 transition-all">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept=".yaml,.yml"
+                        onChange={handleImport}
+                    />
+                    <Button
+                        variant="secondary"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm font-bold flex gap-2 transition-all"
+                    >
                         <FileUp className="w-4 h-4 text-blue-400" /> Import
                     </Button>
                     <Dialog>

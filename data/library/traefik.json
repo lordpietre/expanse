@@ -1,0 +1,16 @@
+{
+    "name": "Traefik",
+    "image": "traefik:v3.0",
+    "category": "Network",
+    "description": "Cloud-native reverse proxy and load balancer. Automatically discovers services and manages SSL certificates via Let's Encrypt.",
+    "default_ports": [
+        "80:80",
+        "443:443",
+        "8080:8080"
+    ],
+    "volumes": [
+        "/var/run/docker.sock:/var/run/docker.sock:ro"
+    ],
+    "command": "--api.insecure=true --providers.docker",
+    "logo": "https://raw.githubusercontent.com/traefik/traefik/v3.0/docs/content/assets/img/traefik.logo.png"
+}

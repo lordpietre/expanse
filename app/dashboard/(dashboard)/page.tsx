@@ -55,7 +55,7 @@ export default async function Page() {
                 </div>
             </div>
 
-            <BetaWarning />
+
 
             {
                 composes.length > 0 ? (

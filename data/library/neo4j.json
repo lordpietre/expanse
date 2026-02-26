@@ -1,0 +1,13 @@
+{
+    "name": "Neo4j",
+    "image": "neo4j:ubi9",
+    "category": "Database",
+    "description": "Graph Database. Social networks, recommendations, fraud. Most used graph DB.",
+    "default_ports": [
+        "7474:7474",
+        "7687:7687"
+    ],
+    "volumes": [
+        "./neo4j_data:/data"
+    ]
+}

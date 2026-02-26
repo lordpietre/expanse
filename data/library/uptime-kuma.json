@@ -1,0 +1,13 @@
+{
+    "name": "Uptime Kuma",
+    "image": "louislam/uptime-kuma:latest",
+    "category": "Network",
+    "description": "Self-hosted monitoring tool for your websites and services. Features a beautiful dashboard, multi-channel notifications, and public status pages.",
+    "default_ports": [
+        "3001:3001"
+    ],
+    "volumes": [
+        "./uptime-kuma:/app/data"
+    ],
+    "logo": "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg"
+}

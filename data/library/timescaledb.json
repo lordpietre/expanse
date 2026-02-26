@@ -1,0 +1,12 @@
+{
+    "name": "TimescaleDB",
+    "image": "timescale/timescaledb:latest-pg16",
+    "category": "Database",
+    "description": "Time Series. IoT, metrics, monitoring. PostgreSQL extension for time-series.",
+    "default_ports": [
+        "5432:5432"
+    ],
+    "env_vars": {
+        "POSTGRES_PASSWORD": "password"
+    }
+}

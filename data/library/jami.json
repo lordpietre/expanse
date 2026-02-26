@@ -1,0 +1,9 @@
+{
+    "name": "Jami (Gateway)",
+    "image": "jami/jami:latest",
+    "category": "Messaging",
+    "description": "P2P communication platform with no central server. High privacy and decentralization for 1:1 and group chats.",
+    "default_ports": [
+        "4242:4242"
+    ]
+}

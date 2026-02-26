@@ -76,7 +76,7 @@ export default function ReadOnlyPlayGround(opt: options) {
             changes.forEach((change) => {
                 if (change?.type === "position") {
                     if (change?.position?.x && change?.position?.y) {
-                        //console.log(change.position)
+                        // Update positions
                         updatePosition(change.id, change.position)
                     }
                 }

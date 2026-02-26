@@ -6,26 +6,29 @@
 
 @layer base {
   :root {
-    --background: 222 47% 5%;
-    --foreground: 210 40% 95%;
-    --card: 222 40% 8%;
-    --card-foreground: 210 40% 95%;
-    --popover: 222 40% 8%;
-    --popover-foreground: 210 40% 95%;
-    --primary: 221.2 83.2% 60%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 14%;
-    --secondary-foreground: 210 40% 95%;
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 262 83% 65%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 221.2 83.2% 60%;
-    --radius: 0.75rem;
+    --background: 222 20% 8%;
+    --foreground: 210 20% 98%;
+    --card: 222 20% 12%;
+    --card-foreground: 210 20% 98%;
+    --popover: 222 20% 12%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 210 100% 85%;
+    /* Pastel Blue */
+    --primary-foreground: 222 47% 10%;
+    --secondary: 217 20% 20%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 217 20% 20%;
+    --muted-foreground: 215 15% 65%;
+    --accent: 280 80% 85%;
+    /* Pastel Purple */
+    --accent-foreground: 222 47% 10%;
+    --destructive: 0 85% 85%;
+    /* Pastel Red */
+    --destructive-foreground: 222 47% 10%;
+    --border: 217 20% 25%;
+    --input: 217 20% 25%;
+    --ring: 210 100% 85%;
+    --radius: 1rem;
   }
 }
 
@@ -138,13 +141,13 @@
 html,
 body {
   font-family: 'Outfit', system-ui, sans-serif;
-  background-color: hsl(222, 47%, 5%);
-  color: white;
+  background-color: hsl(222, 20%, 8%);
+  color: hsl(210, 20%, 98%);
 }
 
 /* ── ReactFlow canvas & edges ────────────────────────────── */
 .react-flow__background {
-  background-color: hsl(222, 47%, 5%);
+  background-color: hsl(222, 20%, 8%);
 }
 
 .react-flow__node {
@@ -191,6 +194,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.07) !important;
   border-radius: 0.5rem;
 }
+
 /* ── ReactFlow Controls Resizing ─────────────────────────── */
 .react-flow__controls {
   display: flex !important;

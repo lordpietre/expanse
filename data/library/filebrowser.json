@@ -1,0 +1,13 @@
+{
+    "name": "File Browser",
+    "image": "filebrowser/filebrowser:latest",
+    "category": "Cloud",
+    "description": "Lightweight web file manager that gives you a beautiful interface to manage your files remotely.",
+    "default_ports": [
+        "80:80"
+    ],
+    "volumes": [
+        "./my_files:/srv"
+    ],
+    "logo": "https://filebrowser.org/img/logo.svg"
+}

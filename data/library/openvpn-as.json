@@ -1,0 +1,12 @@
+{
+    "name": "OpenVPN Access Server",
+    "image": "openvpn/openvpn-as:latest",
+    "category": "Network",
+    "description": "Enterprise-grade VPN solution with a powerful web-based administration interface and easy client setup.",
+    "default_ports": [
+        "943:943",
+        "9443:9443",
+        "1194:1194/udp"
+    ],
+    "logo": "https://openvpn.net/wp-content/themes/openvpn/assets/images/logo-icon.svg"
+}

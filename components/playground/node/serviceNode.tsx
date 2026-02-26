@@ -2,7 +2,7 @@
 import { Service } from "@composecraft/docker-compose-lib";
 import { Handle, Position } from "@xyflow/react";
 import { CardContent } from "@/components/ui/card";
-import { Container, Database, Globe, Network, HardDrive, Key, Tag, ChevronDown, ChevronUp } from "lucide-react";
+import { Container, Database, Globe, Network, HardDrive, Key, Tag, ChevronDown, ChevronUp, Cloud } from "lucide-react";
 import { useExecutionStore } from "@/store/execution";
 import { cn } from "@/lib/utils";
 import Selectable from "@/components/playground/node/Selectable";
@@ -17,6 +17,15 @@ const getCategoryTheme = (imageName: string = "") => {
     if (name.includes('nginx') || name.includes('apache') || name.includes('proxy') || name.includes('http')) {
         return { icon: Globe, gradient: "from-sky-500 to-blue-600", color: "text-sky-400", glow: "shadow-sky-500/20" };
     }
+    if (name.includes('chat') || name.includes('matrix') || name.includes('slack') || name.includes('mattermost') || name.includes('zulip') || name.includes('revolt') || name.includes('synapse') || name.includes('rocketchat')) {
+        return { icon: Globe, gradient: "from-indigo-500 to-purple-600", color: "text-indigo-400", glow: "shadow-indigo-500/20" };
+    }
+    if (name.includes('vpn') || name.includes('wireguard') || name.includes('proxy') || name.includes('dns') || name.includes('traefik') || name.includes('uptime') || name.includes('netdata')) {
+        return { icon: Network, gradient: "from-orange-500 to-red-600", color: "text-orange-400", glow: "shadow-orange-500/20" };
+    }
+    if (name.includes('cloud') || name.includes('nextcloud') || name.includes('owncloud') || name.includes('seafile') || name.includes('syncthing') || name.includes('filebrowser')) {
+        return { icon: Cloud, gradient: "from-sky-400 to-indigo-600", color: "text-sky-300", glow: "shadow-sky-400/20" };
+    }
     return { icon: Container, gradient: "from-emerald-500 to-teal-600", color: "text-emerald-400", glow: "shadow-emerald-500/20" };
 };
 
@@ -24,10 +33,20 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
     const { tick } = useComposeStore();
     const service = data.service;
     const { serviceStatuses } = useExecutionStore();
-    const isRunning = serviceStatuses[service.name]?.status === 'running';
+    const status = serviceStatuses[service.name]?.status || 'stopped';
+    const isRunning = status === 'running';
+    const isError = status === 'dead' || status === 'unknown';
+
     const theme = getCategoryTheme(service.image?.name);
     const Icon = theme.icon;
     const [expanded, setExpanded] = useState(false);
+
+    // Color code based on status: Stopped (Black/Dark), Running (Green), Error (Red)
+    const statusClass = cn(
+        !isRunning && !isError && "bg-slate-900", // Stopped
+        isRunning && "bg-emerald-400 group-hover:bg-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.3)]", // Running
+        isError && "bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)]" // Error
+    );
 
     return (
         <Selectable id={service.id}>
@@ -35,11 +54,11 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                 "group relative flex flex-col transition-all duration-500",
                 selected
                     ? "p-[1.5px] rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 scale-[1.02] z-50 shadow-xl shadow-indigo-500/20"
-                    : "p-[1px] rounded-xl bg-white/5 hover:bg-white/10 shadow-lg",
+                    : cn("p-[1px] rounded-xl shadow-lg", statusClass),
                 isRunning && "float"
             )}>
-                {/* Dark glass card */}
-                <div className="bg-[#0d1117]/90 backdrop-blur-2xl rounded-[0.7rem] flex flex-col overflow-visible border border-white/5" style={{ minWidth: 190 }}>
+                {/* Compact Glass Card */}
+                <div className="bg-[#0d1117]/95 backdrop-blur-2xl rounded-[0.9rem] flex flex-col overflow-visible border border-white/5" style={{ minWidth: 195 }}>
 
                     {/* Gradient Header — always visible, click to toggle */}
                     <div
@@ -63,7 +82,14 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                         </div>
                         <div className="flex items-center gap-1.5 z-10 ml-2 shrink-0">
                             <div className="bg-black/20 backdrop-blur-sm p-2 rounded-lg border border-white/20">
-                                <Icon className="w-5 h-5 text-white" />
+                                {(() => {
+                                    const logo = service.labels?.find(l => l.key === "com.composecraft.logo")?.value;
+                                    return logo ? (
+                                        <img src={logo} className="w-5 h-5 object-contain" alt="logo" />
+                                    ) : (
+                                        <Icon className="w-5 h-5 text-white" />
+                                    );
+                                })()}
                             </div>
                             <div className="bg-black/20 backdrop-blur-sm p-1 rounded-lg border border-white/20">
                                 {expanded

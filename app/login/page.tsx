@@ -49,7 +49,7 @@ function LoginForm() {
     }
 
     return (
-        <Card className="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4">
+        <Card className="w-full max-w-[480px]">
             <CardContent className="p-5">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     <h1 className="text-3xl text-primary font-bold">Welcome back !</h1>

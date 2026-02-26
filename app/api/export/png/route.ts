@@ -4,12 +4,12 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import client from '@/lib/mongodb';
 import { ObjectId } from 'bson';
-import { exportPlaygroundAsPNG } from '@/app/actions/exportActions';
+
 
 export async function GET(request: NextRequest) {
     try {
         const shareId = request.nextUrl.searchParams.get('shareId');
-        
+
         if (!shareId) {
             return NextResponse.json(
                 { error: 'Share ID is required' },
@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
         }
 
         // Get compose data and metadata from database via share
-        await client.connect();
-        const db = client.db('compose_craft');
+        const mongodb = await client;
+        const db = mongodb.db('compose_craft');
         const sharesCollection = db.collection('shares');
 
         // First, find the share to get the composeId
@@ -68,18 +68,13 @@ export async function GET(request: NextRequest) {
             fileBuffer = await fs.readFile(filepath);
             console.log(`Using cached export file: ${filename}`);
         } catch {
-            // File doesn't exist, generate it
-            console.log(`Generating new export file: ${filename}`);
-            fileBuffer = await exportPlaygroundAsPNG(composeId);
-            
-            // Create exports directory if it doesn't exist
-            const exportsDir = path.dirname(filepath);
-            await fs.mkdir(exportsDir, { recursive: true });
-            
-            // Save the file
-            await fs.writeFile(filepath, fileBuffer);
+            // File doesn't exist, and we can no longer generate it on the server
+            return NextResponse.json(
+                { error: 'Thumbnail not available. Please save the project in the playground to generate it.' },
+                { status: 404 }
+            );
         }
-        
+
         return new NextResponse(fileBuffer as any, {
             headers: {
                 'Content-Type': 'image/png',

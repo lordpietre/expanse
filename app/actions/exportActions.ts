@@ -1,8 +1,4 @@
-'use server';
-
-import puppeteer from 'puppeteer';
 import { createHash } from 'crypto';
-import { getExportRenderToken } from '@/lib/exportToken';
 import sharp from 'sharp';
 import path from 'path';
 
@@ -13,7 +9,7 @@ import path from 'path';
  */
 async function removeYellowBackground(pngBuffer: Buffer): Promise<Buffer> {
     // Convert PNG to raw RGBA data for pixel manipulation
-    const {data, info} = await sharp(pngBuffer)
+    const { data, info } = await sharp(pngBuffer)
         .ensureAlpha()
         .raw()
         .toBuffer({ resolveWithObject: true });
@@ -48,7 +44,7 @@ async function removeYellowBackground(pngBuffer: Buffer): Promise<Buffer> {
     // Add watermark in top right corner
     try {
         const watermarkPath = path.join(process.cwd(), 'assets', 'watermark.png');
-        
+
         // Resize watermark to small size (100px wide)
         const watermarkBuffer = await sharp(watermarkPath)
             .resize(300, 300, {
@@ -86,97 +82,24 @@ async function removeYellowBackground(pngBuffer: Buffer): Promise<Buffer> {
 }
 
 /**
- * Export playground as PNG using headless browser
- * @param composeId - The ID of the compose to export
- * @param baseUrl - The base URL of the application (default: localhost:3000)
- * @returns PNG image as buffer
+ * Save an exported image from the client
+ * @param composeId - The ID of the compose
+ * @param imageBase64 - The base64 string of the image (PNG)
+ * @returns PNG image as buffer after processing
  */
-export async function exportPlaygroundAsPNG(
+export async function processAndSaveClientExport(
     composeId: string,
-    baseUrl: string = 'http://localhost:3000'
+    imageBase64: string
 ): Promise<Buffer> {
-    let browser = null;
+    // Remove the data:image/png;base64, prefix if it exists
+    const base64Data = imageBase64.replace(/^data:image\/png;base64,/, "");
+    let buffer = Buffer.from(base64Data, 'base64');
 
-    try {
-        // Launch headless browser
-        browser = await puppeteer.launch({
-            headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-            ],
-        });
+    // Remove yellow background and make it transparent (if needed, 
+    // though the client might already handle transparency)
+    buffer = await removeYellowBackground(buffer) as any;
 
-        const page = await browser.newPage();
-
-        // Set viewport for consistent rendering
-        await page.setViewport({
-            width: 1920,
-            height: 1080,
-            deviceScaleFactor: 2,
-        });
-
-        // Get the export token
-        const exportToken = getExportRenderToken();
-
-        // Navigate to the render page with the security token
-        const renderUrl = `${baseUrl}/playground/export-render?id=${encodeURIComponent(composeId)}&token=${encodeURIComponent(exportToken)}`;
-        
-        await page.goto(renderUrl, {
-            waitUntil: 'networkidle2',
-            timeout: 30000,
-        });
-
-        // Wait for playground to be ready
-        await page.waitForFunction(
-            () => (window as any).__PLAYGROUND_READY__ === true,
-            {
-                timeout: 10000,
-            }
-        );
-
-        // Wait a bit more for smooth rendering
-        await page.evaluate(() => new Promise(resolve => setTimeout(resolve, 500)));
-
-        // Take screenshot of the react-flow element
-        const reactFlowElement = await page.$('.react-flow');
-
-        if (!reactFlowElement) {
-            throw new Error('Playground element not found');
-        }
-
-        // Get the bounding box of the element
-        const boundingBox = await reactFlowElement.boundingBox();
-
-        if (!boundingBox) {
-            throw new Error('Could not get bounding box of playground');
-        }
-
-        // Capture screenshot of the playground area
-        let screenshot = await page.screenshot({
-            clip: {
-                x: boundingBox.x,
-                y: boundingBox.y,
-                width: boundingBox.width,
-                height: boundingBox.height,
-            },
-            type: 'png',
-        }) as Buffer;
-
-        // Remove yellow background and make it transparent
-        screenshot = await removeYellowBackground(screenshot);
-
-        return screenshot;
-    } catch (error) {
-        console.error('Error exporting playground as PNG:', error);
-        throw new Error(`Failed to export playground: ${error instanceof Error ? error.message : String(error)}`);
-    } finally {
-        // Clean up: close the browser
-        if (browser) {
-            await browser.close();
-        }
-    }
+    return buffer;
 }
 
 /**
@@ -191,11 +114,10 @@ export async function exportPlaygroundAsPNGToFile(
 ): Promise<string> {
     const fs = await import('fs').then(m => m.promises);
     const path = await import('path');
-    const client = (await import('@/lib/mongodb')).default;
+    const mongodb = await import('@/lib/mongodb');
+    const client = await mongodb.default;
 
     try {
-        // Get compose data and metadata from database
-        await client.connect();
         const db = client.db('compose_craft');
         const collection = db.collection('composes');
         const { ObjectId } = await import('bson');
@@ -219,7 +141,7 @@ export async function exportPlaygroundAsPNGToFile(
         // Generate filename based on checksum
         const filename = `playground-${checksum}.png`;
         const filepath = path.join(exportsDir, filename);
-        
+
         console.log(filepath);
 
         // Check if file already exists - if so, return it without regenerating
@@ -231,15 +153,9 @@ export async function exportPlaygroundAsPNGToFile(
             // File doesn't exist, proceed with generation
         }
 
-        // Get the PNG buffer
-        const pngBuffer = await exportPlaygroundAsPNG(composeId, baseUrl);
-
-        // Save the file
-        await fs.writeFile(filepath, pngBuffer);
-        console.log(`Export file created: ${filename}`);
-
-        // Return relative path for serving
-        return `/exports/${filename}`;
+        // With Puppeteer removed, we can no longer generate images on the fly on the server.
+        // Images must be provided by the client during save.
+        throw new Error('Image not found in cache and server-side generation is disabled.');
     } catch (error) {
         console.error('Error saving PNG to file:', error);
         throw error;

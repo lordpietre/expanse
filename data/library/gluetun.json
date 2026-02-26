@@ -1,0 +1,15 @@
+{
+    "name": "Gluetun",
+    "image": "qmcgaw/gluetun:latest",
+    "category": "Network",
+    "description": "VPN client container to route traffic of other containers through WireGuard or OpenVPN. Supports 30+ VPN providers with a built-in killswitch.",
+    "default_ports": [
+        "8888:8888/tcp"
+    ],
+    "env_vars": {
+        "VPN_SERVICE_PROVIDER": "mullvad",
+        "VPN_TYPE": "wireguard",
+        "WIREGUARD_PRIVATE_KEY": "your-key",
+        "WIREGUARD_ADDRESSES": "10.64.0.1/32"
+    }
+}
