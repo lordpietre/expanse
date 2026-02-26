@@ -1,0 +1,14 @@
+{
+    "name": "Plone",
+    "image": "plone:6",
+    "category": "CMS",
+    "logo": "https://plone.org/plone-logo.svg",
+    "description": "Secure enterprise CMS known for extreme security. Used for intranets and high-security websites.",
+    "default_ports": [
+        "8080:8080"
+    ],
+    "env_vars": {
+        "SITE": "Plone",
+        "PROFILES": "plone.app.contenttypes:composition"
+    }
+}

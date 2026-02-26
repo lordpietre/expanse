@@ -159,18 +159,26 @@ const handleDbAutoInject = (source: Service, target: Service) => {
         sourceImage.includes('mysql');
 
     if (isDatabase) {
+        const dbMeta = usePositionMap.getState().dbNodeMeta.get(source.id);
+        const shouldOverwrite = dbMeta?.overwriteEnvVars ?? true;
+        
         const envVars = getDbEnvVars(source, source.name);
         if (envVars) {
             if (!target.environment) {
                 target.environment = new SuperSet<Readonly<Env>>();
             }
-            const dbKeys = new Set(Object.keys(envVars));
-            const toRemove = Array.from(target.environment).filter(e => dbKeys.has(e.key));
-            toRemove.forEach(e => target.environment!.delete(e));
+            
+            if (shouldOverwrite) {
+                const dbKeys = new Set(Object.keys(envVars));
+                const toRemove = Array.from(target.environment).filter(e => dbKeys.has(e.key));
+                toRemove.forEach(e => target.environment!.delete(e));
+            }
 
             Object.entries(envVars).forEach(([key, value]) => {
                 if (value !== "") {
-                    target.environment!.add(new Env(key, value));
+                    if (shouldOverwrite || !Array.from(target.environment!).some(e => e.key === key)) {
+                        target.environment!.add(new Env(key, value));
+                    }
                 }
             });
             return true;
@@ -601,16 +609,16 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                 setSelectedString("")
             }}
             colorMode="dark"
-            className="bg-[#070b0f]"
+            className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5"
         >
             <AutoCenter />
             <FitViewOnAdd />
             <MiniMap
-                className="bg-[#0a0d14] border border-white/10 rounded-xl overflow-hidden shadow-2xl"
+                className="bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/10 rounded-xl overflow-hidden shadow-2xl"
                 maskColor="rgba(255, 255, 255, 0.05)"
                 nodeColor={(n) => {
-                    if (n.type === 'service') return '#3b82f6';
-                    if (n.type === 'network') return '#10b981';
+                    if (n.type === 'service') return '#10b981';
+                    if (n.type === 'network') return '#14b8a6';
                     if (n.type === 'volume') return '#f59e0b';
                     return '#64748b';
                 }}

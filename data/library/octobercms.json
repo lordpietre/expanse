@@ -1,0 +1,18 @@
+{
+    "name": "October CMS",
+    "image": "aspendigital/octobercms:latest",
+    "category": "CMS",
+    "logo": "https://octobercms.com/storage/app/meta/logomark.svg",
+    "description": "Elegant PHP CMS built on Laravel. Cleaner and more modern than WordPress with Laravel-based plugins.",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "DB_CONNECTION": "mysql",
+        "DB_HOST": "mariadb",
+        "DB_PORT": "3306",
+        "DB_DATABASE": "october",
+        "DB_USERNAME": "october",
+        "DB_PASSWORD": "password"
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "name": "TYPO3",
+    "image": "typo3/typo3:13",
+    "category": "CMS",
+    "logo": "https://typo3.org/fileadmin/typo3assets/Images/typo3-logo.svg",
+    "description": "Enterprise-grade CMS popular in Germany and Europe. Ideal for large multi-site deployments and complex requirements.",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "TYPO3_INSTALL_DB_DRIVER": "pdo_mysql",
+        "TYPO3_INSTALL_DB_HOST": "mariadb",
+        "TYPO3_INSTALL_DB_PORT": "3306",
+        "TYPO3_INSTALL_DB_NAME": "typo3",
+        "TYPO3_INSTALL_DB_USER": "typo3",
+        "TYPO3_INSTALL_DB_PASSWORD": "password"
+    }
+}

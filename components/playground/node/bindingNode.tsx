@@ -17,7 +17,7 @@ export default function BindingNode({ data }: { data: { binding: Binding } }) {
                     ? "p-[1.5px] rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 scale-[1.05] shadow-xl shadow-emerald-500/20"
                     : "p-[1px] rounded-xl bg-white/5 hover:bg-white/10 shadow-md"
             )}>
-                <div className="bg-[#0d1117]/90 backdrop-blur-2xl rounded-[0.65rem] overflow-visible flex items-center gap-3 px-4 py-3 min-w-[180px]">
+                <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-2xl rounded-[0.65rem] overflow-visible flex items-center gap-3 px-4 py-3 min-w-[180px]">
                     <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-emerald-400 to-teal-600 opacity-70 rounded-l-[0.65rem]" />
 
                     <div className={cn(

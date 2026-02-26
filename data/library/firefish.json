@@ -1,0 +1,19 @@
+{
+    "name": "Firefish",
+    "image": "thatonecalculator/firefish:latest",
+    "category": "Social",
+    "logo": "https://joinfirefish.org/img/logo.svg",
+    "description": "Active fork of Misskey with rich features like calendar, custom reactions, and modern cute interface. Popular in Japan and growing in the West.",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "DB_HOST": "postgres",
+        "DB_PORT": "5432",
+        "DB_USER": "firefish",
+        "DB_NAME": "firefish",
+        "DB_PASS": "password",
+        "REDIS_HOST": "redis",
+        "PORT": "3000"
+    }
+}

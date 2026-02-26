@@ -1,0 +1,14 @@
+{
+    "name": "Open WebUI",
+    "image": "ghcr.io/open-webui/open-webui:main",
+    "category": "AI",
+    "logo": "https://openwebui.com/favicon.ico",
+    "description": "ChatGPT-style interface for Ollama, LocalAI, vLLM, and OpenAI. Features voice, RAG, agents, multi-model switch, and plugins. Most popular with Ollama in 2026.",
+    "default_ports": [
+        "8080:8080"
+    ],
+    "env_vars": {
+        "OLLAMA_BASE_URL": "http://ollama:11434",
+        "WEBUI_SECRET_KEY": "replace-with-random-value"
+    }
+}

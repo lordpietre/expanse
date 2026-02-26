@@ -1,0 +1,19 @@
+{
+    "name": "Akkoma",
+    "image": "akkoma/akkoma:stable",
+    "category": "Social",
+    "logo": "https://akkoma.social/static/akkoma.png",
+    "description": "Optimized fork of Pleroma with extra features. Good for medium instances with advanced MRF policies. Better speed/features balance than base Pleroma.",
+    "default_ports": [
+        "4000:4000"
+    ],
+    "env_vars": {
+        "DB_HOST": "postgres",
+        "DB_PORT": "5432",
+        "DB_USER": "akkoma",
+        "DB_NAME": "akkoma",
+        "DB_PASS": "password",
+        "REDIS_HOST": "redis",
+        "PORT": "4000"
+    }
+}

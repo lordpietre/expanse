@@ -1,0 +1,17 @@
+{
+    "name": "Activepieces",
+    "image": "activepieces/activepieces:latest",
+    "category": "Automation",
+    "logo": "https://www.activepieces.com/favicon.ico",
+    "description": "No-code / AI-first alternative to Zapier. Very intuitive, growing ecosystem, multi-user support with native AI prompts. Easiest for non-devs.",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "AP_FRONTEND_URL": "http://localhost:3000",
+        "AP_POSTGRES_DATABASE": "postgres",
+        "AP_POSTGRES_USERNAME": "activepieces",
+        "AP_POSTGRES_PASSWORD": "password",
+        "AP_POSTGRES_PORT": "5432"
+    }
+}

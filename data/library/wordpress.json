@@ -1,7 +1,7 @@
 {
     "name": "WordPress",
     "image": "wordpress:latest",
-    "category": "Applications",
+    "category": "CMS",
     "logo": "https://raw.githubusercontent.com/docker-library/docs/master/wordpress/logo.png",
     "description": "The world's most popular website builder and content management system.",
     "default_ports": [

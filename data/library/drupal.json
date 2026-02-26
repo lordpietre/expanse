@@ -1,0 +1,16 @@
+{
+    "name": "Drupal",
+    "image": "drupal:11-apache",
+    "category": "CMS",
+    "logo": "https://www.drupal.org/files/Wordmark_Full%20Color_RGB%20light_background.png",
+    "description": "Enterprise-class, flexible content management system used by governments, universities, and large organizations. Highly secure with a steep learning curve.",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "DRUPAL_DB_HOST": "db",
+        "DRUPAL_DB_USER": "drupal",
+        "DRUPAL_DB_PASSWORD": "password",
+        "DRUPAL_DB_NAME": "drupal"
+    }
+}

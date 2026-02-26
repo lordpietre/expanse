@@ -1,0 +1,17 @@
+{
+    "name": "LibreChat",
+    "image": "ghcr.io/danny-avila/librechat:latest",
+    "category": "AI",
+    "logo": "https://librechat.ai/favicon.ico",
+    "description": "Customizable multi-LLM chat for Ollama, LocalAI, OpenAI, Anthropic. Flexible with plugins, agents marketplace, themes, and multi-backend support.",
+    "default_ports": [
+        "3080:3080"
+    ],
+    "env_vars": {
+        "OLLAMA_API_KEY": "ollama",
+        "OPENAI_API_KEY": "sk-xxx",
+        "ANTHROPIC_API_KEY": "sk-ant-xxx",
+        "HOST": "0.0.0.0",
+        "PORT": "3080"
+    }
+}

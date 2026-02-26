@@ -129,7 +129,7 @@ export default function ComposeSettingEditor() {
     }
 
     return (
-        <div className="flex flex-col gap-6 p-6 bg-[#0a0d14]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500 text-slate-300">
+        <div className="flex flex-col gap-6 p-6 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 backdrop-blur-2xl border border-emerald-500/10 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500 text-slate-300">
             <div
                 className="flex items-center justify-between cursor-pointer group"
                 onClick={() => setIsCollapsed(!isCollapsed)}
@@ -152,8 +152,8 @@ export default function ComposeSettingEditor() {
                     <Button type='button' className="flex flex-row gap-2 rounded-xl bg-white/5 hover:bg-emerald-500/15 text-white font-bold border border-white/8 shadow-none transition-colors" onClick={ser}>
                         <Container width={16} className="text-emerald-400" /> Service
                     </Button>
-                    <Button type='button' className="flex flex-row gap-2 rounded-xl bg-white/5 hover:bg-blue-500/15 text-white font-bold border border-white/8 shadow-none transition-colors" onClick={net}>
-                        <NetworkIcon width={16} className="text-blue-400" /> Network
+                    <Button type='button' className="flex flex-row gap-2 rounded-xl bg-white/5 hover:bg-emerald-500/15 text-white font-bold border border-white/8 shadow-none transition-colors" onClick={net}>
+                        <NetworkIcon width={16} className="text-emerald-400" /> Network
                     </Button>
                     <VolumeWizard />
                     <Button type='button' className="flex flex-row gap-2 rounded-xl bg-white/5 hover:bg-violet-500/15 text-white font-bold border border-white/8 shadow-none transition-colors" onClick={env}>
@@ -216,7 +216,7 @@ export default function ComposeSettingEditor() {
                         </DialogContent>
                     </Dialog>
                     :
-                    <Button type="button" onClick={() => { handleSave() }} className="w-full py-5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all active:scale-95">
+                    <Button type="button" onClick={() => { handleSave() }} className="w-full py-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 transition-all active:scale-95">
                         <Save width={18} className="mr-2" /> Save
                     </Button>
                 }

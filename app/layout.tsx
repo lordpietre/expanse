@@ -76,7 +76,7 @@ export default async function RootLayout({
           position="top-right"
           reverseOrder={false}
         />
-        <CoreBanner />
+        {/* CoreBanner removed - unified menu now in dashboard */}
         {showUpdateBanner && (
           <VersionUpdateBanner
             currentVersion={packageJson.version}

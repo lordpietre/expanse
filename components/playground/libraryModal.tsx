@@ -107,13 +107,13 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             className={cn(
                 "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
                 activeCategory === cat
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
                     : "text-slate-400 hover:bg-white/10 hover:text-white"
             )}
         >
             <div className="flex items-center gap-3">
                 <span className={cn(
-                    activeCategory === cat ? "text-white" : "text-slate-500 group-hover:text-blue-400"
+                    activeCategory === cat ? "text-white" : "text-slate-500 group-hover:text-emerald-400"
                 )}>
                     {categoryIcons[cat as keyof typeof categoryIcons]}
                 </span>
@@ -133,7 +133,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             className={cn(
                 "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group",
                 selectedService?.name === service.name
-                    ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                     : "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent"
             )}
         >
@@ -149,17 +149,17 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                 </div>
                 <span className="truncate">{service.name}</span>
             </div>
-            {selectedService?.name === service.name && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm shadow-blue-500" />}
+            {selectedService?.name === service.name && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500" />}
         </button>
     ));
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 overflow-hidden flex flex-col bg-[#0d1117] border-white/10 text-slate-300">
-                <DialogHeader className="p-6 border-b border-white/10 bg-[#0a0d14]">
+            <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 overflow-hidden flex flex-col bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border-emerald-500/10 text-slate-300">
+                <DialogHeader className="p-6 border-b border-emerald-500/10 bg-gradient-to-r from-emerald-500/5 to-teal-500/5">
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-2xl font-bold flex items-center gap-3 text-white">
-                            <div className="p-2 bg-blue-600 rounded-lg text-white">
+                            <div className="p-2 bg-emerald-500 rounded-lg text-white">
                                 <Box className="w-6 h-6" />
                             </div>
                             Service Library
@@ -179,7 +179,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
 
                 <div className="flex flex-1 overflow-hidden">
                     {/* Left Column (Categories) */}
-                    <aside className="w-64 border-r border-white/5 bg-[#0a0d14] p-4 space-y-1 overflow-y-auto">
+                    <aside className="w-64 border-r border-emerald-500/10 bg-gradient-to-b from-emerald-500/5 to-teal-500/5 p-4 space-y-1 overflow-y-auto">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Categories</p>
                         <div className="space-y-1">
                             {categoriesList}
@@ -187,7 +187,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                     </aside>
 
                     {/* Middle Column (Submenu) */}
-                    <aside className="w-64 border-r border-white/5 bg-[#0a0d14]/50 p-4 space-y-1 overflow-y-auto">
+                    <aside className="w-64 border-r border-emerald-500/10 bg-gradient-to-b from-emerald-5/10 to-teal-500/10 p-4 space-y-1 overflow-y-auto">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Services</p>
                         <div className="space-y-1">
                             {servicesSubmenu.length > 0 ? servicesSubmenu : (
@@ -199,10 +199,10 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                     </aside>
 
                     {/* Right Column (Details) */}
-                    <main className="flex-1 p-8 overflow-y-auto bg-[#0d1117] custom-scrollbar flex items-center justify-center">
+                    <main className="flex-1 p-8 overflow-y-auto bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 custom-scrollbar flex items-center justify-center">
                         {loading ? (
                             <div className="flex flex-col items-center gap-4 text-slate-500">
-                                <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+                                <Loader2 className="w-12 h-12 animate-spin text-emerald-500" />
                                 <p className="animate-pulse">Loading library...</p>
                             </div>
                         ) : selectedService ? (
@@ -210,7 +210,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                 <div className="space-y-6">
                                     <div className="space-y-2">
                                         <h2 className="text-5xl font-bold text-white tracking-tight">{selectedService.name}</h2>
-                                        <p className="font-mono text-blue-400 text-sm bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20 inline-block">
+                                        <p className="font-mono text-emerald-400 text-sm bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 inline-block">
                                             {selectedService.image}
                                         </p>
                                     </div>
@@ -220,7 +220,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                     <div className="pt-4">
                                         <Button
                                             onClick={() => handleAdd(selectedService)}
-                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white flex gap-3 transition-all py-8 text-xl font-bold shadow-2xl shadow-blue-600/20 rounded-xl"
+                                            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white flex gap-3 transition-all py-8 text-xl font-bold shadow-2xl shadow-emerald-500/20 rounded-xl"
                                         >
                                             <Plus className="w-6 h-6" />
                                             Add to Deployment
@@ -229,8 +229,8 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                 </div>
 
                                 <div className="flex justify-center">
-                                    <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center p-12 shadow-2xl overflow-hidden relative group">
-                                        <div className="absolute inset-0 bg-blue-600/5 group-hover:bg-blue-600/10 transition-colors" />
+                                    <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/10 flex items-center justify-center p-12 shadow-2xl overflow-hidden relative group">
+                                        <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
                                         {selectedService.logo ? (
                                             <img src={selectedService.logo} alt={selectedService.name} className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
                                         ) : (

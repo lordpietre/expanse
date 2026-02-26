@@ -58,14 +58,14 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[800px] bg-[#0d1117] border-white/5 p-0 overflow-hidden shadow-2xl rounded-[1.5rem]">
+            <DialogContent className="max-w-[800px] bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border-emerald-500/10 p-0 overflow-hidden shadow-2xl rounded-[1.5rem]">
                 <DialogHeader className="p-4 bg-slate-900/50 border-b border-white/5 flex flex-row items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-blue-500/10 rounded-lg">
-                            <Terminal className="w-4 h-4 text-blue-400" />
+                        <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                            <Terminal className="w-4 h-4 text-emerald-400" />
                         </div>
                         <DialogTitle className="text-sm font-bold text-slate-300">
-                            Terminal: <span className="text-blue-400">{containerName}</span>
+                            Terminal: <span className="text-emerald-400">{containerName}</span>
                         </DialogTitle>
                     </div>
                 </DialogHeader>
@@ -84,7 +84,7 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
                                 {history.map((item) => (
                                     <div key={item.id} className={cn(
                                         "whitespace-pre-wrap leading-relaxed",
-                                        item.type === 'cmd' ? "text-blue-400 font-bold flex gap-2" :
+                                        item.type === 'cmd' ? "text-emerald-400 font-bold flex gap-2" :
                                             item.type === 'err' ? "text-rose-400" : "text-slate-300"
                                     )}>
                                         {item.type === 'cmd' && <ChevronRight className="w-3 h-3 mt-0.5 shrink-0" />}
@@ -106,7 +106,7 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
                         className="p-4 bg-slate-900/30 border-t border-white/5 flex items-center gap-3"
                     >
                         <div className="flex-grow relative">
-                            <ChevronRight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-500/50" />
+                            <ChevronRight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/50" />
                             <input
                                 ref={inputRef}
                                 type="text"
@@ -114,13 +114,13 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
                                 onChange={(e) => setCommand(e.target.value)}
                                 disabled={isExecuting}
                                 placeholder="docker exec command..."
-                                className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs font-mono text-white placeholder:text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs font-mono text-white placeholder:text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition-all"
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={isExecuting || !command.trim()}
-                            className="p-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:bg-slate-800 rounded-xl transition-all shadow-lg shadow-blue-950"
+                            className="p-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:bg-slate-800 rounded-xl transition-all shadow-lg shadow-emerald-950"
                         >
                             <Send className="w-4 h-4 text-white" />
                         </button>

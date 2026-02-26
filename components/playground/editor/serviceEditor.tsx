@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import useSelectionStore from "@/store/selection";
 import { useComposeStore } from "@/store/compose";
+import usePositionMap from "@/store/metadataMap";
 import {
     Binding,
     Delay,
@@ -24,7 +25,9 @@ import { addExtraDots, cn } from "@/lib/utils";
 import useUIStore from "@/store/ui";
 import useLibraryStore from "@/store/library";
 import { useExecutionStore } from "@/store/execution";
-import { ChevronDown, ChevronUp, Menu } from "lucide-react";
+import { ChevronDown, ChevronUp, Menu, Terminal } from "lucide-react";
+import TerminalDialog from "@/components/playground/terminalDialog";
+import { Toggle } from "@/components/ui/toggle";
 
 export default function ServiceEditor() {
 
@@ -34,6 +37,7 @@ export default function ServiceEditor() {
     const { setIsLibraryOpen } = useUIStore();
     const { serviceStatuses } = useExecutionStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isTerminalOpen, setIsTerminalOpen] = useState(false);
 
     React.useEffect(() => {
         if (services.length === 0) {
@@ -53,23 +57,39 @@ export default function ServiceEditor() {
     const isRunning = serviceStatuses[serviceName]?.status === 'running';
 
     return (
-        <form className="flex flex-col gap-6 p-6 bg-[#0a0d14]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500 text-slate-300">
-            <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-black tracking-tighter text-white flex items-center gap-2 drop-shadow-md">
-                    <Box className="w-8 h-8 text-blue-500" />
+        <form className="flex flex-col gap-6 p-6 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 backdrop-blur-2xl border border-emerald-500/10 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500 text-slate-300">
+            <div className="flex flex-col gap-1">
+                <h2 className="text-2xl font-black tracking-tighter text-white flex items-center gap-2 drop-shadow-md">
+                    <Box className="w-7 h-7 text-emerald-500" />
                     Service
                 </h2>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="flex items-center gap-2 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
-                >
-                    <Menu className="w-4 h-4" />
-                    Menu
-                    {isMenuOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                </Button>
+                <div className="text-lg font-bold text-blue-400 truncate py-1">
+                    {getService().image?.name || "No image"}:{getService().image?.tag || "latest"}
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsTerminalOpen(true)}
+                        disabled={!isRunning}
+                        className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                        <Terminal className="w-4 h-4" />
+                        Terminal
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className="flex items-center gap-2 text-slate-400 hover:text-white hover:bg-white/5 border border-white/5"
+                    >
+                        <Menu className="w-4 h-4" />
+                        Menu
+                        {isMenuOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    </Button>
+                </div>
             </div>
 
             <Tabs defaultValue="general" className="w-full">
@@ -92,7 +112,7 @@ export default function ServiceEditor() {
                             disabled={isRunning}
                             className={cn(
                                 isRunning ? "opacity-60 cursor-not-allowed bg-white/5 border-amber-500/20" : "bg-white/5 border-white/10",
-                                "text-white focus:ring-blue-500/40"
+                                "text-white focus:ring-emerald-500/40"
                             )}
                             onChange={(e) => {
                                 setCompose(() => getService().name = e.target.value)
@@ -383,77 +403,107 @@ export default function ServiceEditor() {
                 </TabsContent>
                 <TabsContent value="db" className="flex flex-col gap-6 mt-2">
                     <div className="flex flex-col gap-3">
-                        <label className="flex flex-row justify-between text-sm font-bold text-slate-400">
-                            Database Link
-                            <QuickToolType className="" message={"Select or add a database to link and auto-configure variables"} />
-                        </label>
-                        {/* List available databases in project */}
-                        <div className="flex flex-col gap-2 relative">
-                            <Select
-                                value={Array.from(getService().depends_on || []).find(dep => {
-                                    const name = dep.image?.name?.toLowerCase() || "";
-                                    return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
-                                })?.id || "none"}
-                                onValueChange={(selectedDbId) => {
-                                    setCompose(() => {
-                                        const service = getService()
-                                        if (selectedDbId === "none") {
-                                            // Remove current database dependencies
-                                            const currentDBs = Array.from(service.depends_on || []).filter(dep => {
+                        {(() => {
+                            const service = getService();
+                            const imageName = service.image?.name?.toLowerCase() || "";
+                            const isDatabase = imageName.includes('db') || imageName.includes('sql') ||
+                                imageName.includes('mongo') || imageName.includes('redis') ||
+                                imageName.includes('postgres') || imageName.includes('maria') ||
+                                imageName.includes('mysql');
+
+                            return (
+                                <>
+                                    {isDatabase && (
+                                        <>
+                                            <div className="flex flex-row items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                                                <div className="flex flex-col gap-1">
+                                                    <label className="text-sm font-bold text-slate-300">
+                                                        Sobrescribir variables de entorno
+                                                    </label>
+                                                    <span className="text-xs text-slate-400">
+                                                        Cuando se conecte a otros servicios, sus variables de entorno serán sobrescritas
+                                                    </span>
+                                                </div>
+                                                <Toggle
+                                                    pressed={usePositionMap.getState().dbNodeMeta.get(service.id)?.overwriteEnvVars ?? true}
+                                                    onPressedChange={(pressed) => {
+                                                        usePositionMap.getState().setDbNodeMeta(service.id, { overwriteEnvVars: pressed });
+                                                    }}
+                                                    className="data-[state=on]:bg-emerald-500 data-[state=on]:text-white"
+                                                />
+                                            </div>
+                                            <Separator className='my-3 border-white/10' />
+                                        </>
+                                    )}
+                                    <label className="flex flex-row justify-between text-sm font-bold text-slate-400">
+                                        Database Link
+                                        <QuickToolType className="" message={"Select or add a database to link and auto-configure variables"} />
+                                    </label>
+                                    <div className="flex flex-col gap-2 relative">
+                                        <Select
+                                            value={Array.from(getService().depends_on || []).find(dep => {
                                                 const name = dep.image?.name?.toLowerCase() || "";
                                                 return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
-                                            });
-                                            currentDBs.forEach(db => service.depends_on.delete(db))
-                                            return;
-                                        }
-
-                                        const targetDb = Array.from(compose.services).find(s => s.id === selectedDbId)
-                                        if (targetDb) {
-                                            service.depends_on.add(targetDb)
-                                            // Auto-inject env configurations from template if applicable
-                                            const templateApp = services.find(t =>
-                                                service.image?.name?.toLowerCase().includes(t.image.split(":")[0])
-                                            );
-                                            // Use specific database connection ENV map if it's defined in the app template
-                                            if (templateApp && templateApp.env_vars && service.environment) {
-                                                Object.entries(templateApp.env_vars).forEach(([key, value]) => {
-                                                    // Only auto-add if it doesn't exist
-                                                    const exists = Array.from(service.environment!).some(env => env.key === key);
-                                                    if (!exists) {
-                                                        const valStr = String(value);
-                                                        service.environment!.add(new Env(key, valStr));
-                                                        compose.envs.add(new Env(key, valStr));
+                                            })?.id || "none"}
+                                            onValueChange={(selectedDbId) => {
+                                                setCompose(() => {
+                                                    const service = getService()
+                                                    if (selectedDbId === "none") {
+                                                        const currentDBs = Array.from(service.depends_on || []).filter(dep => {
+                                                            const name = dep.image?.name?.toLowerCase() || "";
+                                                            return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
+                                                        });
+                                                        currentDBs.forEach(db => service.depends_on.delete(db))
+                                                        return;
                                                     }
-                                                });
-                                            }
-                                        }
-                                    })
-                                }}
-                            >
-                                <SelectTrigger className="bg-white/5 border-white/10 text-white w-full">
-                                    <SelectValue placeholder="Link existing database" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">None</SelectItem>
-                                    {Array.from(compose.services).filter(s => {
-                                        if (s.id === getService().id) return false;
-                                        const name = s.image?.name?.toLowerCase() || "";
-                                        return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
-                                    }).map(dbService => (
-                                        <SelectItem key={dbService.id} value={dbService.id}>
-                                            {dbService.name} ({dbService.image?.name || 'unknown'})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <Separator className='my-3 border-white/10' />
-                        <label className="text-sm font-bold text-slate-400">Not in your project?</label>
-                        <Button type="button"
-                            onClick={() => setIsLibraryOpen(true, "Database")}
-                            className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold border border-cyan-500/50 shadow-lg shadow-cyan-500/20 flex flex-row gap-2 w-full justify-center">
-                            <Database height={18} /> Add Database from Library
-                        </Button>
+
+                                                    const targetDb = Array.from(compose.services).find(s => s.id === selectedDbId)
+                                                    if (targetDb) {
+                                                        service.depends_on.add(targetDb)
+                                                        const templateApp = services.find(t =>
+                                                            service.image?.name?.toLowerCase().includes(t.image.split(":")[0])
+                                                        );
+                                                        if (templateApp && templateApp.env_vars && service.environment) {
+                                                            Object.entries(templateApp.env_vars).forEach(([key, value]) => {
+                                                                const exists = Array.from(service.environment!).some(env => env.key === key);
+                                                                if (!exists) {
+                                                                    const valStr = String(value);
+                                                                    service.environment!.add(new Env(key, valStr));
+                                                                    compose.envs.add(new Env(key, valStr));
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            <SelectTrigger className="bg-white/5 border-white/10 text-white w-full">
+                                                <SelectValue placeholder="Link existing database" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">None</SelectItem>
+                                                {Array.from(compose.services).filter(s => {
+                                                    if (s.id === getService().id) return false;
+                                                    const name = s.image?.name?.toLowerCase() || "";
+                                                    return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
+                                                }).map(dbService => (
+                                                    <SelectItem key={dbService.id} value={dbService.id}>
+                                                        {dbService.name} ({dbService.image?.name || 'unknown'})
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <Separator className='my-3 border-white/10' />
+                                    <label className="text-sm font-bold text-slate-400">Not in your project?</label>
+                                    <Button type="button"
+                                        onClick={() => setIsLibraryOpen(true, "Database")}
+                                        className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold border border-cyan-500/50 shadow-lg shadow-cyan-500/20 flex flex-row gap-2 w-full justify-center">
+                                        <Database height={18} /> Add Database from Library
+                                    </Button>
+                                </>
+                            );
+                        })()}
                     </div>
                 </TabsContent>
                 <TabsContent value="env" className="flex flex-col gap-6 mt-2">
@@ -510,7 +560,7 @@ export default function ServiceEditor() {
                                     getService().environment = new SuperSet<Readonly<Env>>();
                                     getService().environment!.add(newEnv);
                                 }
-                            })} className="flex flex-row gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold border border-blue-500/50 shadow-lg shadow-blue-500/20">
+                            })} className="flex flex-row gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold border border-emerald-500/50 shadow-lg shadow-emerald-500/20">
                             <ListPlus height={20} />Add variable
                         </Button>
                     </div>
@@ -623,6 +673,12 @@ export default function ServiceEditor() {
                     </div>
                 </TabsContent>
             </Tabs>
+            <TerminalDialog
+                open={isTerminalOpen}
+                onOpenChange={setIsTerminalOpen}
+                containerId={serviceStatuses[serviceName]?.id || ""}
+                containerName={serviceStatuses[serviceName]?.name || serviceName}
+            />
         </form >
     )
 

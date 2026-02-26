@@ -1,0 +1,15 @@
+{
+    "name": "Flowise",
+    "image": "flowiseai/flowise:latest",
+    "category": "Automation",
+    "logo": "https://flowiseai.com/favicon.ico",
+    "description": "AI/LLM workflow builder with visual chains (LangChain). Drag-and-drop for RAG and AI agents, integrates Ollama/LocalAI. Perfect if combined with local LLMs.",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "PORT": "3000",
+        "FLOWISE_USERNAME": "admin",
+        "FLOWISE_PASSWORD": "password"
+    }
+}

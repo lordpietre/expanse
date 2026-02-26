@@ -1,0 +1,13 @@
+{
+    "name": "Node-RED",
+    "image": "nodered/node-red:latest",
+    "category": "Automation",
+    "logo": "https://nodered.org/about/resources/media/node-red-icon.png",
+    "description": "Flow-based programming for IoT, MQTT, hardware, and edge computing. Thousands of community nodes, ultra-lightweight, mature since 2013. Ideal for sensors and home automation.",
+    "default_ports": [
+        "1880:1880"
+    ],
+    "env_vars": {
+        "NODE_RED_ENABLE_S Projects": "true"
+    }
+}

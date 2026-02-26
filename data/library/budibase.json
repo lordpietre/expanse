@@ -1,0 +1,17 @@
+{
+    "name": "Budibase",
+    "image": "budibase/budibase:latest",
+    "category": "Automation",
+    "logo": "https://budibase.com/favicon.ico",
+    "description": "App builder with internal tools and basic workflows. Build apps + automate within, full low-code. If you want UI + automation together.",
+    "default_ports": [
+        "10000:10000"
+    ],
+    "env_vars": {
+        "BB_ADMIN_EMAIL": "admin@example.com",
+        "BB_ADMIN_PASSWORD": "password",
+        "BB_POSTGRES_HOST": "postgres",
+        "BB_POSTGRES_USER": "budibase",
+        "BB_POSTGRES_PASSWORD": "password"
+    }
+}

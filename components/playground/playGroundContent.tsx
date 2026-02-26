@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity, CheckCircle2, Loader2 } from "lucide-react";
+import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity, CheckCircle2, Loader2, ChevronLeft, ChevronRight, PanelLeftClose, PanelLeftCloseIcon } from "lucide-react";
 import Playground, { PlaygroundHandle } from "@/components/playground/playground";
 import { useComposeStore } from "@/store/compose";
 import useSelectionStore from "@/store/selection";
@@ -24,7 +24,7 @@ import Link from "next/link";
 type DeployPhase = null | 'validating' | 'writing' | 'starting' | 'done';
 
 const PHASE_CONFIG: Record<Exclude<DeployPhase, null>, { label: string; detail: string; progress: number; color: string }> = {
-    validating: { label: 'Validando puertos...', detail: 'Comprobando conflictos con puertos en uso', progress: 20, color: 'from-blue-500 to-indigo-500' },
+    validating: { label: 'Validando puertos...', detail: 'Comprobando conflictos con puertos en uso', progress: 20, color: 'from-emerald-500 to-teal-500' },
     writing: { label: 'Escribiendo configuración...', detail: 'Generando docker-compose.yaml con parches', progress: 50, color: 'from-indigo-500 to-purple-500' },
     starting: { label: 'Iniciando contenedores...', detail: 'Ejecutando docker compose up -d', progress: 80, color: 'from-purple-500 to-emerald-500' },
     done: { label: '¡Listo!', detail: 'Contendores arrancados correctamente', progress: 100, color: 'from-emerald-400 to-teal-500' },
@@ -34,7 +34,7 @@ function DeployProgress({ phase }: { phase: DeployPhase }) {
     if (!phase) return null;
     const cfg = PHASE_CONFIG[phase];
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 bg-[#0d1117] border border-white/10 rounded-2xl p-4 flex flex-col gap-3">
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-4 flex flex-col gap-3">
             <div className="flex items-center gap-2">
                 {phase === 'done'
                     ? <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -71,6 +71,13 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
     const playgroundRef = useRef<PlaygroundHandle>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [deployPhase, setDeployPhase] = useState<DeployPhase>(null);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+    React.useEffect(() => {
+        if (isExecuting) {
+            setIsSidebarCollapsed(true);
+        }
+    }, [isExecuting]);
 
     const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -411,12 +418,12 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
     };
 
     return (
-        <section className="flex flex-col h-screen bg-[hsl(222,47%,5%)] relative overflow-hidden">
+        <section className="flex flex-col h-[calc(100vh-80px)] bg-[hsl(222,47%,5%)] relative overflow-hidden rounded-2xl border border-emerald-500/10">
             {/* Mesh Background */}
             <div className="absolute inset-0 opacity-10 pointer-events-none mesh-gradient-blue" />
 
-            <div className="flex z-10 p-3 px-8 border-b border-white/5 relative justify-between backdrop-blur-3xl bg-[#0a0d14]/80 shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-                <div className="flex gap-4 items-center pl-8">
+            <div className="flex z-10 p-3 px-4 border-b border-emerald-500/10 relative justify-between bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10">
+                <div className="flex gap-3 items-center">
                     <input
                         type="file"
                         ref={fileInputRef}
@@ -452,7 +459,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                                     <Button
                                         variant="default"
                                         size="sm"
-                                        className="ml-auto bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                        className="ml-auto bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
                                         onClick={() => {
                                             const yaml = YAML.stringify(new Translator(compose).toDict());
                                             const blob = new Blob([yaml], { type: 'text/yaml' });
@@ -483,10 +490,10 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                         <Zap className="w-4 h-4 text-amber-400 mr-2" />
                         <span className="font-bold">Layout</span>
                     </Button>
-                    <Link href="/global-dashboard">
+                    <Link href="/deploy/settings">
                         <Button variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm transition-all" >
                             <Activity className="w-4 h-4 text-rose-500 mr-2" />
-                            <span className="font-bold">Dashboard</span>
+                            <span className="font-bold">System</span>
                         </Button>
                     </Link>
                 </div>
@@ -498,60 +505,87 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 </div>
             </div>
 
-            <div className="flex-grow flex flex-row p-6 gap-6 overflow-hidden">
-                <div className="flex-grow bg-[#070b0f]/60 rounded-2xl overflow-hidden relative shadow-2xl border border-white/5">
+            <div className="flex-grow flex flex-row p-4 gap-4 overflow-hidden">
+                <div className={cn("flex-grow bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 rounded-2xl overflow-hidden relative shadow-2xl border border-emerald-500/10 transition-all duration-300", isSidebarCollapsed && isExecuting ? "mr-0" : "")}>
                     <Playground ref={playgroundRef} />
                 </div>
 
-                <div className="w-[400px] flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
-                    <div className="bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-2xl">
-                        <EditMenu />
-                    </div>
-
-                    <div className="bg-[#0d1117]/80 backdrop-blur-xl border border-white/5 rounded-2xl p-5 shadow-2xl flex flex-col gap-4 mt-auto">
-                        <div className="flex flex-col gap-3">
-                            {/* Deploy progress bar — shown during launch */}
-                            <DeployProgress phase={deployPhase} />
-
-                            <Button
-                                onClick={isExecuting ? handleStop : handleExecute}
-                                disabled={!!deployPhase && deployPhase !== 'done'}
-                                className={cn(
-                                    "w-full py-5 rounded-2xl font-black text-base uppercase tracking-widest transition-all duration-500 scale-100 active:scale-95 shadow-2xl relative overflow-hidden group",
-                                    isExecuting ? "bg-rose-500 hover:bg-rose-600 shadow-rose-500/30" : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/30"
-                                )}
-                            >
-                                <div className="absolute inset-0 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity animate-liquid" />
-                                <div className="relative z-10 flex items-center justify-center gap-3">
-                                    {deployPhase && deployPhase !== 'done'
-                                        ? <Loader2 className="w-5 h-5 animate-spin" />
-                                        : isExecuting ? <Square className="fill-white" /> : <Play className="fill-white" />}
-                                    <span>{isExecuting ? "Detener" : "Ejecutar"}</span>
-                                </div>
-                            </Button>
-
-                            {isExecuting && (
-                                <Button
-                                    onClick={handleRestart}
-                                    disabled={!!deployPhase && deployPhase !== 'done'}
-                                    variant="outline"
-                                    className="w-full py-5 rounded-xl font-black text-sm uppercase tracking-widest transition-all duration-300 hover:bg-amber-500/10 border-amber-500/30 text-amber-400 relative overflow-hidden group"
-                                >
-                                    <div className="relative z-10 flex items-center justify-center gap-3">
-                                        <Zap className="fill-amber-500" />
-                                        <span>Reiniciar</span>
-                                    </div>
-                                </Button>
-                            )}
-
-                            {isExecuting && (
-                                <div className="mt-2 text-white">
-                                    <ExecutionPanel />
-                                </div>
-                            )}
+                {isSidebarCollapsed && isExecuting ? (
+                    <div className="w-14 flex flex-col gap-4 h-full">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsSidebarCollapsed(false)}
+                            className="h-14 w-full rounded-xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/10 hover:bg-emerald-500/20 text-slate-400 hover:text-white"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </Button>
+                        <div className="flex-1 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 overflow-y-auto custom-scrollbar">
+                            <ExecutionPanel />
                         </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="w-[400px] flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                        {isExecuting && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsSidebarCollapsed(true)}
+                                className="self-end h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white flex items-center gap-2"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                                <span className="text-xs font-medium">Contraer</span>
+                            </Button>
+                        )}
+                        <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-6 shadow-2xl">
+                            <EditMenu />
+                        </div>
+
+                        <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-5 shadow-2xl flex flex-col gap-4 mt-auto">
+                            <div className="flex flex-col gap-3">
+                                {/* Deploy progress bar — shown during launch */}
+                                <DeployProgress phase={deployPhase} />
+
+                                <Button
+                                    onClick={isExecuting ? handleStop : handleExecute}
+                                    disabled={!!deployPhase && deployPhase !== 'done'}
+                                    className={cn(
+                                        "w-full py-5 rounded-2xl font-black text-base uppercase tracking-widest transition-all duration-500 scale-100 active:scale-95 shadow-2xl relative overflow-hidden group",
+                                        isExecuting ? "bg-rose-500 hover:bg-rose-600 shadow-rose-500/30" : "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/30"
+                                    )}
+                                >
+                                    <div className="absolute inset-0 opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity animate-liquid" />
+                                    <div className="relative z-10 flex items-center justify-center gap-3">
+                                        {deployPhase && deployPhase !== 'done'
+                                            ? <Loader2 className="w-5 h-5 animate-spin" />
+                                            : isExecuting ? <Square className="fill-white" /> : <Play className="fill-white" />}
+                                        <span>{isExecuting ? "Detener" : "Ejecutar"}</span>
+                                    </div>
+                                </Button>
+
+                                {isExecuting && (
+                                    <Button
+                                        onClick={handleRestart}
+                                        disabled={!!deployPhase && deployPhase !== 'done'}
+                                        variant="outline"
+                                        className="w-full py-5 rounded-xl font-black text-sm uppercase tracking-widest transition-all duration-300 hover:bg-amber-500/10 border-amber-500/30 text-amber-400 relative overflow-hidden group"
+                                    >
+                                        <div className="relative z-10 flex items-center justify-center gap-3">
+                                            <Zap className="fill-amber-500" />
+                                            <span>Reiniciar</span>
+                                        </div>
+                                    </Button>
+                                )}
+
+                                {isExecuting && (
+                                    <div className="mt-2 text-white">
+                                        <ExecutionPanel />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
             <LibraryModal open={isLibraryOpen} onOpenChange={setIsLibraryOpen} />
         </section>

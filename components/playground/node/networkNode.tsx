@@ -46,10 +46,10 @@ function getNodeTypeMeta(type: NetworkNodeType, gatewayImpl?: GatewayImpl): Node
             return {
                 label: 'Switch',
                 Icon: GitBranch,
-                badgeBg: 'bg-blue-500/15 border-blue-500/25',
-                badgeText: 'text-blue-400',
-                glowColor: 'rgba(59,130,246,0.5)',
-                gradient: 'from-blue-400 via-indigo-500 to-purple-600',
+                badgeBg: 'bg-emerald-500/15 border-emerald-500/25',
+                badgeText: 'text-emerald-400',
+                glowColor: 'rgba(16,185,129,0.5)',
+                gradient: 'from-emerald-400 via-teal-500 to-cyan-600',
             };
     }
 }
@@ -92,7 +92,7 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                     ? `p-[1.5px] rounded-xl bg-gradient-to-br ${typeMeta.gradient} scale-[1.03] z-50 shadow-xl`
                     : "p-[1px] rounded-xl bg-white/5 hover:bg-white/10 shadow-lg"
             )}>
-                <div className="bg-[#0d1117]/95 backdrop-blur-3xl rounded-[0.7rem] overflow-visible flex flex-col min-w-[260px]">
+                <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-3xl rounded-[0.7rem] overflow-visible flex flex-col min-w-[260px]">
 
                     {/* Header — dark chassis */}
                     <div className="px-5 py-3 flex items-center justify-between relative overflow-hidden bg-slate-950 rounded-t-[0.7rem]">
@@ -102,7 +102,7 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
 
                         <div className="flex flex-col z-10 gap-1 min-w-0">
                             <div className="flex items-center gap-2">
-                                <div className="w-5 h-0.5 bg-blue-500 rounded-full shadow-[0_0_6px_rgba(59,130,246,0.9)]" />
+                                <div className="w-5 h-0.5 bg-emerald-500 rounded-full shadow-[0_0_6px_rgba(16,185,129,0.9)]" />
                                 <span className={cn("text-[8px] font-black uppercase tracking-[0.35em]", typeMeta.badgeText)}>
                                     {typeMeta.label}{typeMeta.subLabel ? ` · ${typeMeta.subLabel}` : ''}
                                 </span>
@@ -116,7 +116,7 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                                     {meta.type === 'switch' ? 'Switch Virtual' : meta.type === 'gateway-l7' ? `L7 · ${meta.gatewayImpl || 'nginx'}` : 'Router L3'}
                                 </div>
                                 {/* Driver badge */}
-                                <div className="px-1.5 py-0.5 rounded bg-blue-500/15 border border-blue-500/25 text-[7px] font-black text-blue-400 uppercase tracking-widest">
+                                <div className="px-1.5 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/25 text-[7px] font-black text-emerald-400 uppercase tracking-widest">
                                     {data.network.driver?.toUpperCase() || "BRIDGE"}
                                 </div>
                             </div>
@@ -172,12 +172,12 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                         </div>
 
                         {/* Stats & Services */}
-                        <div className="p-3 space-y-2 bg-[#0d1117]/90">
+                        <div className="p-3 space-y-2 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5">
                             {/* Stats row */}
                             <div className="flex items-center justify-between bg-white/3 border border-white/5 rounded-lg px-2 py-1.5 gap-2">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-6 h-6 rounded-md bg-blue-500/10 flex items-center justify-center">
-                                        {isHostMode ? <Zap className="w-3.5 h-3.5 text-amber-400" /> : <Globe className="w-3.5 h-3.5 text-blue-400" />}
+                                    <div className="w-6 h-6 rounded-md bg-emerald-500/10 flex items-center justify-center">
+                                        {isHostMode ? <Zap className="w-3.5 h-3.5 text-amber-400" /> : <Globe className="w-3.5 h-3.5 text-emerald-400" />}
                                     </div>
                                     <div>
                                         <div className="text-[7px] font-black text-slate-600 uppercase tracking-widest">
@@ -205,7 +205,7 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                             {/* Services list */}
                             <div>
                                 <div className="flex items-center gap-1.5 mb-2">
-                                    <Link className="w-3 h-3 text-blue-400" />
+                                    <Link className="w-3 h-3 text-emerald-400" />
                                     <span className="text-[8px] font-black uppercase text-slate-500 tracking-wider">Interface Discovery</span>
                                 </div>
                                 {connectedServices.length > 0 ? (

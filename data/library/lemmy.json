@@ -1,0 +1,15 @@
+{
+    "name": "Lemmy",
+    "image": "dessalines/lemmy:latest",
+    "category": "Social",
+    "logo": "https://join-lemmy.org/assets/img/logo.svg",
+    "description": "Federated link aggregator (Reddit-like). Communities, voting, and community-level moderation. Fediverse.",
+    "default_ports": [
+        "1236:1236"
+    ],
+    "env_vars": {
+        "LEMMY_DATABASE_URL": "postgres://lemmy:password@postgres:5432/lemmy",
+        "LEMMY_HOSTNAME": "localhost",
+        "LEMMY_ADMIN_EMAIL": "admin@example.com"
+    }
+}

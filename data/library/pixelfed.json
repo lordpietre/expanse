@@ -1,0 +1,19 @@
+{
+    "name": "Pixelfed",
+    "image": "pixelfed/pixelfed:v0.12",
+    "category": "Social",
+    "logo": "https://pixelfed.org/pixelfed.svg",
+    "description": "Federated photo sharing platform (Instagram-like). Federates with Mastodon, supports stories, filters, and collections.",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "DB_HOST": "postgres",
+        "DB_PORT": "5432",
+        "DB_DATABASE": "pixelfed",
+        "DB_USERNAME": "pixelfed",
+        "DB_PASSWORD": "password",
+        "REDIS_HOST": "redis",
+        "ADMIN_EMAIL": "admin@example.com"
+    }
+}

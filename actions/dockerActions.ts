@@ -210,10 +210,11 @@ export async function getComposeLogs(composeId: string) {
 
 export async function getGlobalDockerStats() {
     try {
-        const [projectsRes, containersRes, volumesRes, dfRes] = await Promise.all([
+        const [projectsRes, containersRes, volumesRes, networksRes, dfRes] = await Promise.all([
             execAsync('docker compose ls --format json'),
             execAsync('docker ps -a --format json'),
             execAsync('docker volume ls --format json'),
+            execAsync('docker network ls --format json'),
             execAsync('docker system df -v').catch(() => ({ stdout: '' }))
         ]);
 
@@ -234,6 +235,7 @@ export async function getGlobalDockerStats() {
         };
 
         const volumes = parseJson(volumesRes.stdout);
+        const networks = parseJson(networksRes.stdout);
         const dfOutput = dfRes.stdout;
 
         // Simple regex to find volume sizes in 'docker system df -v' output
@@ -275,7 +277,8 @@ export async function getGlobalDockerStats() {
         return {
             projects: parseJson(projectsRes.stdout),
             containers: parseJson(containersRes.stdout),
-            volumes
+            volumes,
+            networks
         };
     } catch (error: any) {
         console.error('Global Docker Stats Error:', error);

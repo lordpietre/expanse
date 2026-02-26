@@ -1,0 +1,18 @@
+{
+    "name": "Automatisch",
+    "image": "automatisch/automatisch:latest",
+    "category": "Automation",
+    "logo": "https://automatisch.io/favicon.ico",
+    "description": "Open source Zapier-like automation. Similar interface to n8n, focused on privacy and self-hosting. Good direct alternative.",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "APP_URL": "http://localhost:3000",
+        "POSTGRES_HOST": "postgres",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_DATABASE": "automatisch",
+        "POSTGRES_USER": "automatisch",
+        "POSTGRES_PASSWORD": "password"
+    }
+}

@@ -109,7 +109,7 @@ function PasswordModal({
                             value={value}
                             onChange={e => { setValue(e.target.value); setError(""); }}
                             placeholder="••••••••"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
                             autoFocus
                         />
                         {error && <span className="text-[10px] text-rose-400 font-bold">{error}</span>}
@@ -198,7 +198,7 @@ function ProjectDetail({
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-[#0d1117]/80">
                         <div className="flex items-center gap-4">
-                            <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                                 <Boxes className="w-5 h-5 text-blue-400" />
                             </div>
                             <div>
@@ -482,7 +482,7 @@ export default function DashboardPage() {
             )}
 
             {/* ── Header ── */}
-            <div className="border-b border-white/5 bg-[#0a0d14]/80 backdrop-blur-xl sticky top-0 z-30">
+            <div className="border-b border-emerald-500/10 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 backdrop-blur-xl sticky top-0 z-30">
                 <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <Link href="/">
@@ -497,7 +497,7 @@ export default function DashboardPage() {
                         <div className={cn(
                             "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border",
                             loading
-                                ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                                 : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                         )}>
                             <RefreshCw className={cn("w-3 h-3", loading && "animate-spin")} />
@@ -579,14 +579,14 @@ export default function DashboardPage() {
                                     return (
                                         <div
                                             key={proj.Name}
-                                            className="flex items-start justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-blue-500/30 hover:bg-[#0d1117] transition-all group"
+                                            className="flex items-start justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-emerald-500/30 hover:bg-[#0d1117] transition-all group"
                                         >
                                             <button
                                                 onClick={() => setSelectedProject(proj)}
                                                 className="flex items-start gap-3 min-w-0 flex-1 text-left"
                                             >
-                                                <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/10 group-hover:border-blue-500/30 transition-colors shrink-0 mt-0.5">
-                                                    <Boxes className="w-4 h-4 text-blue-400" />
+                                                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/10 group-hover:border-emerald-500/30 transition-colors shrink-0 mt-0.5">
+                                                    <Boxes className="w-4 h-4 text-emerald-400" />
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className="font-bold text-sm text-white truncate">{proj.Name}</div>

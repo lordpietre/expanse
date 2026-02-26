@@ -1,0 +1,15 @@
+{
+    "name": "Windmill",
+    "image": "windmill-labs/windmill:latest",
+    "category": "Automation",
+    "logo": "https://www.windmill.dev/favicon.ico",
+    "description": "Developer-focused scripts and flows with Python/Go/TS + UI. Teams, Deno/Bun runtime, Git sync, strong RBAC, auto-generated APIs. Very powerful for code-heavy workflows.",
+    "default_ports": [
+        "8000:8000"
+    ],
+    "env_vars": {
+        "DATABASE_URL": "postgres://windmill:password@postgres:5432/windmill",
+        "RUST_LOG": "info",
+        "WM_WORKER_SECRET": "replace-with-random-value"
+    }
+}

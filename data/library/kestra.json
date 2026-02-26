@@ -1,0 +1,16 @@
+{
+    "name": "Kestra",
+    "image": "kestra/kestra:latest",
+    "category": "Automation",
+    "logo": "https://kestra.io/favicon.ico",
+    "description": "YAML-based orchestration for data pipelines, ETL, and scheduled tasks. Declarative, scalable, rich plugins, modern UI. Best for batch/data-heavy workloads.",
+    "default_ports": [
+        "8080:8080"
+    ],
+    "env_vars": {
+        "KESTRA_CONFIGURATION": "database",
+        "KESTRA_CONFIG__DATASOURCES__postgres__URL": "jdbc:postgresql://postgres:5432/kestra?currentSchema=public",
+        "KESTRA_CONFIG__DATASOURCES__postgres__USER": "kestra",
+        "KESTRA_CONFIG__DATASOURCES__postgres__PASSWORD": "password"
+    }
+}

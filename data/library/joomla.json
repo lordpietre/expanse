@@ -1,0 +1,16 @@
+{
+    "name": "Joomla",
+    "image": "joomla:5-apache",
+    "category": "CMS",
+    "logo": "https://docs.joomla.org/images/7/72/Logo-j25-trans.png",
+    "description": "User-friendly CMS for medium-sized websites and community platforms. Good balance between WordPress simplicity and Drupal power.",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "JOOMLA_DB_HOST": "db",
+        "JOOMLA_DB_USER": "joomla",
+        "JOOMLA_DB_PASSWORD": "password",
+        "JOOMLA_DB_NAME": "joomla"
+    }
+}

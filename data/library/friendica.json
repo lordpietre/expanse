@@ -1,0 +1,18 @@
+{
+    "name": "Friendica",
+    "image": "friendica/node:stable",
+    "category": "Social",
+    "logo": "https://friendi.ca/logo.png",
+    "description": "Full-featured social network (Facebook-like). Contacts, groups, events, and connection with other protocols. Connects with Mastodon, Diaspora, and older protocols.",
+    "default_ports": [
+        "8080:8080"
+    ],
+    "env_vars": {
+        "MYSQL_HOST": "mariadb",
+        "MYSQL_DATABASE": "friendica",
+        "MYSQL_USER": "friendica",
+        "MYSQL_PASSWORD": "password",
+        "SITE_NAME": "Friendica",
+        "ADMIN_MAIL": "admin@example.com"
+    }
+}

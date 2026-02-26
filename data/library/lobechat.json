@@ -1,0 +1,15 @@
+{
+    "name": "LobeChat",
+    "image": "lobehub/lobe-chat:latest",
+    "category": "AI",
+    "logo": "https://lobehub.com/favicon.ico",
+    "description": "Modern multi-modal chat for Ollama, OpenAI, and more. Features speech synthesis, plugins, one-click deploy. Very beautiful UI, trending for personal use.",
+    "default_ports": [
+        "3210:3210"
+    ],
+    "env_vars": {
+        "OLLAMA_PROXY_URL": "http://ollama:11434",
+        "OPENAI_API_KEY": "sk-xxx",
+        "ACCESS_CODE": "replace-with-password"
+    }
+}

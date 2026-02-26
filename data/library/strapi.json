@@ -1,0 +1,15 @@
+{
+    "name": "Strapi",
+    "image": "strapi/strapi:5",
+    "category": "CMS",
+    "logo": "https://strapi.io/assets/strapi_logo.svg",
+    "description": "Open-source headless CMS for building modern APIs. The most popular headless CMS in 2026 for connecting apps + websites.",
+    "default_ports": [
+        "1337:1337"
+    ],
+    "env_vars": {
+        "DATABASE_CLIENT": "sqlite",
+        "ADMIN_JWT_SECRET": "your-secret-key",
+        "API_TOKEN_SALT": "your-salt"
+    }
+}

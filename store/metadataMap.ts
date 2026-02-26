@@ -11,14 +11,19 @@ export interface NetworkNodeMeta {
     gatewayImpl?: GatewayImpl;
 }
 
-// Define the type for the store's state
+export interface DbNodeMeta {
+    overwriteEnvVars?: boolean;
+}
+
 interface metadataState {
     positionMap: Map<string, NodeData>;
     connectionMap: Map<string, string>; // Key: "sourceId:targetId", Value: "targetHandle"
     networkNodeMeta: Map<string, NetworkNodeMeta>; // Key: networkId
+    dbNodeMeta: Map<string, DbNodeMeta>; // Key: serviceId
     setPositionMap: (newMap: Map<string, NodeData>) => void;
     setConnectionMap: (newMap: Map<string, string>) => void;
     setNetworkNodeMeta: (networkId: string, meta: Partial<NetworkNodeMeta>) => void;
+    setDbNodeMeta: (serviceId: string, meta: Partial<DbNodeMeta>) => void;
 }
 
 // Create the Zustand store
@@ -26,6 +31,7 @@ const usePositionMap = create<metadataState>((set, get) => ({
     positionMap: new Map(),
     connectionMap: new Map(),
     networkNodeMeta: new Map(),
+    dbNodeMeta: new Map(),
     setPositionMap: (newMap: Map<string, NodeData>) => set({ positionMap: newMap }),
     setConnectionMap: (newMap: Map<string, string>) => set({ connectionMap: newMap }),
     setNetworkNodeMeta: (networkId: string, meta: Partial<NetworkNodeMeta>) => {
@@ -33,6 +39,12 @@ const usePositionMap = create<metadataState>((set, get) => ({
         const updated = new Map(get().networkNodeMeta);
         updated.set(networkId, { ...existing, ...meta });
         set({ networkNodeMeta: updated });
+    },
+    setDbNodeMeta: (serviceId: string, meta: Partial<DbNodeMeta>) => {
+        const existing = get().dbNodeMeta.get(serviceId) || {};
+        const updated = new Map(get().dbNodeMeta);
+        updated.set(serviceId, { ...existing, ...meta });
+        set({ dbNodeMeta: updated });
     },
 }));
 

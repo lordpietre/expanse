@@ -1,0 +1,15 @@
+{
+    "name": "AnythingLLM",
+    "image": "mintplexlabs/anythingllm:latest",
+    "category": "AI",
+    "logo": "https://anythingllm.com/favicon.ico",
+    "description": "RAG-focused chat with Ollama and LocalAI. Embeds local documents, multi-user workspaces. Excellent for private knowledge bases.",
+    "default_ports": [
+        "3001:3001"
+    ],
+    "env_vars": {
+        "OLLAMA_BASE_URL": "http://ollama:11434",
+        "JWT_SECRET": "replace-with-random-value",
+        "STORAGE_DIR": "/app/storage"
+    }
+}

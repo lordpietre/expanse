@@ -1,0 +1,14 @@
+{
+    "name": "Payload CMS",
+    "image": "payloadcms/payload:3",
+    "category": "CMS",
+    "logo": "https://payloadcms.com/images/brand.svg",
+    "description": "TypeScript-based headless CMS built on Node.js. Developer-friendly with powerful authentication and advanced hooks.",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "PAYLOAD_PUBLIC_SERVER_URL": "http://localhost:3000",
+        "PAYLOAD_SECRET": "your-secret-key"
+    }
+}

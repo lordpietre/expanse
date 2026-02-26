@@ -31,7 +31,7 @@ export default function VolumeNode({ data }: { data: { volume: Volume } }) {
                     ? "p-[1.5px] rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 scale-[1.05] shadow-xl shadow-amber-500/20"
                     : "p-[1px] rounded-xl bg-white/5 hover:bg-white/10 shadow-md"
             )}>
-                <div className="bg-[#0d1117]/90 backdrop-blur-2xl rounded-[0.65rem] overflow-visible flex flex-col min-w-[150px]">
+                <div className="bg-gradient-to-br from-amber-500/5 via-orange-500/5 to-yellow-500/5 backdrop-blur-2xl rounded-[0.65rem] overflow-visible flex flex-col w-[120px]">
                     {/* Header */}
                     <div className="flex items-center gap-2.5 px-3 py-2 relative border-b border-white/5">
                         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-400 to-orange-600 opacity-70 rounded-tl-[0.65rem]" />

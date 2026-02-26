@@ -1,0 +1,19 @@
+{
+    "name": "Misskey",
+    "image": "misskey/misskey:latest",
+    "category": "Social",
+    "logo": "https://misskey-hub.net/avatar.png",
+    "description": "Rich-featured microblogging with calendar, custom reactions, and modern interface. Communities that want more than just toots.",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "DB_HOST": "postgres",
+        "DB_PORT": "5432",
+        "DB_USER": "misskey",
+        "DB_NAME": "misskey",
+        "DB_PASS": "password",
+        "REDIS_HOST": "redis",
+        "PORT": "3000"
+    }
+}

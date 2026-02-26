@@ -1,0 +1,16 @@
+{
+    "name": "Huginn",
+    "image": "huginn/huginn:latest",
+    "category": "Automation",
+    "logo": "https://huginn.github.io/images/huginn_blue_thumb.png",
+    "description": "Agents automation for web monitoring, scraping, and alerts. Create 'agents' that watch and act. Very flexible but less visual. Classic tool.",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "DATABASE_USERNAME": "huginn",
+        "DATABASE_PASSWORD": "password",
+        "DATABASE_HOST": "postgres",
+        "APP_SECRET_TOKEN": "replace-with-random-value"
+    }
+}

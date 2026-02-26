@@ -15,7 +15,7 @@ const getCategoryTheme = (imageName: string = "") => {
         return { icon: Database, gradient: "from-amber-500 to-orange-600", color: "text-amber-400", glow: "shadow-amber-500/20" };
     }
     if (name.includes('nginx') || name.includes('apache') || name.includes('proxy') || name.includes('http')) {
-        return { icon: Globe, gradient: "from-sky-500 to-blue-600", color: "text-sky-400", glow: "shadow-sky-500/20" };
+        return { icon: Globe, gradient: "from-sky-500 to-emerald-600", color: "text-sky-400", glow: "shadow-sky-500/20" };
     }
     if (name.includes('chat') || name.includes('matrix') || name.includes('slack') || name.includes('mattermost') || name.includes('zulip') || name.includes('revolt') || name.includes('synapse') || name.includes('rocketchat')) {
         return { icon: Globe, gradient: "from-indigo-500 to-purple-600", color: "text-indigo-400", glow: "shadow-indigo-500/20" };
@@ -42,23 +42,28 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
     const [expanded, setExpanded] = useState(false);
 
     // Color code based on status: Stopped (Black/Dark), Running (Green), Error (Red)
-    const statusClass = cn(
-        !isRunning && !isError && "bg-slate-900", // Stopped
-        isRunning && "bg-emerald-400 group-hover:bg-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.3)]", // Running
-        isError && "bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)]" // Error
-    );
+    const getStatusBorder = () => {
+        if (isError) {
+            return "p-[1px] rounded-xl border-[4px] border-rose-500 z-50";
+        }
+        if (isRunning) {
+            return "p-[1px] rounded-xl border-[4px] border-emerald-400 z-50";
+        }
+        // Stopped - dark border
+        return "p-[1px] rounded-xl border-[4px] border-slate-800 z-50";
+    };
 
     return (
         <Selectable id={service.id}>
             <div className={cn(
                 "group relative flex flex-col transition-all duration-500",
-                selected
-                    ? "p-[1.5px] rounded-xl bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 scale-[1.02] z-50 shadow-xl shadow-indigo-500/20"
-                    : cn("p-[1px] rounded-xl shadow-lg", statusClass),
+                selected ? getStatusBorder() : "p-[1px] rounded-xl",
+                !selected && "border-[4px]",
+                !selected && (isError ? "border-rose-500" : isRunning ? "border-emerald-400" : "border-slate-800"),
                 isRunning && "float"
             )}>
                 {/* Compact Glass Card */}
-                <div className="bg-[#0d1117]/95 backdrop-blur-2xl rounded-[0.9rem] flex flex-col overflow-visible border border-white/5" style={{ minWidth: 195 }}>
+                <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-2xl rounded-[0.9rem] flex flex-col overflow-visible border border-white/5" style={{ minWidth: 195 }}>
 
                     {/* Gradient Header — always visible, click to toggle */}
                     <div
@@ -73,21 +78,21 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                     >
                         <div className="absolute inset-0 shimmer opacity-30" />
                         <div className="flex flex-col z-10 min-w-0">
-                            <h3 className="text-white font-black text-base tracking-tight uppercase truncate max-w-[120px] leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                                {service.name}
+                            <h3 className="text-white font-black text-lg tracking-tight uppercase truncate max-w-[160px] leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                                {service.image?.name || 'no-image'}
                             </h3>
-                            <span className="text-white/70 text-[9px] font-bold uppercase tracking-widest truncate max-w-[110px] mt-0.5" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                                {service.image?.toString() || 'no-image'}
+                            <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest truncate max-w-[150px] mt-1" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                                {service.name}
                             </span>
                         </div>
-                        <div className="flex items-center gap-1.5 z-10 ml-2 shrink-0">
-                            <div className="bg-black/20 backdrop-blur-sm p-2 rounded-lg border border-white/20">
+                        <div className="flex items-center gap-2 z-10 ml-3 shrink-0">
+                            <div className="bg-white/20 backdrop-blur-sm p-2.5 rounded-lg border border-white/30 shadow-lg">
                                 {(() => {
                                     const logo = service.labels?.find(l => l.key === "com.composecraft.logo")?.value;
                                     return logo ? (
-                                        <img src={logo} className="w-5 h-5 object-contain" alt="logo" />
+                                        <img src={logo} className="w-8 h-8 object-contain drop-shadow-lg" alt="logo" />
                                     ) : (
-                                        <Icon className="w-5 h-5 text-white" />
+                                        <Icon className="w-8 h-8 text-white drop-shadow-lg" />
                                     );
                                 })()}
                             </div>
@@ -108,10 +113,10 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                                 id="network"
                                 type="source"
                                 position={Position.Left}
-                                className="!w-4 !h-4 !rounded-full !-left-3.5 !bg-blue-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(59,130,246,0.5)] hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
+                                className="!w-4 !h-4 !rounded-full !-left-3.5 !bg-emerald-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(16,185,129,0.5)] hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer"
                             />
-                            <Network className="w-3 h-3 text-blue-400" />
-                            <span className="text-[8px] font-bold text-blue-300">
+                            <Network className="w-3 h-3 text-emerald-400" />
+                            <span className="text-[8px] font-bold text-emerald-300">
                                 {service.networks?.size || 0}
                             </span>
                         </div>
@@ -149,7 +154,7 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
 
                     {/* Expanded detail sections */}
                     {expanded && (
-                        <CardContent className="p-0 bg-[#0d1117]/80">
+                        <CardContent className="p-0 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5">
                             {/* Running badge */}
                             {isRunning && (
                                 <div className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-500/10 border-b border-emerald-500/10">
@@ -162,12 +167,12 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                                 {/* NETWORKS */}
                                 <div className="relative px-3 py-1.5 hover:bg-white/3 transition-colors">
                                     <div className="flex items-center gap-1.5 mb-1">
-                                        <Network className="w-3 h-3 text-blue-400" />
+                                        <Network className="w-3 h-3 text-emerald-400" />
                                         <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Networks</span>
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {Array.from(service.networks || []).map(net => (
-                                            <div key={net.id} className="px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[8px] font-bold text-blue-300 leading-none">{net.name}</div>
+                                            <div key={net.id} className="px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-bold text-emerald-300 leading-none">{net.name}</div>
                                         ))}
                                         {(service.networks?.size || 0) === 0 && <span className="text-[8px] italic text-slate-600 leading-none">None</span>}
                                     </div>
