@@ -1,7 +1,7 @@
 {
     "name": "Zabbix Server",
     "image": "zabbix/zabbix-server-mysql:latest",
-    "category": "Network",
+    "category": "Monitoring",
     "description": "Enterprise-class open source monitoring solution for networks and applications. Highly scalable and extremely feature-rich.",
     "default_ports": [
         "10051:10051"
@@ -11,5 +11,5 @@
         "MYSQL_USER": "zabbix",
         "MYSQL_PASSWORD": "zabbix_password"
     },
-    "logo": "https://www.zabbix.com/assets/img/zabbix_logo_svg.svg"
+    "logo": "https://cdn.simpleicons.org/zabbix"
 }

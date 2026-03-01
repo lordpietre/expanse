@@ -1,4 +1,4 @@
-import { Binding } from "@composecraft/docker-compose-lib";
+import { Binding } from "expanse-docker-lib";
 import { FolderSync } from "lucide-react";
 import Selectable from "@/components/playground/node/Selectable";
 import useSelectionStore from "@/store/selection";

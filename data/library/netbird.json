@@ -2,6 +2,7 @@
     "name": "NetBird",
     "image": "netbirdio/netbird:latest",
     "category": "Network",
+    "logo": "https://cdn.simpleicons.org/netbird",
     "description": "Zero-trust mesh VPN that connects devices in a flat network. Includes SSO, access control, and a management dashboard.",
     "default_ports": [
         "80:80",

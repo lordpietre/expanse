@@ -2,7 +2,7 @@
     "name": "TYPO3",
     "image": "typo3/typo3:13",
     "category": "CMS",
-    "logo": "https://typo3.org/fileadmin/typo3assets/Images/typo3-logo.svg",
+    "logo": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/512/external-typo3-a-free-and-open-source-content-management-system-written-in-php-logo-color-tal-revivo.png",
     "description": "Enterprise-grade CMS popular in Germany and Europe. Ideal for large multi-site deployments and complex requirements.",
     "default_ports": [
         "8080:80"

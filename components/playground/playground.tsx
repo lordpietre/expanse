@@ -12,7 +12,7 @@ import {
 import { useComposeStore } from "@/store/compose";
 import ServiceNode from "@/components/playground/node/serviceNode";
 import NetworkNode from "@/components/playground/node/networkNode";
-import { Binding, Compose, Env, KeyValue, Network, SuperSet, Volume, Service } from "@composecraft/docker-compose-lib";
+import { Binding, Compose, Env, KeyValue, Network, SuperSet, Volume, Service } from "expanse-docker-lib";
 import { dependencyEdgeStyle, envEdgeStyle, networkEdgeStyle, volumeEdgeStyle, labelEdgeStyle } from "@/components/playground/node/utils";
 import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -161,13 +161,13 @@ const handleDbAutoInject = (source: Service, target: Service) => {
     if (isDatabase) {
         const dbMeta = usePositionMap.getState().dbNodeMeta.get(source.id);
         const shouldOverwrite = dbMeta?.overwriteEnvVars ?? true;
-        
+
         const envVars = getDbEnvVars(source, source.name);
         if (envVars) {
             if (!target.environment) {
                 target.environment = new SuperSet<Readonly<Env>>();
             }
-            
+
             if (shouldOverwrite) {
                 const dbKeys = new Set(Object.keys(envVars));
                 const toRemove = Array.from(target.environment).filter(e => dbKeys.has(e.key));
@@ -305,7 +305,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                     } as Node)
                 }
             })
-            service.labels?.filter(label => !label.key.startsWith('com.composecraft.')).forEach(label => {
+            service.labels?.filter(label => !label.key.startsWith('com.expanse.')).forEach(label => {
                 result.push({
                     id: label.id,
                     position: positionMap.get(label.id)?.position || { x: 10, y: 10 },
@@ -331,6 +331,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                 draggable: true
             })
         })
+        /*
         compose.envs.forEach((env) => {
             result.push({
                 id: env.id,
@@ -340,6 +341,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                 draggable: true
             })
         })
+        */
         return result;
     }
 
@@ -368,7 +370,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                     ...networkEdgeStyle
                 } as Edge)
             })
-            service.labels?.filter(label => !label.key.startsWith('com.composecraft.')).forEach(label => {
+            service.labels?.filter(label => !label.key.startsWith('com.expanse.')).forEach(label => {
                 result.push({
                     id: "edg-" + label.id + service.id,
                     source: service.id,
@@ -410,6 +412,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                     ...dependencyEdgeStyle
                 } as Edge)
             })
+            /*
             service.environment?.forEach((targetEnv) => {
                 result.push({
                     id: "edg-" + targetEnv.id + service.id,
@@ -420,6 +423,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                     ...envEdgeStyle
                 } as Edge)
             })
+            */
         })
         return result
     }

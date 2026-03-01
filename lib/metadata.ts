@@ -1,4 +1,4 @@
-import { Compose } from "@composecraft/docker-compose-lib";
+import { Compose } from "expanse-docker-lib";
 import { NodeData } from "@/components/playground/playground";
 import usePositionMap from "@/store/metadataMap";
 

@@ -2,7 +2,7 @@
     "name": "Plone",
     "image": "plone:6",
     "category": "CMS",
-    "logo": "https://plone.org/plone-logo.svg",
+    "logo": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/512/external-plone-a-free-and-open-source-content-management-system-built-on-top-of-the-zope-application-server-logo-color-tal-revivo.png",
     "description": "Secure enterprise CMS known for extreme security. Used for intranets and high-security websites.",
     "default_ports": [
         "8080:8080"

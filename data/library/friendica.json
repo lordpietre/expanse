@@ -2,7 +2,7 @@
     "name": "Friendica",
     "image": "friendica/node:stable",
     "category": "Social",
-    "logo": "https://friendi.ca/logo.png",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Friendica_Logo.png",
     "description": "Full-featured social network (Facebook-like). Contacts, groups, events, and connection with other protocols. Connects with Mastodon, Diaspora, and older protocols.",
     "default_ports": [
         "8080:8080"

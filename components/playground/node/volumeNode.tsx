@@ -1,4 +1,4 @@
-import { Binding, Service, Volume } from "@composecraft/docker-compose-lib";
+import { Binding, Service, Volume } from "expanse-docker-lib";
 import { HardDrive } from "lucide-react";
 import Selectable from "@/components/playground/node/Selectable";
 import useSelectionStore from "@/store/selection";

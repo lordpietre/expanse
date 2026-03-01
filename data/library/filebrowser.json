@@ -9,5 +9,5 @@
     "volumes": [
         "./my_files:/srv"
     ],
-    "logo": "https://filebrowser.org/img/logo.svg"
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/filebrowser.svg"
 }

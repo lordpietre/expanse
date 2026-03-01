@@ -2,6 +2,7 @@
     "name": "Mattermost",
     "image": "mattermost/mattermost-team-edition:latest",
     "category": "Messaging",
+    "logo": "https://cdn.simpleicons.org/mattermost",
     "description": "Open source Slack alternative for DevOps and enterprise secure collaboration with deep workflow focus.",
     "default_ports": [
         "8065:8065"

@@ -9,5 +9,5 @@
     "volumes": [
         "./nextcloud_data:/var/www/html"
     ],
-    "logo": "https://raw.githubusercontent.com/nextcloud/nextcloud/master/docs/logo.png"
+    "logo": "https://img.icons8.com/color/512/nextcloud.png"
 }

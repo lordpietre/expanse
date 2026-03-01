@@ -1,4 +1,4 @@
-import { Network as NetworkType } from "@composecraft/docker-compose-lib";
+import { Network as NetworkType } from "expanse-docker-lib";
 import { Handle, Position, useEdges } from "@xyflow/react";
 import { CardContent } from "@/components/ui/card";
 import { Globe, Activity, Signal, Link, Router, Zap, GitBranch, Shield } from "lucide-react";

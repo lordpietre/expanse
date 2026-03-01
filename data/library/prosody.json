@@ -2,6 +2,7 @@
     "name": "XMPP (Prosody)",
     "image": "prosody/prosody:latest",
     "category": "Messaging",
+    "logo": "https://cdn.simpleicons.org/xmpp",
     "description": "Classic lightweight XMPP server for reliable instant messaging with E2EE support via OMEMO.",
     "default_ports": [
         "5222:5222",

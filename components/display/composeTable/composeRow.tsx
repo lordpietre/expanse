@@ -21,10 +21,10 @@ import { shareCompose } from "@/actions/composeActions";
 async function handleDelete(composeId: string) {
     try {
         await deleteCompose(composeId)
-        toast.success("deleted")
+        toast.success("Deleted")
     } catch (e) {
         console.error(e)
-        toast.error("error")
+        toast.error("Error")
     }
 }
 
@@ -40,7 +40,7 @@ export default function ComposeRow(data: ComposeLine) {
             setLink(`${res}&name=${data.name}`)
         } catch (e) {
             console.error(e)
-            toast.error("error")
+            toast.error("Error")
         }
     }
 
@@ -66,7 +66,7 @@ export default function ComposeRow(data: ComposeLine) {
         <div className='flex flex-row items-center gap-3'>
             <Link href={`/dashboard/playground?id=${data.id}`}>
                 <Button>
-                    See
+                    View
                 </Button>
             </Link>
             <DropdownMenu onOpenChange={open => { if (!open) setShareOpen(false) }}>
@@ -91,7 +91,7 @@ export default function ComposeRow(data: ComposeLine) {
                         <PopoverContent sideOffset={-30} className="flex flex-col gap-2">
                             <span className="flex flex col justify-between rounded border-2 p-1">
                                 <input className="outline-0" value={link} />
-                                <button onClick={() => { navigator.clipboard.writeText(link); toast("link copied") }} type="button" className='rounded bg-black text-white text-xs flex flex-row justify-center items-center gap-2 py-1 px-2 active:bg-slate-500 transition-all'>
+                                <button onClick={() => { navigator.clipboard.writeText(link); toast("Link copied") }} type="button" className='rounded bg-black text-white text-xs flex flex-row justify-center items-center gap-2 py-1 px-2 active:bg-slate-500 transition-all'>
                                     <Copy height={20} className='stroke-white' />
                                     <p>Copy</p>
                                 </button>

@@ -73,7 +73,7 @@ Expanse is built with cutting-edge web technologies:
 
 1. **Clone and Install**
    ```bash
-   git clone https://github.com/composecraft/composecraft.git
+   git clone https://github.com/lordpietre/expanse.git
    cd expanse
    pnpm install
    ```

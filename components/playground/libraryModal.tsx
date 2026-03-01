@@ -15,7 +15,7 @@ import { TemplateService } from "@/types/library";
 import { useComposeStore } from "@/store/compose";
 import useUIStore from "@/store/ui";
 import useLibraryStore from "@/store/library";
-import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor, Share2, Cloud } from "lucide-react";
+import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor, Share2, Cloud, Library, Brain, Workflow, Activity, FileText, Users, Network, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LibraryModalProps {
@@ -25,27 +25,39 @@ interface LibraryModalProps {
 
 const categoryIcons = {
     'Database': <Database className="w-4 h-4" />,
+    'CMS': <FileText className="w-4 h-4" />,
+    'AI': <Brain className="w-4 h-4" />,
+    'Automation': <Workflow className="w-4 h-4" />,
+    'Social': <Users className="w-4 h-4" />,
     'Web Server': <Globe className="w-4 h-4" />,
+    'Monitoring': <Activity className="w-4 h-4" />,
     'Cache': <Zap className="w-4 h-4" />,
     'Queue': <MessageSquare className="w-4 h-4" />,
     'Applications': <LayoutGrid className="w-4 h-4" />,
     'Development': <Code2 className="w-4 h-4" />,
     'OS': <Monitor className="w-4 h-4" />,
-    'Messaging': <MessageSquare className="w-4 h-4" />,
-    'Network': <Share2 className="w-4 h-4" />,
+    'Network': <Network className="w-4 h-4" />,
     'Cloud': <Cloud className="w-4 h-4" />,
-    'Other': <Box className="w-4 h-4" />
+    'Other': <Box className="w-4 h-4" />,
+    'Messaging': <MessageSquare className="w-4 h-4" />,
 };
 
 export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) {
     const { services, loading, fetchServices } = useLibraryStore();
     const { addServiceFromTemplate } = useComposeStore();
     const { libraryCategory, setIsLibraryOpen } = useUIStore();
+    const [libraryMode, setLibraryMode] = useState<'dockers' | 'stacks'>('dockers');
     const [activeCategory, setActiveCategory] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedService, setSelectedService] = useState<TemplateService | null>(null);
 
-    const categories = Array.from(new Set(services.map(s => s.category)));
+    // Filter services based on mode
+    const modeFilteredServices = services.filter(s => {
+        if (libraryMode === 'stacks') return s.isStack === true && s.category !== 'Database';
+        return s.isStack !== true;
+    });
+
+    const categories = Array.from(new Set(modeFilteredServices.map(s => s.category)));
 
     // Initial fetch
     React.useEffect(() => {
@@ -54,27 +66,34 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
         }
     }, [open, services.length]);
 
-    // Handle initial selection when services are loaded
+    // Reset selection when mode changes
     React.useEffect(() => {
-        if (services.length > 0) {
-            const initialCat = (libraryCategory && services.some(s => s.category === libraryCategory))
-                ? libraryCategory
-                : (services[0]?.category || "");
-
-            setActiveCategory(initialCat);
-            const firstService = services.find(s => s.category === initialCat);
+        if (categories.length > 0) {
+            const firstCat = categories[0];
+            setActiveCategory(firstCat);
+            const firstService = modeFilteredServices.find(s => s.category === firstCat);
             setSelectedService(firstService || null);
+        } else {
+            setActiveCategory("");
+            setSelectedService(null);
+        }
+    }, [libraryMode, services]);
+
+    // Handle initial selection when services are loaded or libraryCategory changes
+    React.useEffect(() => {
+        if (modeFilteredServices.length > 0) {
+            const currentCats = new Set(modeFilteredServices.map(s => s.category));
+            const initialCat = (libraryCategory && currentCats.has(libraryCategory as any))
+                ? libraryCategory
+                : (categories[0] || "");
+
+            if (initialCat) {
+                setActiveCategory(initialCat);
+                const firstService = modeFilteredServices.find(s => s.category === initialCat);
+                setSelectedService(firstService || null);
+            }
         }
     }, [services, libraryCategory]);
-
-    // Sync category when libraryCategory override changes while open
-    React.useEffect(() => {
-        if (open && libraryCategory && services.some(s => s.category === libraryCategory)) {
-            setActiveCategory(libraryCategory);
-            const first = services.find(s => s.category === libraryCategory);
-            setSelectedService(first || null);
-        }
-    }, [libraryCategory]);
 
     const handleOpenChange = (newOpen: boolean) => {
         onOpenChange(newOpen);
@@ -86,10 +105,10 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
     const handleAdd = async (service: any) => {
         if (!service) return;
         await addServiceFromTemplate(service);
-        onOpenChange(false);
+        handleOpenChange(false);
     };
 
-    const filteredServices = services.filter(s => {
+    const filteredServices = modeFilteredServices.filter(s => {
         const matchesCategory = s.category === activeCategory;
         const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             s.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -101,7 +120,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             key={cat}
             onClick={() => {
                 setActiveCategory(cat);
-                const first = services.find(s => s.category === cat);
+                const first = modeFilteredServices.find(s => s.category === cat);
                 setSelectedService(first || null);
             }}
             className={cn(
@@ -158,12 +177,40 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 overflow-hidden flex flex-col bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border-emerald-500/10 text-slate-300">
                 <DialogHeader className="p-6 border-b border-emerald-500/10 bg-gradient-to-r from-emerald-500/5 to-teal-500/5">
                     <div className="flex items-center justify-between">
-                        <DialogTitle className="text-2xl font-bold flex items-center gap-3 text-white">
-                            <div className="p-2 bg-emerald-500 rounded-lg text-white">
-                                <Box className="w-6 h-6" />
+                        <div className="flex flex-col gap-4">
+                            <DialogTitle className="text-2xl font-bold flex items-center gap-3 text-white">
+                                <div className="p-2 bg-emerald-500 rounded-lg text-white">
+                                    <Box className="w-6 h-6" />
+                                </div>
+                                Service Library
+                            </DialogTitle>
+
+                            <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10 w-fit">
+                                <button
+                                    onClick={() => setLibraryMode('dockers')}
+                                    className={cn(
+                                        "px-6 py-2 rounded-lg text-sm font-black transition-all",
+                                        libraryMode === 'dockers'
+                                            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                            : "text-slate-500 hover:text-white"
+                                    )}
+                                >
+                                    DOCKERS
+                                </button>
+                                <button
+                                    onClick={() => setLibraryMode('stacks')}
+                                    className={cn(
+                                        "px-6 py-2 rounded-lg text-sm font-black transition-all",
+                                        libraryMode === 'stacks'
+                                            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                            : "text-slate-500 hover:text-white"
+                                    )}
+                                >
+                                    STACKS
+                                </button>
                             </div>
-                            Service Library
-                        </DialogTitle>
+                        </div>
+
                         <DialogDescription className="sr-only">Browse and add services to your compose deployment</DialogDescription>
                         <div className="relative w-64">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -180,7 +227,9 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                 <div className="flex flex-1 overflow-hidden">
                     {/* Left Column (Categories) */}
                     <aside className="w-64 border-r border-emerald-500/10 bg-gradient-to-b from-emerald-500/5 to-teal-500/5 p-4 space-y-1 overflow-y-auto">
-                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Categories</p>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">
+                            {libraryMode === 'dockers' ? 'Docker Categories' : 'Stack Categories'}
+                        </p>
                         <div className="space-y-1">
                             {categoriesList}
                         </div>

@@ -2,7 +2,7 @@
     "name": "Node.js",
     "image": "node:current-alpine",
     "category": "Development",
-    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/node/logo.png",
+    "logo": "https://img.icons8.com/color/512/nodejs.png",
     "description": "Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.",
     "default_ports": [
         "3000:3000"

@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from 'zustand';
-import { Compose, Translator, Service, Env, Binding, Image, PortMapping, SuperSet, KeyValue } from "@composecraft/docker-compose-lib";
+import { Compose, Translator, Service, Env, Binding, Image, PortMapping, SuperSet, KeyValue } from "expanse-docker-lib";
 import { generateRandomName } from "@/lib/utils";
 import { registerCompose } from "@/actions/userActions";
 import { toPng } from 'html-to-image';
@@ -115,22 +115,22 @@ export const useComposeStore = create<ComposeState>((set, get) => {
         },
         addServiceFromTemplate: async (template: TemplateService) => {
             const { setCompose } = useComposeStore.getState();
-            await setCompose((compose) => {
-                const [imageName, imageTag] = template.image.split(':');
 
+            const createService = (tmp: TemplateService, isRelated = false): Service => {
+                const [imageName, imageTag] = tmp.image.split(':');
                 const newEnvironment = new SuperSet<Readonly<Env>>();
                 const newPorts: PortMapping[] = [];
                 const newBindings = new SuperSet<Binding>();
 
-                if (template.env_vars) {
-                    Object.entries(template.env_vars).forEach(([key, value]) => {
+                if (tmp.env_vars) {
+                    Object.entries(tmp.env_vars).forEach(([key, value]) => {
                         newEnvironment.add(new Env(key, value));
                     });
                 }
 
-                if (template.default_ports) {
+                if (tmp.default_ports) {
                     const { usedPorts } = useSystemStore.getState();
-                    template.default_ports.forEach(p => {
+                    tmp.default_ports.forEach(p => {
                         const [hostPortStr, containerPortStr] = p.split(':');
                         let hostPort = parseInt(hostPortStr);
                         const containerPort = parseInt(containerPortStr);
@@ -147,24 +147,41 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                     });
                 }
 
-                if (template.volumes) {
-                    template.volumes.forEach(v => {
+                if (tmp.volumes) {
+                    tmp.volumes.forEach(v => {
                         const [source, target] = v.split(':');
                         newBindings.add(new Binding({ source, target }));
                     });
                 }
 
-                const baseName = template.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-                const newService = new Service({
-                    name: baseName + "_" + generateRandomName().substring(0, 4),
+                const baseName = tmp.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                // For related services (like "db") we try to keep the exact name if it's short, 
+                // but for main ones we add a random suffix to avoid collisions.
+                const finalName = isRelated && baseName.length < 8 ? baseName : baseName + "_" + generateRandomName().substring(0, 4);
+
+                return new Service({
+                    name: finalName,
                     image: new Image({ name: imageName, tag: imageTag }),
                     environment: newEnvironment.size > 0 ? newEnvironment : undefined,
                     ports: newPorts.length > 0 ? newPorts : undefined,
                     bindings: newBindings.size > 0 ? newBindings : undefined,
-                    labels: template.logo ? [new KeyValue("com.composecraft.logo", template.logo)] : undefined
+                    labels: tmp.logo ? [new KeyValue("com.expanse.logo", tmp.logo)] : undefined
                 });
+            };
 
-                compose.addService(newService);
+            await setCompose((compose) => {
+                const mainService = createService(template);
+                compose.addService(mainService);
+
+                if (template.related_services) {
+                    template.related_services.forEach(rel => {
+                        const relService = createService(rel, true);
+                        compose.addService(relService);
+                        // Automatically make the main service depend on the related one
+                        mainService.depends_on.push(relService);
+                    });
+                }
+
                 toast.success(`${template.name} added to compose`);
             });
         }

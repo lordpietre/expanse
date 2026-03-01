@@ -16,5 +16,5 @@
     "volumes": [
         "./wireguard:/config"
     ],
-    "logo": "https://www.wireguard.com/img/wireguard.svg"
+    "logo": "https://cdn.simpleicons.org/wireguard"
 }

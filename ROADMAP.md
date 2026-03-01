@@ -34,7 +34,7 @@ We encourage community feedback and contributions! If you'd like to help with an
 
 ## Feedback and Suggestions
 Have a suggestion or question about the roadmap? Feel free to:
-- Open a discussion in the [GitHub Discussions](https://github.com/composecraft/composecraft/discussions) tab.
+- Open a discussion in the [GitHub Discussions](https://github.com/lordpietre/expanse/discussions) tab.
 - Submit an issue with the `enhancement` label.
 
 ---

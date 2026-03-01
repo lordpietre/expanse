@@ -2,7 +2,7 @@
     "name": "GoToSocial",
     "image": "superseriousbusiness/gotosocial:latest",
     "category": "Social",
-    "logo": "https://got/logo.pngosocial.org",
+    "logo": "https://gotosocial.org/static/logo.svg",
     "description": "Lightweight ActivityPub microblogging server. Perfect for personal or small instances, very low resource usage. Written in Go, 100% compatible with Mastodon clients.",
     "default_ports": [
         "8080:8080"

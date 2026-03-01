@@ -2,7 +2,7 @@
     "name": "Firefish",
     "image": "thatonecalculator/firefish:latest",
     "category": "Social",
-    "logo": "https://joinfirefish.org/img/logo.svg",
+    "logo": "https://cdn.simpleicons.org/firefish",
     "description": "Active fork of Misskey with rich features like calendar, custom reactions, and modern cute interface. Popular in Japan and growing in the West.",
     "default_ports": [
         "3000:3000"

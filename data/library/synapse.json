@@ -2,7 +2,7 @@
     "name": "Matrix (Synapse)",
     "image": "matrixdotorg/synapse:latest",
     "category": "Messaging",
-    "logo": "https://raw.githubusercontent.com/matrix-org/synapse/master/docs/images/synapse_logo.png",
+    "logo": "https://cdn.simpleicons.org/matrix",
     "description": "Federated, E2EE, decentralized messaging platform. Maximum privacy, bridges to multiple networks.",
     "default_ports": [
         "8008:8008"

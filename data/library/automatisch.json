@@ -2,7 +2,7 @@
     "name": "Automatisch",
     "image": "automatisch/automatisch:latest",
     "category": "Automation",
-    "logo": "https://automatisch.io/favicon.ico",
+    "logo": "https://github.com/automatisch.png",
     "description": "Open source Zapier-like automation. Similar interface to n8n, focused on privacy and self-hosting. Good direct alternative.",
     "default_ports": [
         "3000:3000"

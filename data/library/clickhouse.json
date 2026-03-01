@@ -2,6 +2,7 @@
     "name": "ClickHouse",
     "image": "clickhouse/clickhouse-server:latest",
     "category": "Database",
+    "logo": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/512/external-clickhouse-an-open-source-column-oriented-database-management-system-logo-color-tal-revivo.png",
     "description": "Columnar Analytics. Data Warehouse, real-time analytics. Fastest for OLAP.",
     "default_ports": [
         "8123:8123",

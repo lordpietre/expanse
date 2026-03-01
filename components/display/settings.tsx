@@ -56,7 +56,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
         try {
             const res = await deleteUser()
             if (res) {
-                window.location.href = "https://form.composecraft.com/s/cm40i9zod000hwl0z6005uvwp"
+                window.location.href = "https://form.expanse.com/s/cm40i9zod000hwl0z6005uvwp"
             }
         } catch (e) {
             toast.error("Error deleting account")

@@ -1,6 +1,6 @@
 import useSelectionStore from "@/store/selection";
 import { useComposeStore } from "@/store/compose";
-import { Env } from "@composecraft/docker-compose-lib";
+import { Env } from "expanse-docker-lib";
 import { Input } from "@/components/ui/input";
 import { Key } from "lucide-react";
 

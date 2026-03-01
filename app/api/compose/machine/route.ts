@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {Compose, Network, Service, Translator, Image, Binding, Volume} from "@composecraft/docker-compose-lib";
+import {Compose, Network, Service, Translator, Image, Binding, Volume} from "expanse-docker-lib";
 import {jwtVerify} from "jose";
 import {registerComposeWithoutMetadata} from "@/actions/userActions";
 import {ObjectId} from "bson";

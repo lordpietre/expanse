@@ -2,7 +2,7 @@
     "name": "Huginn",
     "image": "huginn/huginn:latest",
     "category": "Automation",
-    "logo": "https://huginn.github.io/images/huginn_blue_thumb.png",
+    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/huginn.svg",
     "description": "Agents automation for web monitoring, scraping, and alerts. Create 'agents' that watch and act. Very flexible but less visual. Classic tool.",
     "default_ports": [
         "3000:3000"

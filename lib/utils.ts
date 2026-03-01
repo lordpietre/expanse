@@ -58,7 +58,7 @@ export function isWithinOneDay(timestamp1: number, timestamp2: number): boolean 
 export async function GetLastVersion():Promise<string>{
   console.log("fetching")
   const res = await axios.get(
-        "https://api.github.com/repos/composecraft/composecraft/releases/latest",
+        "https://api.github.com/repos/lordpietre/expanse/releases/latest",
     );
   const data = res.data
   return data?.tag_name
@@ -78,7 +78,7 @@ export const getCachedLastVersion = async (): Promise<string | undefined> => {
   
   try {
     const res = await axios.get(
-      "https://api.github.com/repos/composecraft/composecraft/releases/latest",
+      "https://api.github.com/repos/lordpietre/expanse/releases/latest",
     );
     const data = res.data
     const version = data?.tag_name.substring(1)

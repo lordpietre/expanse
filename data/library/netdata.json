@@ -1,7 +1,7 @@
 {
     "name": "Netdata",
     "image": "netdata/netdata:latest",
-    "category": "Network",
+    "category": "Monitoring",
     "description": "High-performance, real-time health monitoring and performance troubleshooting for systems and applications. Stunning 1s-granularity dashboards.",
     "default_ports": [
         "19999:19999"
@@ -11,5 +11,5 @@
         "netdata_cache:/var/cache/netdata",
         "netdata_lib:/var/lib/netdata"
     ],
-    "logo": "https://raw.githubusercontent.com/netdata/netdata/master/web/gui/images/logo.svg"
+    "logo": "https://cdn.simpleicons.org/netdata"
 }

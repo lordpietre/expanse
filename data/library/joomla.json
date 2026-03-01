@@ -2,7 +2,7 @@
     "name": "Joomla",
     "image": "joomla:5-apache",
     "category": "CMS",
-    "logo": "https://docs.joomla.org/images/7/72/Logo-j25-trans.png",
+    "logo": "https://img.icons8.com/color/512/joomla.png",
     "description": "User-friendly CMS for medium-sized websites and community platforms. Good balance between WordPress simplicity and Drupal power.",
     "default_ports": [
         "8080:80"

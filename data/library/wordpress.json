@@ -2,7 +2,7 @@
     "name": "WordPress",
     "image": "wordpress:latest",
     "category": "CMS",
-    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/wordpress/logo.png",
+    "logo": "https://img.icons8.com/color/512/wordpress.png",
     "description": "The world's most popular website builder and content management system.",
     "default_ports": [
         "8080:80"

@@ -2,6 +2,7 @@
     "name": "ScyllaDB",
     "image": "scylladb/scylla:latest",
     "category": "Database",
+    "logo": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/512/external-scylladb-is-an-open-source-distributed-nosql-wide-column-data-store-logo-color-tal-revivo.png",
     "description": "Cassandra Compatible. Same API as Cassandra, much faster and efficient.",
     "default_ports": [
         "9042:9042"

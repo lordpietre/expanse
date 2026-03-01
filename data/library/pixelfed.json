@@ -2,7 +2,7 @@
     "name": "Pixelfed",
     "image": "pixelfed/pixelfed:v0.12",
     "category": "Social",
-    "logo": "https://pixelfed.org/pixelfed.svg",
+    "logo": "https://cdn.simpleicons.org/pixelfed",
     "description": "Federated photo sharing platform (Instagram-like). Federates with Mastodon, supports stories, filters, and collections.",
     "default_ports": [
         "8080:80"

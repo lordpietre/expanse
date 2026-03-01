@@ -2,7 +2,7 @@
     "name": "Pleroma",
     "image": "pleroma/pleroma:stable",
     "category": "Social",
-    "logo": "https://pleroma.social/static/logo.svg",
+    "logo": "https://cdn.simpleicons.org/pleroma",
     "description": "Ultra-lightweight microblogging platform. Extremely low resource consumption (Elixir). Can handle 10k+ users on modest hardware, ideal for Raspberry Pi or cheap VPS.",
     "default_ports": [
         "4000:4000"

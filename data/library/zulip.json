@@ -2,6 +2,7 @@
     "name": "Zulip",
     "image": "zulip/docker-zulip:latest",
     "category": "Messaging",
+    "logo": "https://cdn.simpleicons.org/zulip",
     "description": "Open source team chat with unique topic-based threading for highly organized asynchronous discussions.",
     "default_ports": [
         "80:80"

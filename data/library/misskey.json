@@ -2,7 +2,7 @@
     "name": "Misskey",
     "image": "misskey/misskey:latest",
     "category": "Social",
-    "logo": "https://misskey-hub.net/avatar.png",
+    "logo": "https://cdn.simpleicons.org/misskey",
     "description": "Rich-featured microblogging with calendar, custom reactions, and modern interface. Communities that want more than just toots.",
     "default_ports": [
         "3000:3000"

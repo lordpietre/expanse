@@ -2,7 +2,7 @@
     "name": "Lemmy",
     "image": "dessalines/lemmy:latest",
     "category": "Social",
-    "logo": "https://join-lemmy.org/assets/img/logo.svg",
+    "logo": "https://cdn.simpleicons.org/lemmy",
     "description": "Federated link aggregator (Reddit-like). Communities, voting, and community-level moderation. Fediverse.",
     "default_ports": [
         "1236:1236"

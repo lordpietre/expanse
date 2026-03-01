@@ -2,6 +2,7 @@
     "name": "Cozy Cloud",
     "image": "cozy/cozy-stack:latest",
     "category": "Cloud",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/cozy.svg",
     "description": "Personal data aggregator that puts you in control of your data. Sync your files, notes, passwords, and more.",
     "default_ports": [
         "8080:8080"

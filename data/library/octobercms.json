@@ -2,7 +2,7 @@
     "name": "October CMS",
     "image": "aspendigital/octobercms:latest",
     "category": "CMS",
-    "logo": "https://octobercms.com/storage/app/meta/logomark.svg",
+    "logo": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/512/external-october-a-free-open-source-self-hosted-content-management-system-platform-logo-color-tal-revivo.png",
     "description": "Elegant PHP CMS built on Laravel. Cleaner and more modern than WordPress with Laravel-based plugins.",
     "default_ports": [
         "8080:80"

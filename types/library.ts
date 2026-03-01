@@ -8,4 +8,6 @@ export interface TemplateService {
     env_vars?: Record<string, string>;
     volumes?: string[];
     command?: string;
+    isStack?: boolean;
+    related_services?: TemplateService[];
 }

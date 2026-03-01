@@ -1,6 +1,8 @@
+"use client"
+
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity, CheckCircle2, Loader2, ChevronLeft, ChevronRight, PanelLeftClose, PanelLeftCloseIcon } from "lucide-react";
+import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity, CheckCircle2, Loader2, ChevronLeft, ChevronRight, PanelLeftClose, PanelLeftCloseIcon, Terminal, Globe, Search, Plus, FolderOpen, Save, Share2, LayoutGrid, ListPlus } from "lucide-react";
 import Playground, { PlaygroundHandle } from "@/components/playground/playground";
 import { useComposeStore } from "@/store/compose";
 import useSelectionStore from "@/store/selection";
@@ -8,7 +10,7 @@ import { useExecutionStore } from "@/store/execution";
 import useComposeIdStore from "@/store/composeId";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import YamlEditor from "@/components/playground/yamlEditor";
-import { Translator } from "@composecraft/docker-compose-lib";
+import { Translator } from "expanse-docker-lib";
 import YAML from "yaml";
 import { toPng } from "html-to-image";
 
@@ -24,10 +26,10 @@ import Link from "next/link";
 type DeployPhase = null | 'validating' | 'writing' | 'starting' | 'done';
 
 const PHASE_CONFIG: Record<Exclude<DeployPhase, null>, { label: string; detail: string; progress: number; color: string }> = {
-    validating: { label: 'Validando puertos...', detail: 'Comprobando conflictos con puertos en uso', progress: 20, color: 'from-emerald-500 to-teal-500' },
-    writing: { label: 'Escribiendo configuración...', detail: 'Generando docker-compose.yaml con parches', progress: 50, color: 'from-indigo-500 to-purple-500' },
-    starting: { label: 'Iniciando contenedores...', detail: 'Ejecutando docker compose up -d', progress: 80, color: 'from-purple-500 to-emerald-500' },
-    done: { label: '¡Listo!', detail: 'Contendores arrancados correctamente', progress: 100, color: 'from-emerald-400 to-teal-500' },
+    validating: { label: 'Validating ports...', detail: 'Checking for port conflicts', progress: 20, color: 'from-emerald-500 to-teal-500' },
+    writing: { label: 'Writing config...', detail: 'Generating docker-compose.yaml with patches', progress: 50, color: 'from-indigo-500 to-purple-500' },
+    starting: { label: 'Starting containers...', detail: 'Running docker compose up -d', progress: 80, color: 'from-purple-500 to-emerald-500' },
+    done: { label: 'Ready!', detail: 'Containers started correctly', progress: 100, color: 'from-emerald-400 to-teal-500' },
 };
 
 function DeployProgress({ phase }: { phase: DeployPhase }) {
@@ -263,7 +265,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                                                 <span className="text-slate-600 font-medium">{s.name}</span>
                                                 <div className="flex gap-1">
                                                     {s.ports!.map(p => (
-                                                        <span key={`${p.hostPort}`} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
+                                                        <span key={`${p.hostPort} `} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
                                                             {p.hostPort}:{p.containerPort}
                                                         </span>
                                                     ))}
@@ -278,7 +280,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     );
                     success = true;
                 } else if (res.collisionPort) {
-                    toast.error(`Host port ${res.collisionPort} is currently occupied natively. Reassigning...`);
+                    toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
                     await setCompose((currentCompose) => {
                         currentCompose.services.forEach(service => {
@@ -343,7 +345,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                                                 <span className="text-slate-600 font-medium">{s.name}</span>
                                                 <div className="flex gap-1">
                                                     {s.ports!.map(p => (
-                                                        <span key={`${p.hostPort}`} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
+                                                        <span key={`${p.hostPort} `} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
                                                             {p.hostPort}:{p.containerPort}
                                                         </span>
                                                     ))}
@@ -358,7 +360,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     );
                     success = true;
                 } else if (res.collisionPort) {
-                    toast.error(`Host port ${res.collisionPort} is currently occupied natively. Reassigning...`);
+                    toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
                     await setCompose((currentCompose) => {
                         currentCompose.services.forEach(service => {
@@ -411,7 +413,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
         if (playgroundElement) {
             const dataUrl = await toPng(playgroundElement, { backgroundColor: '#f8fafc' });
             const link = document.createElement('a');
-            link.download = 'composecraft-playground.png';
+            link.download = 'expanse-playground.png';
             link.href = dataUrl;
             link.click();
         }
@@ -506,10 +508,6 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
             </div>
 
             <div className="flex-grow flex flex-row p-4 gap-4 overflow-hidden">
-                <div className={cn("flex-grow bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 rounded-2xl overflow-hidden relative shadow-2xl border border-emerald-500/10 transition-all duration-300", isSidebarCollapsed && isExecuting ? "mr-0" : "")}>
-                    <Playground ref={playgroundRef} />
-                </div>
-
                 {isSidebarCollapsed && isExecuting ? (
                     <div className="w-14 flex flex-col gap-4 h-full">
                         <Button
@@ -518,23 +516,23 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                             onClick={() => setIsSidebarCollapsed(false)}
                             className="h-14 w-full rounded-xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/10 hover:bg-emerald-500/20 text-slate-400 hover:text-white"
                         >
-                            <ChevronRight className="w-5 h-5" />
+                            <ChevronLeft className="w-5 h-5" />
                         </Button>
                         <div className="flex-1 bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 overflow-y-auto custom-scrollbar">
                             <ExecutionPanel />
                         </div>
                     </div>
                 ) : (
-                    <div className="w-[400px] flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="w-[400px] flex flex-col gap-6 h-full overflow-y-auto pl-2 custom-scrollbar">
                         {isExecuting && (
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setIsSidebarCollapsed(true)}
-                                className="self-end h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white flex items-center gap-2"
+                                className="self-start h-8 px-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-white flex items-center gap-2"
                             >
-                                <ChevronRight className="w-4 h-4" />
-                                <span className="text-xs font-medium">Contraer</span>
+                                <ChevronLeft className="w-4 h-4" />
+                                <span className="text-xs font-medium">Collapse</span>
                             </Button>
                         )}
                         <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-6 shadow-2xl">
@@ -559,7 +557,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                                         {deployPhase && deployPhase !== 'done'
                                             ? <Loader2 className="w-5 h-5 animate-spin" />
                                             : isExecuting ? <Square className="fill-white" /> : <Play className="fill-white" />}
-                                        <span>{isExecuting ? "Detener" : "Ejecutar"}</span>
+                                        <span>{isExecuting ? "Stop" : "Run"}</span>
                                     </div>
                                 </Button>
 
@@ -572,7 +570,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                                     >
                                         <div className="relative z-10 flex items-center justify-center gap-3">
                                             <Zap className="fill-amber-500" />
-                                            <span>Reiniciar</span>
+                                            <span>Restart</span>
                                         </div>
                                     </Button>
                                 )}
@@ -586,6 +584,10 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                         </div>
                     </div>
                 )}
+
+                <div className={cn("flex-grow bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 rounded-2xl overflow-hidden relative shadow-2xl border border-emerald-500/10 transition-all duration-300", isSidebarCollapsed && isExecuting ? "ml-0" : "")}>
+                    <Playground ref={playgroundRef} />
+                </div>
             </div>
             <LibraryModal open={isLibraryOpen} onOpenChange={setIsLibraryOpen} />
         </section>

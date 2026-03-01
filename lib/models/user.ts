@@ -1,5 +1,5 @@
 import type { WithId, Document } from "mongodb";
-import {Compose} from "@composecraft/docker-compose-lib";
+import {Compose} from "expanse-docker-lib";
 
 export interface User extends WithId<Document> {
     email: string,

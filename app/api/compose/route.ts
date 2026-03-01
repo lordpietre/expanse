@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 import {getComposeByShareId} from "@/actions/composeActions";
-import {Translator} from "@composecraft/docker-compose-lib";
+import {Translator} from "expanse-docker-lib";
 import YAML from "yaml";
 import {jwtVerify} from "jose";
 import {registerComposeWithoutMetadata} from "@/actions/userActions";

@@ -2,6 +2,7 @@
     "name": "Gluetun",
     "image": "qmcgaw/gluetun:latest",
     "category": "Network",
+    "logo": "https://raw.githubusercontent.com/loganmarchione/homelab-svg-assets/main/assets/gluetun.svg",
     "description": "VPN client container to route traffic of other containers through WireGuard or OpenVPN. Supports 30+ VPN providers with a built-in killswitch.",
     "default_ports": [
         "8888:8888/tcp"

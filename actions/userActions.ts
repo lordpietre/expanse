@@ -356,7 +356,7 @@ export const deleteUser = async () => {
     await userCollection.deleteOne({ _id: userId });
     (await cookies()).delete("token");
     console.log("account " + userId.toString() + " deleted");
-    redirect("https://form.composecraft.com/s/cm40i9zod000hwl0z6005uvwp");
+    redirect("https://form.expanse.com/s/cm40i9zod000hwl0z6005uvwp");
 }
 
 export const logout = async () => {

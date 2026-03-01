@@ -3,7 +3,7 @@
 import { save, useComposeStore } from "@/store/compose";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
-import { ComposeVersion, Env, Network, Service, Volume } from "@composecraft/docker-compose-lib";
+import { ComposeVersion, Env, Network, Service, Volume } from "expanse-docker-lib";
 import { Button } from "@/components/ui/button";
 import { Container, Folder, Key, NetworkIcon, Save } from "lucide-react";
 import { generateRandomName } from "@/lib/utils";
@@ -25,7 +25,7 @@ const VolumeWizard = () => {
         setCompose((current) => {
             const newVolOptions: any = {
                 name,
-                labels: [{ id: Math.random().toString(36).substr(2, 9), key: "composecraft.persistence", value: "true" }]
+                labels: [{ id: Math.random().toString(36).substr(2, 9), key: "expanse.persistence", value: "true" }]
             };
             if (size.trim() !== "" && size.match(/\d/)) {
                 newVolOptions.driver_opts = [{ id: Math.random().toString(36).substr(2, 9), key: "size", value: size }];

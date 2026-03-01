@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, Suspense } from "react";
-import { Translator } from "@composecraft/docker-compose-lib";
+import { Translator } from "expanse-docker-lib";
 import { getComposeByIdPublic } from "@/actions/userActions";
 import { composeMetadata, recreatePositionMap, reHydrateComposeIds } from "@/lib/metadata";
 import { useComposeStore } from "@/store/compose";

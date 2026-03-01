@@ -12,7 +12,7 @@ import {
     Service, SuperSet, Env,
     TimeUnits, Volume,
     KeyValue
-} from "@composecraft/docker-compose-lib";
+} from "expanse-docker-lib";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,8 @@ import useUIStore from "@/store/ui";
 import useLibraryStore from "@/store/library";
 import { useExecutionStore } from "@/store/execution";
 import { ChevronDown, ChevronUp, Menu, Terminal } from "lucide-react";
-import TerminalDialog from "@/components/playground/terminalDialog";
+import dynamic from "next/dynamic";
+const TerminalDialog = dynamic(() => import("@/components/playground/terminalDialog"), { ssr: false });
 import { Toggle } from "@/components/ui/toggle";
 
 export default function ServiceEditor() {
@@ -469,7 +470,6 @@ export default function ServiceEditor() {
                                                                 if (!exists) {
                                                                     const valStr = String(value);
                                                                     service.environment!.add(new Env(key, valStr));
-                                                                    compose.envs.add(new Env(key, valStr));
                                                                 }
                                                             });
                                                         }
@@ -540,7 +540,6 @@ export default function ServiceEditor() {
                                             const envSet = getService().environment;
                                             if (envSet) {
                                                 envSet.delete(envItem);
-                                                compose.envs.delete(envItem);
                                             }
                                         })}>
                                         <Eraser className="w-4 h-4" />
@@ -552,7 +551,7 @@ export default function ServiceEditor() {
                         <Button type="button"
                             onClick={() => setCompose(() => {
                                 const newEnv = new Env("NEW_VAR", "value");
-                                compose.envs.add(newEnv); // Add to global pool so it appears in graph if needed
+                                // No longer adding to global pool to keep grid clean
 
                                 if (getService().environment) {
                                     getService().environment!.add(newEnv);

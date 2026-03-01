@@ -12,5 +12,5 @@
         "./npm_data:/data",
         "./npm_letsencrypt:/etc/letsencrypt"
     ],
-    "logo": "https://nginxproxymanager.com/logo.png"
+    "logo": "https://raw.githubusercontent.com/loganmarchione/homelab-svg-assets/main/assets/nginxproxymanager.svg"
 }

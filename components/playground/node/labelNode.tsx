@@ -1,4 +1,4 @@
-import { KeyValue } from "@composecraft/docker-compose-lib";
+import { KeyValue } from "expanse-docker-lib";
 import { Tag } from "lucide-react";
 import Selectable from "@/components/playground/node/Selectable";
 import useSelectionStore from "@/store/selection";

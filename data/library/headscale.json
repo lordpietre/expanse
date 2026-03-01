@@ -2,6 +2,7 @@
     "name": "Headscale",
     "image": "headscale/headscale:latest",
     "category": "Network",
+    "logo": "https://raw.githubusercontent.com/loganmarchione/homelab-svg-assets/main/assets/headscale.svg",
     "description": "An open source, self-hosted implementation of the Tailscale coordination server. Create a secure mesh VPN for all your devices.",
     "default_ports": [
         "8080:8080"

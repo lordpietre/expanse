@@ -2,7 +2,7 @@
     "name": "Akkoma",
     "image": "akkoma/akkoma:stable",
     "category": "Social",
-    "logo": "https://akkoma.social/static/akkoma.png",
+    "logo": "https://akkoma.social/static/logo.svg",
     "description": "Optimized fork of Pleroma with extra features. Good for medium instances with advanced MRF policies. Better speed/features balance than base Pleroma.",
     "default_ports": [
         "4000:4000"

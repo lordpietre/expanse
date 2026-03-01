@@ -1,6 +1,6 @@
 import useSelectionStore from "@/store/selection";
 import {useComposeStore} from "@/store/compose";
-import {Binding} from "@composecraft/docker-compose-lib";
+import {Binding} from "expanse-docker-lib";
 import {Input} from "@/components/ui/input";
 
 export default function BindingEditor(){

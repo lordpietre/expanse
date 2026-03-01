@@ -1,4 +1,4 @@
-import {Compose, Service, Volume} from "@composecraft/docker-compose-lib";
+import {Compose, Service, Volume} from "expanse-docker-lib";
 
 export function handleBackspacePress(select: string, setCompose: (updater: (currentCompose: Compose) => void) => void, setSelectedString: (value: string) => void) {
     switch (select.substring(0, 3)) {

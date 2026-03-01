@@ -11,5 +11,5 @@
         "SEAFILE_ADMIN_EMAIL": "admin@example.com",
         "SEAFILE_ADMIN_PASSWORD": "password"
     },
-    "logo": "https://www.seafile.com/en/static/seafile/img/seafile-logo.png"
+    "logo": "https://cdn.simpleicons.org/seafile"
 }

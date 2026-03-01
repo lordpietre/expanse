@@ -7,6 +7,7 @@ import path from 'path';
 import os from 'os';
 import net from 'net';
 import YAML from 'yaml';
+import { ensureAuth } from "@/lib/auth";
 
 const execAsync = promisify(exec);
 
@@ -76,6 +77,7 @@ function patchComposeYaml(yamlText: string): string {
 
 /** Expose the generated YAML for debugging */
 export async function getComposeYaml(composeId: string): Promise<string | null> {
+    await ensureAuth();
     const yamlPath = path.join(os.tmpdir(), `expanse-${composeId}`, 'docker-compose.yaml')
     try {
         return await fs.readFile(yamlPath, 'utf-8')
@@ -85,6 +87,7 @@ export async function getComposeYaml(composeId: string): Promise<string | null> 
 }
 
 export async function runCompose(composeId: string, yamlContent: string) {
+    await ensureAuth();
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     await fs.mkdir(tempDir, { recursive: true });
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
@@ -111,6 +114,7 @@ export async function runCompose(composeId: string, yamlContent: string) {
 }
 
 export async function stopCompose(composeId: string) {
+    await ensureAuth();
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
@@ -131,6 +135,7 @@ export async function stopCompose(composeId: string) {
 }
 
 export async function restartCompose(composeId: string, yamlContent: string) {
+    await ensureAuth();
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     await fs.mkdir(tempDir, { recursive: true });
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
@@ -158,6 +163,7 @@ export async function restartCompose(composeId: string, yamlContent: string) {
 }
 
 export async function getComposeStatus(composeId: string) {
+    await ensureAuth();
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
@@ -191,6 +197,7 @@ export async function getComposeStatus(composeId: string) {
 }
 
 export async function getComposeLogs(composeId: string) {
+    await ensureAuth();
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
 
@@ -209,6 +216,7 @@ export async function getComposeLogs(composeId: string) {
 }
 
 export async function getGlobalDockerStats() {
+    await ensureAuth();
     try {
         const [projectsRes, containersRes, volumesRes, networksRes, dfRes] = await Promise.all([
             execAsync('docker compose ls --format json'),
@@ -287,6 +295,7 @@ export async function getGlobalDockerStats() {
 }
 
 export async function getSystemInfo() {
+    await ensureAuth();
     try {
         const cpus = os.cpus();
         const totalMemory = os.totalmem();
@@ -317,6 +326,7 @@ export async function getSystemInfo() {
 }
 
 export async function getUsedDockerPorts(): Promise<number[]> {
+    await ensureAuth();
     try {
         const { stdout } = await execAsync('docker ps --format="{{.Ports}}"');
         if (!stdout.trim()) return [];
@@ -362,6 +372,7 @@ async function checkPort(port: number): Promise<boolean> {
 }
 
 export async function getAvailablePort(preferred: number): Promise<number> {
+    await ensureAuth();
     const usedDockerPorts = await getUsedDockerPorts();
 
     const isPortFree = async (p: number) => {
@@ -382,6 +393,7 @@ export async function getAvailablePort(preferred: number): Promise<number> {
 }
 
 export async function stopProjectByName(projectName: string) {
+    await ensureAuth();
     try {
         const { stdout, stderr } = await execAsync(`docker compose -p ${projectName} stop`);
         console.log('Stop project:', stdout);
@@ -393,6 +405,7 @@ export async function stopProjectByName(projectName: string) {
 }
 
 export async function removeProjectByName(projectName: string) {
+    await ensureAuth();
     try {
         const { stdout, stderr } = await execAsync(`docker compose -p ${projectName} down --volumes --remove-orphans`);
         console.log('Remove project:', stdout);
@@ -404,6 +417,7 @@ export async function removeProjectByName(projectName: string) {
 }
 
 export async function stopContainer(containerId: string) {
+    await ensureAuth();
     try {
         const { stdout } = await execAsync(`docker stop ${containerId}`);
         console.log('Stop container:', stdout);
@@ -414,6 +428,7 @@ export async function stopContainer(containerId: string) {
 }
 
 export async function removeContainer(containerId: string) {
+    await ensureAuth();
     try {
         await execAsync(`docker stop ${containerId}`).catch(() => { });
         const { stdout } = await execAsync(`docker rm -f ${containerId}`);
@@ -425,6 +440,7 @@ export async function removeContainer(containerId: string) {
 }
 
 export async function removeVolume(volumeName: string) {
+    await ensureAuth();
     try {
         const { stdout } = await execAsync(`docker volume rm -f ${volumeName}`);
         console.log('Remove volume:', stdout);
@@ -435,6 +451,7 @@ export async function removeVolume(volumeName: string) {
 }
 
 export async function getProjectContainers(projectName: string) {
+    await ensureAuth();
     try {
         const { stdout } = await execAsync(
             `docker ps -a --filter "label=com.docker.compose.project=${projectName}" --format json`
@@ -496,6 +513,7 @@ export async function getProjectContainers(projectName: string) {
 }
 
 export async function validateComposePorts(yamlContent: string) {
+    await ensureAuth();
     const YAML = await import('yaml');
     const doc = YAML.parse(yamlContent);
     const reassignments: Record<string, { old: number, new: number }[]> = {};
@@ -538,6 +556,7 @@ export async function validateComposePorts(yamlContent: string) {
 }
 
 export async function execDockerCommand(containerId: string, command: string) {
+    await ensureAuth();
     try {
         // Execute the command inside the container. We use -i for non-interactive mode with output.
         // Note: For a real terminal, we'd want a specialized TTY handler, but for this web UI, 

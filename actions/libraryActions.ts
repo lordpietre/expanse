@@ -28,22 +28,22 @@ export async function getLibraryServices(): Promise<TemplateService[]> {
 }
 
 const categoryOrder: Record<string, number> = {
-    'Database': 1,
-    'CMS': 2,
-    'Social': 3,
-    'AI': 4,
-    'Automation': 5,
-    'Web Server': 6,
-    'Cache': 7,
-    'Queue': 8,
-    'Messaging': 9,
-    'Network': 10,
-    'Monitoring': 11,
-    'Development': 12,
-    'Cloud': 13,
-    'Applications': 14,
-    'Other': 15,
-    'OS': 16,
+    'Database': 0,
+    'CMS': 1,
+    'Social': 2,
+    'AI': 3,
+    'Automation': 4,
+    'Web Server': 5,
+    'Cache': 6,
+    'Queue': 7,
+    'Messaging': 8,
+    'Network': 9,
+    'Monitoring': 10,
+    'Development': 11,
+    'Cloud': 12,
+    'Applications': 13,
+    'Other': 14,
+    'OS': 15,
 };
 
 const dbPopularity: Record<string, number> = {
@@ -161,7 +161,7 @@ function readFromDir(dir: string): TemplateService[] {
     services.sort((a, b) => {
         const catOrderA = categoryOrder[a.category] ?? 99;
         const catOrderB = categoryOrder[b.category] ?? 99;
-        
+
         if (catOrderA !== catOrderB) {
             return catOrderA - catOrderB;
         }

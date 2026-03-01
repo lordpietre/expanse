@@ -16,5 +16,5 @@
         "./pihole:/etc/pihole",
         "./dnsmasq.d:/etc/dnsmasq.d"
     ],
-    "logo": "https://raw.githubusercontent.com/pi-hole/pi-hole/master/advanced/Resources/vortex.svg"
+    "logo": "https://cdn.simpleicons.org/pihole"
 }

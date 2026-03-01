@@ -2,6 +2,7 @@
     "name": "CouchDB",
     "image": "couchdb:latest",
     "category": "Database",
+    "logo": "https://img.icons8.com/color/512/couchdb.png",
     "description": "Documents + REST. Offline-first sync. Great for multi-master replication.",
     "default_ports": [
         "5984:5984"

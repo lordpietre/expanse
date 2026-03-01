@@ -2,6 +2,7 @@
     "name": "Cassandra",
     "image": "cassandra:latest",
     "category": "Database",
+    "logo": "https://img.icons8.com/color/512/cassandra.png",
     "description": "Wide Column Distributed. Big Data, high availability. Robust for mass writes.",
     "default_ports": [
         "9042:9042"

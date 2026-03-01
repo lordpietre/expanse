@@ -1,0 +1,38 @@
+{
+    "name": "WordPress (Full Stack)",
+    "description": "The complete WordPress stack including a pre-configured MariaDB database and optimized environment variables.",
+    "category": "CMS",
+    "isStack": true,
+    "image": "wordpress:latest",
+    "logo": "https://img.icons8.com/color/512/wordpress.png",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "WORDPRESS_DB_HOST": "db",
+        "WORDPRESS_DB_USER": "wordpress",
+        "WORDPRESS_DB_PASSWORD": "password",
+        "WORDPRESS_DB_NAME": "wordpress"
+    },
+    "volumes": [
+        "wordpress_data:/var/www/html"
+    ],
+    "related_services": [
+        {
+            "name": "db",
+            "description": "MariaDB database for WordPress",
+            "category": "Database",
+            "image": "mariadb:10.6",
+            "logo": "https://img.icons8.com/color/512/mariadb.png",
+            "env_vars": {
+                "MYSQL_ROOT_PASSWORD": "password",
+                "MYSQL_DATABASE": "wordpress",
+                "MYSQL_USER": "wordpress",
+                "MYSQL_PASSWORD": "password"
+            },
+            "volumes": [
+                "db_data:/var/lib/mysql"
+            ]
+        }
+    ]
+}

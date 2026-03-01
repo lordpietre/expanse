@@ -2,6 +2,7 @@
     "name": "Mumble",
     "image": "mumblevoip/mumble-server:latest",
     "category": "Messaging",
+    "logo": "https://cdn.simpleicons.org/mumble",
     "description": "High-quality, low-latency open source voice chat software designed specifically for gamers and group voice.",
     "default_ports": [
         "64738:64738"

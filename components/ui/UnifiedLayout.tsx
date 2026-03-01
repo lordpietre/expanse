@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { House, LogOut, Settings, Share, Rocket, Activity } from "lucide-react";
+import { House, LogOut, Settings, Share, Rocket, Activity, Box } from "lucide-react";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
@@ -13,14 +13,14 @@ export default function UnifiedLayout({ children, version }: { children: ReactNo
 
     const navItems = [
         { href: "/", label: "Home", icon: House },
-        { href: "/deploy/settings", label: "System", icon: Activity },
         { href: "/dashboard/playground", label: "Deploy", icon: Rocket },
-        { href: "/dashboard/deploys", label: "Deploys", icon: Share },
+        { href: "/deploy/settings", label: "System", icon: Activity },
         { href: "/dashboard/settings", label: "Settings", icon: Settings },
     ];
 
     const getActiveHref = () => {
-        if (pathname === "/" || pathname === "/dashboard") return "/";
+        if (pathname === "/") return "/";
+        if (pathname === "/dashboard") return "/dashboard";
         if (pathname.startsWith("/deploy")) return "/deploy/settings";
         if (pathname.includes("/playground")) return "/dashboard/playground";
         if (pathname.includes("/deploys")) return "/dashboard/deploys";
@@ -42,17 +42,17 @@ export default function UnifiedLayout({ children, version }: { children: ReactNo
                         {/* Unified Navigation Links */}
                         <div className="flex bg-slate-900/50 border border-slate-800 rounded-xl p-1 backdrop-blur-md">
                             {navItems.map((item) => {
-                                const isActive = pathname === "/" 
-                                    ? item.href === "/" 
+                                const isActive = pathname === "/"
+                                    ? item.href === "/"
                                     : item.href === activeHref;
                                 return (
-                                    <Link 
-                                        key={item.href} 
+                                    <Link
+                                        key={item.href}
                                         href={item.href}
                                         className={cn(
                                             "flex items-center gap-2 px-4 py-1.5 rounded-lg font-bold text-xs uppercase tracking-widest transition-all",
-                                            isActive 
-                                                ? "bg-white text-emerald-600 shadow-lg" 
+                                            isActive
+                                                ? "bg-white text-emerald-600 shadow-lg"
                                                 : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                                         )}
                                     >

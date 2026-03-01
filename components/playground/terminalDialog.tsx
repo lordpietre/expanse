@@ -1,10 +1,13 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { execDockerCommand } from "@/actions/dockerActions";
-import { Terminal, Send, Loader2, ChevronRight, XCircle } from "lucide-react";
+import { Terminal as TerminalIcon, Send, Loader2, ChevronRight, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Terminal } from "xterm";
+import { FitAddon } from "xterm-addon-fit";
+import "xterm/css/xterm.css";
 
 interface TerminalDialogProps {
     open: boolean;
@@ -15,41 +18,99 @@ interface TerminalDialogProps {
 
 export default function TerminalDialog({ open, onOpenChange, containerId, containerName }: TerminalDialogProps) {
     const [command, setCommand] = useState("");
-    const [history, setHistory] = useState<{ id: string; type: 'cmd' | 'out' | 'err'; content: string }[]>([]);
     const [isExecuting, setIsExecuting] = useState(false);
-    const scrollRef = useRef<HTMLDivElement>(null);
+    const terminalRef = useRef<HTMLDivElement>(null);
+    const xtermRef = useRef<Terminal | null>(null);
+    const fitAddonRef = useRef<FitAddon | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    // Initialize xterm.js
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
-    }, [history]);
+        if (!terminalRef.current || xtermRef.current) return;
 
+        const term = new Terminal({
+            cursorBlink: true,
+            fontSize: 12,
+            fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+            theme: {
+                background: 'transparent',
+                foreground: '#cbd5e1',
+                cursor: '#10b981',
+                selectionBackground: 'rgba(16, 185, 129, 0.3)',
+                black: '#0f172a',
+                red: '#f43f5e',
+                green: '#10b981',
+                yellow: '#f59e0b',
+                blue: '#3b82f6',
+                magenta: '#8b5cf6',
+                cyan: '#06b6d4',
+                white: '#f8fafc',
+            },
+            allowProposedApi: true
+        });
+
+        const fitAddon = new FitAddon();
+        term.loadAddon(fitAddon);
+
+        term.open(terminalRef.current);
+        fitAddon.fit();
+
+        term.writeln("\x1b[1;32mWelcome to Expanse Terminal\x1b[0m");
+        term.writeln(`\x1b[2mConnected to: ${containerName}\x1b[0m`);
+        term.writeln("\x1b[2mType a command below to execute...\x1b[0m\r\n");
+
+        xtermRef.current = term;
+        fitAddonRef.current = fitAddon;
+
+        return () => {
+            term.dispose();
+            xtermRef.current = null;
+        };
+    }, [open, containerName]);
+
+    // Handle resizing
+    useEffect(() => {
+        const handleResize = () => {
+            fitAddonRef.current?.fit();
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Refit when open status changes
     useEffect(() => {
         if (open) {
-            setTimeout(() => inputRef.current?.focus(), 100);
+            setTimeout(() => {
+                fitAddonRef.current?.fit();
+                inputRef.current?.focus();
+            }, 100);
         }
     }, [open]);
 
     const handleExecute = async (e?: React.FormEvent) => {
         e?.preventDefault();
-        if (!command.trim() || isExecuting) return;
+        if (!command.trim() || isExecuting || !xtermRef.current) return;
 
         const currentCmd = command.trim();
-        setHistory(prev => [...prev, { id: Math.random().toString(), type: 'cmd', content: currentCmd }]);
+        const term = xtermRef.current;
+
+        // Display command in terminal
+        term.write(`\r\n\x1b[1;32m➜\x1b[0m \x1b[1m${currentCmd}\x1b[0m\r\n`);
+
         setCommand("");
         setIsExecuting(true);
 
         try {
             const res = await execDockerCommand(containerId, currentCmd);
             if (res.success) {
-                setHistory(prev => [...prev, { id: Math.random().toString(), type: 'out', content: res.output || "" }]);
+                // Handle results that might contain multiple lines
+                const lines = (res.output || "").split('\n');
+                lines.forEach(line => term.writeln(line));
             } else {
-                setHistory(prev => [...prev, { id: Math.random().toString(), type: 'err', content: res.error || "Execution failed" }]);
+                term.write(`\x1b[31mError: ${res.error || "Execution failed"}\x1b[0m\r\n`);
             }
         } catch (error: any) {
-            setHistory(prev => [...prev, { id: Math.random().toString(), type: 'err', content: error.message || "Unexpected error" }]);
+            term.write(`\x1b[31mUnexpected Error: ${error.message || "Unknown error"}\x1b[0m\r\n`);
         } finally {
             setIsExecuting(false);
             inputRef.current?.focus();
@@ -58,73 +119,57 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[800px] bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border-emerald-500/10 p-0 overflow-hidden shadow-2xl rounded-[1.5rem]">
-                <DialogHeader className="p-4 bg-slate-900/50 border-b border-white/5 flex flex-row items-center justify-between">
+            <DialogContent className="max-w-[900px] w-[90vw] bg-[hsl(222,47%,5%)] border-emerald-500/10 p-0 overflow-hidden shadow-2xl rounded-[1.5rem]">
+                <DialogHeader className="p-4 bg-slate-900/50 border-b border-emerald-500/10 flex flex-row items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-                            <Terminal className="w-4 h-4 text-emerald-400" />
+                            <TerminalIcon className="w-4 h-4 text-emerald-400" />
                         </div>
                         <DialogTitle className="text-sm font-bold text-slate-300">
-                            Terminal: <span className="text-emerald-400">{containerName}</span>
+                            Expanse TTY: <span className="text-emerald-400">{containerName}</span>
                         </DialogTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Active Session</span>
                     </div>
                 </DialogHeader>
 
-                <div className="flex flex-col h-[450px]">
+                <div className="flex flex-col h-[500px] bg-black/40 relative">
+                    {/* Terminal Area */}
                     <div
-                        ref={scrollRef}
-                        className="flex-grow p-4 overflow-y-auto font-mono text-xs custom-scrollbar bg-black/20"
-                    >
-                        {history.length === 0 ? (
-                            <div className="text-slate-600 italic">
-                                Ready. Type a command to start (e.g., ls, pwd, cat...)
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-2">
-                                {history.map((item) => (
-                                    <div key={item.id} className={cn(
-                                        "whitespace-pre-wrap leading-relaxed",
-                                        item.type === 'cmd' ? "text-emerald-400 font-bold flex gap-2" :
-                                            item.type === 'err' ? "text-rose-400" : "text-slate-300"
-                                    )}>
-                                        {item.type === 'cmd' && <ChevronRight className="w-3 h-3 mt-0.5 shrink-0" />}
-                                        {item.content}
-                                    </div>
-                                ))}
-                                {isExecuting && (
-                                    <div className="flex items-center gap-2 text-slate-500 italic animate-pulse">
-                                        <Loader2 className="w-3 h-3 animate-spin" />
-                                        Thinking...
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                        ref={terminalRef}
+                        className="flex-grow p-4 overflow-hidden"
+                    />
 
+                    {/* Input Area */}
                     <form
                         onSubmit={handleExecute}
-                        className="p-4 bg-slate-900/30 border-t border-white/5 flex items-center gap-3"
+                        className="p-4 bg-slate-900/30 border-t border-emerald-500/10 flex items-center gap-3"
                     >
-                        <div className="flex-grow relative">
-                            <ChevronRight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/50" />
+                        <div className="flex-grow relative group">
+                            <ChevronRight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/30 group-focus-within:text-emerald-500 transition-colors" />
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={command}
                                 onChange={(e) => setCommand(e.target.value)}
                                 disabled={isExecuting}
-                                placeholder="docker exec command..."
-                                className="w-full bg-black/40 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs font-mono text-white placeholder:text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition-all"
+                                placeholder="Type command here..."
+                                className="w-full bg-black/60 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs font-mono text-emerald-400 placeholder:text-slate-700 outline-none focus:border-emerald-500/20 focus:ring-1 focus:ring-emerald-500/20 transition-all shadow-inner"
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={isExecuting || !command.trim()}
-                            className="p-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:bg-slate-800 rounded-xl transition-all shadow-lg shadow-emerald-950"
+                            className="p-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-30 disabled:bg-slate-800 rounded-xl transition-all shadow-lg shadow-emerald-500/10 flex items-center justify-center min-w-[48px]"
                         >
-                            <Send className="w-4 h-4 text-white" />
+                            {isExecuting ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Send className="w-4 h-4 text-white" />}
                         </button>
                     </form>
+
+                    {/* Decor Overlay */}
+                    <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
                 </div>
             </DialogContent>
         </Dialog>

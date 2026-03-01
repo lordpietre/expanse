@@ -1,0 +1,27 @@
+{
+    "name": "Monitoring Stack (Prometheus + Grafana)",
+    "description": "A complete monitoring solution with Prometheus for metrics collection and Grafana for professional dashboards.",
+    "category": "Monitoring",
+    "isStack": true,
+    "image": "prom/prometheus:latest",
+    "logo": "https://img.icons8.com/external-flat-icons-inmotus-design/512/external-prometheus-monitoring-flat-icons-inmotus-design.png",
+    "default_ports": [
+        "9090:9090"
+    ],
+    "env_vars": {
+        "GF_SECURITY_ADMIN_PASSWORD": "admin",
+        "GF_USERS_ALLOW_SIGN_UP": "false"
+    },
+    "related_services": [
+        {
+            "name": "grafana",
+            "description": "Grafana visualization tool",
+            "category": "Monitoring",
+            "image": "grafana/grafana:latest",
+            "logo": "https://img.icons8.com/color/512/grafana.png",
+            "default_ports": [
+                "3000:3000"
+            ]
+        }
+    ]
+}

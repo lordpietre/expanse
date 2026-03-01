@@ -76,7 +76,7 @@ function PasswordModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!value.trim()) { setError("Introduce la contraseña"); return; }
+        if (!value.trim()) { setError("Please enter the password"); return; }
         setLoading(true);
         setError("");
         // Simple PIN – we just require the user to type "confirm" or their own arbitrary token
@@ -102,7 +102,7 @@ function PasswordModal({
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                            <Lock className="w-3 h-3" /> Contraseña de confirmación
+                            <Lock className="w-3 h-3" /> Confirmation Password
                         </label>
                         <input
                             type="password"
@@ -117,11 +117,11 @@ function PasswordModal({
                     <div className="flex gap-3 mt-2">
                         <Button type="button" variant="outline" onClick={onCancel}
                             className="flex-1 bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-xl font-bold text-xs uppercase tracking-widest">
-                            Cancelar
+                            Cancel
                         </Button>
                         <Button type="submit" disabled={loading}
                             className="flex-1 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs uppercase tracking-widest">
-                            Confirmar
+                            Confirm
                         </Button>
                     </div>
                 </form>
@@ -213,25 +213,25 @@ function ProjectDetail({
                         <div className="flex items-center gap-2">
                             <Button
                                 onClick={() => runWithPassword(
-                                    "Detener proyecto",
-                                    `Se detendrán todos los contenedores de "${project.Name}"`,
+                                    "Stop project",
+                                    `All containers of "${project.Name}" will be stopped`,
                                     () => stopProjectByName(project.Name)
                                 )}
                                 disabled={actionLoading}
                                 className="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-400 rounded-xl text-[10px] font-black uppercase tracking-widest px-3 py-2 h-auto gap-1.5"
                             >
-                                <Square className="w-3 h-3 fill-amber-400" /> Detener
+                                <Square className="w-3 h-3 fill-amber-400" /> Stop
                             </Button>
                             <Button
                                 onClick={() => runWithPassword(
-                                    "Eliminar proyecto",
-                                    `Se eliminarán todos los contenedores y volúmenes de "${project.Name}"`,
+                                    "Delete project",
+                                    `All containers and volumes of "${project.Name}" will be deleted`,
                                     () => removeProjectByName(project.Name)
                                 )}
                                 disabled={actionLoading}
                                 className="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 rounded-xl text-[10px] font-black uppercase tracking-widest px-3 py-2 h-auto gap-1.5"
                             >
-                                <Trash2 className="w-3 h-3" /> Eliminar
+                                <Trash2 className="w-3 h-3" /> Delete
                             </Button>
                             <button onClick={onClose}
                                 className="p-2 rounded-xl hover:bg-white/5 text-slate-500 hover:text-white transition-colors">
@@ -246,7 +246,7 @@ function ProjectDetail({
                             <div className="flex items-center gap-2 mb-3">
                                 <Container className="w-4 h-4 text-indigo-400" />
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                    Contenedores ({detail?.containers.length ?? 0})
+                                    Containers ({detail?.containers.length ?? 0})
                                 </h3>
                             </div>
 
@@ -255,7 +255,7 @@ function ProjectDetail({
                                     <RefreshCw className="w-5 h-5 animate-spin" />
                                 </div>
                             ) : detail?.containers.length === 0 ? (
-                                <div className="py-8 text-center text-slate-600 text-xs">Sin contenedores</div>
+                                <div className="py-8 text-center text-slate-600 text-xs">No containers</div>
                             ) : (
                                 <div className="space-y-2">
                                     {detail?.containers.map((c: any) => {
@@ -283,22 +283,22 @@ function ProjectDetail({
                                                     )}>{c.State}</span>
                                                     <button
                                                         onClick={() => runWithPassword(
-                                                            "Detener contenedor",
-                                                            `Detener "${c.Names}"`,
+                                                            "Stop container",
+                                                            `Stop "${c.Names}"`,
                                                             () => stopContainer(c.ID)
                                                         )}
                                                         className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all"
-                                                        title="Detener">
+                                                        title="Stop">
                                                         <Square className="w-3 h-3 fill-amber-400" />
                                                     </button>
                                                     <button
                                                         onClick={() => runWithPassword(
-                                                            "Eliminar contenedor",
-                                                            `Eliminar permanentemente "${c.Names}"`,
+                                                            "Delete container",
+                                                            `Permanently delete "${c.Names}"`,
                                                             () => removeContainer(c.ID)
                                                         )}
                                                         className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all"
-                                                        title="Eliminar">
+                                                        title="Delete">
                                                         <Trash2 className="w-3 h-3" />
                                                     </button>
                                                 </div>
@@ -314,11 +314,11 @@ function ProjectDetail({
                             <div className="flex items-center gap-2 mb-3">
                                 <HardDrive className="w-4 h-4 text-purple-400" />
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                    Volúmenes ({detail?.volumes.length ?? 0})
+                                    Volumes ({detail?.volumes.length ?? 0})
                                 </h3>
                             </div>
                             {!loadingDetail && detail?.volumes.length === 0 ? (
-                                <div className="py-8 text-center text-slate-600 text-xs">Sin volúmenes</div>
+                                <div className="py-8 text-center text-slate-600 text-xs">No volumes</div>
                             ) : (
                                 <div className="space-y-2">
                                     {detail?.volumes.map((v: any) => (
@@ -334,7 +334,7 @@ function ProjectDetail({
                                             <div className="flex items-center gap-3 shrink-0">
                                                 {v.Size && (
                                                     <div className="flex flex-col items-end mr-1">
-                                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Tamaño</span>
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Size</span>
                                                         <span className="text-xs font-black text-purple-400">{v.Size}</span>
                                                     </div>
                                                 )}
@@ -343,12 +343,12 @@ function ProjectDetail({
                                                 </span>
                                                 <button
                                                     onClick={() => runWithPassword(
-                                                        "Eliminar volumen",
-                                                        `Eliminar permanentemente "${v.Name}"`,
+                                                        "Delete volume",
+                                                        `Permanently delete "${v.Name}"`,
                                                         () => removeVolume(v.Name)
                                                     )}
                                                     className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
-                                                    title="Eliminar">
+                                                    title="Delete">
                                                     <Trash2 className="w-3 h-3" />
                                                 </button>
                                             </div>
@@ -455,10 +455,10 @@ export default function DashboardPage() {
         const res = await modalAction.fn();
         setActionLoading(false);
         if (res?.success) {
-            toast.success("Operación completada");
+            toast.success("Operation completed");
             fetchData();
         } else {
-            toast.error(res?.error || "Error en la operación");
+            toast.error(res?.error || "Operation error");
         }
     };
 
@@ -489,19 +489,19 @@ export default function DashboardPage() {
                             icon: <Cpu className="w-4 h-4 text-indigo-400" />,
                             label: "CPU",
                             value: sysInfo?.cpuCount ? `${sysInfo.cpuCount} Cores` : "—",
-                            sub: sysInfo?.cpuModel || "Cargando..."
+                            sub: sysInfo?.cpuModel || "Loading..."
                         },
                         {
                             icon: <MemoryStick className="w-4 h-4 text-emerald-400" />,
-                            label: "Memoria",
+                            label: "Memory",
                             value: sysInfo ? formatBytes(sysInfo.totalMemory - sysInfo.freeMemory) : "—",
-                            sub: `de ${sysInfo ? formatBytes(sysInfo.totalMemory) : "—"} total`
+                            sub: `of ${sysInfo ? formatBytes(sysInfo.totalMemory) : "—"} total`
                         },
                         {
                             icon: <HardDrive className="w-4 h-4 text-purple-400" />,
-                            label: "Disco (/)",
+                            label: "Disk (/)",
                             value: sysInfo?.diskInfo?.free || "—",
-                            sub: `${sysInfo?.diskInfo?.used || "—"} usado (${sysInfo?.diskInfo?.usage || "—"})`
+                            sub: `${sysInfo?.diskInfo?.used || "—"} used (${sysInfo?.diskInfo?.usage || "—"})`
                         },
                         {
                             icon: <Activity className="w-4 h-4 text-amber-400" />,
@@ -528,9 +528,9 @@ export default function DashboardPage() {
                 <Tabs defaultValue="projects" className="w-full">
                     <TabsList className="bg-white/5 border border-white/5 p-1 rounded-xl mb-6 flex w-fit gap-1">
                         {[
-                            { value: "projects", label: "Proyectos", count: stats?.projects.length ?? 0 },
-                            { value: "containers", label: "Contenedores", count: stats?.containers.length ?? 0 },
-                            { value: "volumes", label: "Volúmenes", count: stats?.volumes.length ?? 0 },
+                            { value: "projects", label: "Projects", count: stats?.projects.length ?? 0 },
+                            { value: "containers", label: "Containers", count: stats?.containers.length ?? 0 },
+                            { value: "volumes", label: "Volumes", count: stats?.volumes.length ?? 0 },
                         ].map(tab => (
                             <TabsTrigger key={tab.value} value={tab.value}
                                 className="rounded-lg px-5 py-2 text-slate-500 data-[state=active]:bg-white/10 data-[state=active]:text-white font-bold text-xs uppercase tracking-widest transition-all">
@@ -545,7 +545,7 @@ export default function DashboardPage() {
                     {/* Projects Tab */}
                     <TabsContent value="projects" className="mt-0">
                         {!stats || stats.projects.length === 0 ? (
-                            <EmptyState icon={<Layers className="w-12 h-12" />} label="Sin proyectos activos" />
+                            <EmptyState icon={<Layers className="w-12 h-12" />} label="No active projects" />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {stats.projects.map((proj: any) => {
@@ -586,27 +586,27 @@ export default function DashboardPage() {
                                                             stopProjectByName(proj.Name).then(r => {
                                                                 if (r.success) fetchData(); else throw new Error(r.error);
                                                             }),
-                                                            { loading: 'Deteniendo...', success: 'Detenido', error: (e: Error) => e.message || 'Error' }
+                                                            { loading: 'Stopping...', success: 'Stopped', error: (e: Error) => e.message || 'Error' }
                                                         );
                                                     }}
                                                     className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
-                                                    title="Detener proyecto"
+                                                    title="Stop project"
                                                 >
                                                     <Square className="w-3 h-3 fill-amber-400" />
                                                 </button>
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (!confirm(`¿Eliminar completamente "${proj.Name}"? Esto borrará todos los contenedores y volúmenes.`)) return;
+                                                        if (!confirm(`Completely delete "${proj.Name}"? This will erase all containers and volumes.`)) return;
                                                         toast.promise(
                                                             removeProjectByName(proj.Name).then(r => {
                                                                 if (r.success) fetchData(); else throw new Error(r.error);
                                                             }),
-                                                            { loading: 'Eliminando...', success: 'Eliminado', error: (e: Error) => e.message || 'Error' }
+                                                            { loading: 'Deleting...', success: 'Deleted', error: (e: Error) => e.message || 'Error' }
                                                         );
                                                     }}
                                                     className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
-                                                    title="Eliminar proyecto"
+                                                    title="Delete project"
                                                 >
                                                     <Trash2 className="w-3 h-3" />
                                                 </button>
@@ -627,7 +627,7 @@ export default function DashboardPage() {
                     {/* Containers Tab */}
                     <TabsContent value="containers" className="mt-0">
                         {!stats || stats.containers.length === 0 ? (
-                            <EmptyState icon={<Container className="w-12 h-12" />} label="Sin contenedores" />
+                            <EmptyState icon={<Container className="w-12 h-12" />} label="No containers" />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {stats.containers.map((c: any) => {
@@ -657,22 +657,22 @@ export default function DashboardPage() {
                                                 </span>
                                                 <button
                                                     onClick={() => runWithPassword(
-                                                        "Detener contenedor",
-                                                        `Detener "${c.Names}"`,
+                                                        "Stop container",
+                                                        `Stop "${c.Names}"`,
                                                         () => stopContainer(c.ID)
                                                     )}
                                                     className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/20 transition-all"
-                                                    title="Detener">
+                                                    title="Stop">
                                                     <Square className="w-3 h-3 fill-amber-400" />
                                                 </button>
                                                 <button
                                                     onClick={() => runWithPassword(
-                                                        "Eliminar contenedor",
-                                                        `Eliminar permanentemente "${c.Names}"`,
+                                                        "Delete container",
+                                                        `Permanently delete "${c.Names}"`,
                                                         () => removeContainer(c.ID)
                                                     )}
                                                     className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
-                                                    title="Eliminar">
+                                                    title="Delete">
                                                     <Trash2 className="w-3 h-3" />
                                                 </button>
                                             </div>
@@ -686,7 +686,7 @@ export default function DashboardPage() {
                     {/* Volumes Tab */}
                     <TabsContent value="volumes" className="mt-0">
                         {!stats || stats.volumes.length === 0 ? (
-                            <EmptyState icon={<Database className="w-12 h-12" />} label="Sin volúmenes" />
+                            <EmptyState icon={<Database className="w-12 h-12" />} label="No volumes" />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {stats.volumes.map((v: any) => (
@@ -702,7 +702,7 @@ export default function DashboardPage() {
                                         <div className="flex items-center gap-3 shrink-0">
                                             {v.Size && (
                                                 <div className="flex flex-col items-end mr-1">
-                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Tamaño</span>
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Size</span>
                                                     <span className="text-xs font-black text-purple-400">{v.Size}</span>
                                                 </div>
                                             )}
@@ -711,12 +711,12 @@ export default function DashboardPage() {
                                             </span>
                                             <button
                                                 onClick={() => runWithPassword(
-                                                    "Eliminar volumen",
-                                                    `Eliminar permanentemente "${v.Name}"`,
+                                                    "Delete volume",
+                                                    `Permanently delete "${v.Name}"`,
                                                     () => removeVolume(v.Name)
                                                 )}
                                                 className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
-                                                title="Eliminar">
+                                                title="Delete">
                                                 <Trash2 className="w-3 h-3" />
                                             </button>
                                         </div>

@@ -2,7 +2,7 @@
     "name": "LibreChat",
     "image": "ghcr.io/danny-avila/librechat:latest",
     "category": "AI",
-    "logo": "https://librechat.ai/favicon.ico",
+    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/librechat.svg",
     "description": "Customizable multi-LLM chat for Ollama, LocalAI, OpenAI, Anthropic. Flexible with plugins, agents marketplace, themes, and multi-backend support.",
     "default_ports": [
         "3080:3080"

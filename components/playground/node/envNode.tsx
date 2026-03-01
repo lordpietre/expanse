@@ -1,4 +1,4 @@
-import { Env } from "@composecraft/docker-compose-lib";
+import { Env } from "expanse-docker-lib";
 import { Key, Fingerprint } from "lucide-react";
 import Selectable from "@/components/playground/node/Selectable";
 import { Handle, Position } from "@xyflow/react";

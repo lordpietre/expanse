@@ -1,5 +1,5 @@
 "use client"
-import { Service } from "@composecraft/docker-compose-lib";
+import { Service } from "expanse-docker-lib";
 import { Handle, Position } from "@xyflow/react";
 import { CardContent } from "@/components/ui/card";
 import { Container, Database, Globe, Network, HardDrive, Key, Tag, ChevronDown, ChevronUp, Cloud } from "lucide-react";
@@ -88,7 +88,7 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                         <div className="flex items-center gap-2 z-10 ml-3 shrink-0">
                             <div className="bg-white/20 backdrop-blur-sm p-2.5 rounded-lg border border-white/30 shadow-lg">
                                 {(() => {
-                                    const logo = service.labels?.find(l => l.key === "com.composecraft.logo")?.value;
+                                    const logo = service.labels?.find(l => l.key === "com.expanse.logo")?.value;
                                     return logo ? (
                                         <img src={logo} className="w-8 h-8 object-contain drop-shadow-lg" alt="logo" />
                                     ) : (

@@ -1,6 +1,6 @@
 import {Editor} from "@monaco-editor/react";
 import {useComposeStore} from "@/store/compose";
-import {Translator} from "@composecraft/docker-compose-lib";
+import {Translator} from "expanse-docker-lib";
 import YAML from 'yaml'
 
 export default function YamlEditor(){

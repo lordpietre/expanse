@@ -2,7 +2,7 @@
     "name": "AnythingLLM",
     "image": "mintplexlabs/anythingllm:latest",
     "category": "AI",
-    "logo": "https://anythingllm.com/favicon.ico",
+    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/anything-llm.svg",
     "description": "RAG-focused chat with Ollama and LocalAI. Embeds local documents, multi-user workspaces. Excellent for private knowledge bases.",
     "default_ports": [
         "3001:3001"

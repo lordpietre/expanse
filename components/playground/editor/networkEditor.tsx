@@ -1,6 +1,6 @@
 import useSelectionStore from "@/store/selection";
 import { useComposeStore } from "@/store/compose";
-import { Network } from "@composecraft/docker-compose-lib";
+import { Network } from "expanse-docker-lib";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
@@ -8,7 +8,7 @@ import { Unlink, Link, Blocks, Grid2x2, Router, Shield, ShieldOff, Cpu, Globe, G
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { NetworkDriver } from "@composecraft/docker-compose-lib";
+import { NetworkDriver } from "expanse-docker-lib";
 import usePositionMap, { NetworkNodeType, GatewayImpl } from "@/store/metadataMap";
 
 export default function NetowrkEditor() {

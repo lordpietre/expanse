@@ -2,6 +2,7 @@
     "name": "AmneziaVPN",
     "image": "amneziavpn/amnezia-wg:latest",
     "category": "Network",
+    "logo": "https://avatars.githubusercontent.com/u/74641681?s=200&v=4",
     "description": "Multi-protocol VPN designed for bypassing censorship in hostile environments. Self-hosted and focused on obfuscation.",
     "default_ports": [
         "51820:51820/udp"

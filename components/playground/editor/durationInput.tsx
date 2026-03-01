@@ -1,5 +1,5 @@
 import {Input} from "@/components/ui/input";
-import {TimeUnits,Delay} from "@composecraft/docker-compose-lib";
+import {TimeUnits,Delay} from "expanse-docker-lib";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useEffect, useState} from "react";
 

@@ -11,7 +11,7 @@ import { loginUser, registerUser } from "@/actions/userActions";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { useComposeStore } from "@/store/compose";
-import { Translator } from "@composecraft/docker-compose-lib";
+import { Translator } from "expanse-docker-lib";
 import usePositionMap from "@/store/metadataMap";
 import { extractMetadata } from "@/lib/metadata";
 import { useRouter } from 'next/navigation'

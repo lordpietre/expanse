@@ -2,7 +2,7 @@
     "name": "Python",
     "image": "python:3.11-trixie",
     "category": "Development",
-    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/python/logo.png",
+    "logo": "https://img.icons8.com/color/512/python.png",
     "description": "Python is a programming language that lets you work quickly and integrate systems more effectively.",
     "default_ports": []
 }

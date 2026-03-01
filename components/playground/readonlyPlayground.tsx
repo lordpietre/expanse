@@ -1,6 +1,6 @@
 "use client"
 
-import { Compose, Translator, Volume } from "@composecraft/docker-compose-lib";
+import { Compose, Translator, Volume } from "expanse-docker-lib";
 import { NodeData } from "@/components/playground/playground";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ServiceNode from "@/components/playground/node/serviceNode";
@@ -123,6 +123,7 @@ export default function ReadOnlyPlayGround(opt: options) {
                 draggable: true
             })
         })
+        /*
         compose.envs.forEach((env) => {
             result.push({
                 id: env.id,
@@ -132,6 +133,7 @@ export default function ReadOnlyPlayGround(opt: options) {
                 draggable: true
             })
         })
+        */
         return result;
     }
 
@@ -180,6 +182,7 @@ export default function ReadOnlyPlayGround(opt: options) {
                     ...dependencyEdgeStyle
                 } as Edge)
             })
+            /*
             service.environment?.forEach((targetEnv) => {
                 result.push({
                     id: "edg-" + targetEnv.id + service.id,
@@ -190,6 +193,7 @@ export default function ReadOnlyPlayGround(opt: options) {
                     ...envEdgeStyle
                 } as Edge)
             })
+            */
         })
         return result
     }

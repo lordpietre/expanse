@@ -1,6 +1,6 @@
 import useSelectionStore from "@/store/selection";
 import { useComposeStore } from "@/store/compose";
-import { Volume } from "@composecraft/docker-compose-lib";
+import { Volume } from "expanse-docker-lib";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FolderTree } from "lucide-react";

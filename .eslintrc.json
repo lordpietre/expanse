@@ -10,18 +10,24 @@
     "plugin:react-hooks/recommended",
     "plugin:@next/next/recommended"
   ],
-  "ignorePatterns": ["dist", ".eslintrc.cjs","components/ui/","next-env.d.ts"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["react-refresh"],
+  "plugins": [
+    "react-refresh"
+  ],
   "rules": {
     "react-refresh/only-export-components": [
       "warn",
-      { "allowConstantExport": true }
+      {
+        "allowConstantExport": true
+      }
     ]
   },
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx"],
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
       "rules": {
         "no-case-declarations": "off",
         "@typescript-eslint/ban-ts-comment": "off",

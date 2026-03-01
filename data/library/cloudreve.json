@@ -2,6 +2,7 @@
     "name": "Cloudreve",
     "image": "cloudreve/cloudreve:latest",
     "category": "Cloud",
+    "logo": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/cloudreve.svg",
     "description": "Powerful self-hosted file management system that supports multiple storage backends like S3, OneDrive, and local storage.",
     "default_ports": [
         "5212:5212"

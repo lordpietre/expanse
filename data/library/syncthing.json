@@ -8,5 +8,5 @@
         "22000:22000/tcp",
         "22000:22000/udp"
     ],
-    "logo": "https://raw.githubusercontent.com/syncthing/syncthing/main/assets/logo-128.png"
+    "logo": "https://cdn.simpleicons.org/syncthing"
 }

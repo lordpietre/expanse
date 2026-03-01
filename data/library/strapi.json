@@ -2,7 +2,7 @@
     "name": "Strapi",
     "image": "strapi/strapi:5",
     "category": "CMS",
-    "logo": "https://strapi.io/assets/strapi_logo.svg",
+    "logo": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/512/external-strapi-a-free-and-open-source-headless-content-management-system-logo-color-tal-revivo.png",
     "description": "Open-source headless CMS for building modern APIs. The most popular headless CMS in 2026 for connecting apps + websites.",
     "default_ports": [
         "1337:1337"

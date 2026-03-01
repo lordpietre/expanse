@@ -36,7 +36,7 @@ export default function VersionUpdateBanner({
         </div>
         <div className="flex items-center space-x-3">
           <Link
-            href="https://github.com/composecraft/composecraft/releases"
+            href="https://github.com/lordpietre/expanse/releases"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 flex items-center space-x-1"

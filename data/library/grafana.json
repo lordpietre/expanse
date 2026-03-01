@@ -1,7 +1,7 @@
 {
     "name": "Grafana",
     "image": "grafana/grafana:latest",
-    "category": "Network",
+    "category": "Monitoring",
     "description": "The open observability platform. Masterfully visualize metrics, logs, and traces from Prometheus, Loki, and other data sources with beautiful dashboards.",
     "default_ports": [
         "3000:3000"
@@ -9,5 +9,5 @@
     "volumes": [
         "./grafana_data:/var/lib/grafana"
     ],
-    "logo": "https://raw.githubusercontent.com/grafana/grafana/main/public/img/grafana_icon.svg"
+    "logo": "https://cdn.simpleicons.org/grafana"
 }

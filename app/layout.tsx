@@ -4,7 +4,6 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
 import { DM_Sans } from 'next/font/google'
-import CoreBanner from "@/components/ui/coreBanner";
 import VersionUpdateBanner from "@/components/ui/versionUpdateBanner";
 import Instrumentation from "@/components/instrumentation";
 import Script from "next/script";

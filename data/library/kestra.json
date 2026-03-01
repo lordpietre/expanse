@@ -2,7 +2,7 @@
     "name": "Kestra",
     "image": "kestra/kestra:latest",
     "category": "Automation",
-    "logo": "https://kestra.io/favicon.ico",
+    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/kestra.svg",
     "description": "YAML-based orchestration for data pipelines, ETL, and scheduled tasks. Declarative, scalable, rich plugins, modern UI. Best for batch/data-heavy workloads.",
     "default_ports": [
         "8080:8080"
