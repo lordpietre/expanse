@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html class="client-nojs vector-feature-language-in-header-enabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled wp25eastereggs-enable-clientpref-1 vector-toc-available skin-theme-clientpref-thumb-standard" lang="es" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>OwnCloud - Wikipedia, la enciclopedia libre</title>
+<script>(function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled wp25eastereggs-enable-clientpref-1 vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )eswikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":[",\t."," \t,"],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],"wgRequestId":"84a4682b-acfc-4482-90f3-6c7e427e3c6b","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"OwnCloud","wgTitle":"OwnCloud","wgCurRevisionId":158782359,"wgRevisionId":158782359,"wgArticleId":6008926,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Computación en nube","Software libre programado en PHP","JavaScript","Almacenamiento en nube","Alojamiento de archivos","KDE"],"wgPageViewLanguage":"es","wgPageContentLanguage":"es","wgPageContentModel":"wikitext","wgRelevantPageName":"OwnCloud","wgRelevantArticleId":6008926,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgConfirmEditCaptchaNeededForGenericEdit":false,"wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"es","pageLanguageDir":"ltr","pageVariantFallbacks":"es"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":true,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":6000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q290284","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":true,"wgGELevelingUpEnabledForUser":false,"wgGEUseTestKitchenExtension":true,"wgMetricsPlatformUserExperiments":{"active_experiments":[],"overrides":[],"enrolled":[],"assigned":[],"subject_ids":[],"sampling_units":[],"coordinator":[]},"wgTestKitchenUserExperiments":{"active_experiments":[],"overrides":[],"enrolled":[],"assigned":[],"subject_ids":[],"sampling_units":[],"coordinator":[]}};
+RLSTATE={"ext.gadget.imagenesinfobox":"ready","ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.cite.styles":"ready","ext.wikimediamessages.styles":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready","ext.wp25EasterEggs.styles":"ready"};RLPAGEMODULES=["ext.cite.ux-enhancements","site","mediawiki.page.ready","mediawiki.toc","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.a-commons-directo","ext.gadget.ReferenceTooltips","ext.gadget.refToolbar","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.xLab","ext.testKitchen","ext.wp25EasterEggs"];</script>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+}];});});</script>
+<link rel="stylesheet" href="/w/load.php?lang=es&amp;modules=ext.cite.styles%7Cext.uls.interlanguage%7Cext.visualEditor.desktopArticleTarget.noscript%7Cext.wikimediamessages.styles%7Cext.wp25EasterEggs.styles%7Cskins.vector.icons%2Cstyles%7Cskins.vector.search.codex.styles%7Cwikibase.client.init&amp;only=styles&amp;skin=vector-2022">
+<script async="" src="/w/load.php?lang=es&amp;modules=startup&amp;only=scripts&amp;raw=1&amp;skin=vector-2022"></script>
+<meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="/w/load.php?lang=es&amp;modules=ext.gadget.imagenesinfobox&amp;only=styles&amp;skin=vector-2022">
+<link rel="stylesheet" href="/w/load.php?lang=es&amp;modules=site.styles&amp;only=styles&amp;skin=vector-2022">
+<noscript><link rel="stylesheet" href="/w/load.php?lang=es&amp;modules=noscript&amp;only=styles&amp;skin=vector-2022"></noscript>
+<meta name="generator" content="MediaWiki 1.46.0-wmf.17">
+<meta name="referrer" content="origin">
+<meta name="referrer" content="origin-when-cross-origin">
+<meta name="robots" content="max-image-preview:standard">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/OwnCloud2-Logo.svg/1280px-OwnCloud2-Logo.svg.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta name="viewport" content="width=1120">
+<meta property="og:title" content="OwnCloud - Wikipedia, la enciclopedia libre">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="//upload.wikimedia.org">
+<link rel="alternate" type="application/x-wiki" title="Editar" href="/w/index.php?title=OwnCloud&amp;action=edit">
+<link rel="apple-touch-icon" href="/static/apple-touch/wikipedia.png">
+<link rel="icon" href="/static/favicon/wikipedia.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="/w/rest.php/v1/search" title="Wikipedia (es)">
+<link rel="EditURI" type="application/rsd+xml" href="//es.wikipedia.org/w/api.php?action=rsd">
+<link rel="canonical" href="https://es.wikipedia.org/wiki/OwnCloud">
+<link rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.es">
+<link rel="alternate" type="application/atom+xml" title="Canal Atom de Wikipedia" href="/w/index.php?title=Especial:CambiosRecientes&amp;feed=atom">
+<link rel="dns-prefetch" href="//meta.wikimedia.org" />
+<link rel="dns-prefetch" href="auth.wikimedia.org">
+</head>
+<body class="skin--responsive skin-vector skin-vector-search-vue mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject mw-editable page-OwnCloud rootpage-OwnCloud skin-vector-2022 action-view">
+<div id="mw-aria-live-region" class="mw-aria-live-region" aria-live="polite"></div><a class="mw-jump-link" href="#bodyContent">Ir al contenido</a>
+<div class="vector-header-container">
+	<header class="vector-header mw-header no-font-mode-scale">
+		<div class="vector-header-start">
+			<nav class="vector-main-menu-landmark" aria-label="Sitio">
+				
+<div id="vector-main-menu-dropdown" class="vector-dropdown vector-main-menu-dropdown vector-button-flush-left vector-button-flush-right"  title="Menú principal" >
+	<input type="checkbox" id="vector-main-menu-dropdown-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-vector-main-menu-dropdown" class="vector-dropdown-checkbox "  aria-label="Menú principal"  >
+	<label id="vector-main-menu-dropdown-label" for="vector-main-menu-dropdown-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only " aria-hidden="true"  ><span class="vector-icon mw-ui-icon-menu mw-ui-icon-wikimedia-menu"></span>
+
+<span class="vector-dropdown-label-text">Menú principal</span>
+	</label>
+	<div class="vector-dropdown-content">
+
+
+				<div id="vector-main-menu-unpinned-container" class="vector-unpinned-container">
+		
+<div id="vector-main-menu" class="vector-main-menu vector-pinnable-element">
+	<div
+	class="vector-pinnable-header vector-main-menu-pinnable-header vector-pinnable-header-unpinned"
+	data-feature-name="main-menu-pinned"
+	data-pinnable-element-id="vector-main-menu"
+	data-pinned-container-id="vector-main-menu-pinned-container"
+	data-unpinned-container-id="vector-main-menu-unpinned-container"
+>
+	<div class="vector-pinnable-header-label">Menú principal</div>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-pin-button" data-event-name="pinnable-header.vector-main-menu.pin">mover a la barra lateral</button>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-unpin-button" data-event-name="pinnable-header.vector-main-menu.unpin">ocultar</button>
+</div>
+
+	
+<div id="p-navigation" class="vector-menu mw-portlet mw-portlet-navigation"  >
+	<div class="vector-menu-heading">
+		Navegación
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="n-mainpage-description" class="mw-list-item"><a href="/wiki/Wikipedia:Portada" title="Visitar la página principal [z]" accesskey="z"><span>Portada</span></a></li><li id="n-portal" class="mw-list-item"><a href="/wiki/Portal:Comunidad" title="Acerca del proyecto, lo que puedes hacer, dónde encontrar información"><span>Portal de la comunidad</span></a></li><li id="n-currentevents" class="mw-list-item"><a href="/wiki/Portal:Actualidad" title="Encuentra información de contexto sobre acontecimientos actuales"><span>Actualidad</span></a></li><li id="n-recentchanges" class="mw-list-item"><a href="/wiki/Especial:CambiosRecientes" title="Lista de cambios recientes en la wiki [r]" accesskey="r"><span>Cambios recientes</span></a></li><li id="n-newpages" class="mw-list-item"><a href="/wiki/Especial:P%C3%A1ginasNuevas"><span>Páginas nuevas</span></a></li><li id="n-randompage" class="mw-list-item"><a href="/wiki/Especial:Aleatoria" title="Cargar una página al azar [x]" accesskey="x"><span>Página aleatoria</span></a></li><li id="n-help" class="mw-list-item"><a href="/wiki/Ayuda:Contenidos" title="El lugar para aprender"><span>Ayuda</span></a></li><li id="n-bug_in_article" class="mw-list-item"><a href="/wiki/Wikipedia:Informes_de_error"><span>Notificar un error</span></a></li><li id="n-specialpages" class="mw-list-item"><a href="/wiki/Especial:P%C3%A1ginasEspeciales" title="Lista de todas las páginas especiales [q]" accesskey="q"><span>Páginas especiales</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+	
+</div>
+
+				</div>
+
+	</div>
+</div>
+
+		</nav>
+			
+<a href="/wiki/Wikipedia:Portada" class="mw-logo">
+	<img class="mw-logo-icon" src="/static/images/icons/wikipedia.png" alt="" aria-hidden="true" height="50" width="50">
+	<span class="mw-logo-container skin-invert">
+		<img class="mw-logo-wordmark" alt="Wikipedia" src="/static/images/mobile/copyright/wikipedia-wordmark-en.svg" style="width: 7.5em; height: 1.125em;">
+		<img class="mw-logo-tagline" alt="La enciclopedia libre" src="/static/images/mobile/copyright/wikipedia-tagline-es.svg" width="120" height="13" style="width: 7.5em; height: 0.8125em;">
+	</span>
+</a>
+
+		</div>
+		<div class="vector-header-end">
+			
+<div id="p-search" role="search" class="vector-search-box-vue  vector-search-box-collapses vector-search-box-show-thumbnail vector-search-box-auto-expand-width vector-search-box">
+	<a href="/wiki/Especial:Buscar" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only search-toggle" title="Buscar en este wiki [f]" accesskey="f"><span class="vector-icon mw-ui-icon-search mw-ui-icon-wikimedia-search"></span>
+
+<span>Buscar</span>
+	</a>
+	<div class="vector-typeahead-search-container">
+		<div class="cdx-typeahead-search cdx-typeahead-search--show-thumbnail cdx-typeahead-search--auto-expand-width">
+			<form action="/w/index.php" id="searchform" class="cdx-search-input cdx-search-input--has-end-button">
+				<div id="simpleSearch" class="cdx-search-input__input-wrapper"  data-search-loc="header-moved">
+					<div class="cdx-text-input cdx-text-input--has-start-icon">
+						<input
+							class="cdx-text-input__input mw-searchInput" autocomplete="off"
+							 type="search" name="search" placeholder="Buscar en Wikipedia" aria-label="Buscar en Wikipedia" autocapitalize="none" spellcheck="false" title="Buscar en este wiki [f]" accesskey="f" id="searchInput"
+							>
+						<span class="cdx-text-input__icon cdx-text-input__start-icon"></span>
+					</div>
+					<input type="hidden" name="title" value="Especial:Buscar">
+				</div>
+				<button class="cdx-button cdx-search-input__end-button">Buscar</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+			<nav class="vector-user-links vector-user-links-wide" aria-label="Herramientas personales">
+	<div class="vector-user-links-main">
+	
+<div id="p-vector-user-menu-preferences" class="vector-menu mw-portlet emptyPortlet"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</div>
+
+	
+<div id="p-vector-user-menu-userpage" class="vector-menu mw-portlet emptyPortlet"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</div>
+
+	<nav class="vector-appearance-landmark" aria-label="Apariencia">
+		
+<div id="vector-appearance-dropdown" class="vector-dropdown "  title="Cambiar la apariencia del tamaño, ancho y color de la fuente de la página" >
+	<input type="checkbox" id="vector-appearance-dropdown-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-vector-appearance-dropdown" class="vector-dropdown-checkbox "  aria-label="Apariencia"  >
+	<label id="vector-appearance-dropdown-label" for="vector-appearance-dropdown-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only " aria-hidden="true"  ><span class="vector-icon mw-ui-icon-appearance mw-ui-icon-wikimedia-appearance"></span>
+
+<span class="vector-dropdown-label-text">Apariencia</span>
+	</label>
+	<div class="vector-dropdown-content">
+
+
+			<div id="vector-appearance-unpinned-container" class="vector-unpinned-container">
+				
+			</div>
+		
+	</div>
+</div>
+
+	</nav>
+	
+<div id="p-vector-user-menu-notifications" class="vector-menu mw-portlet emptyPortlet"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</div>
+
+	
+<div id="p-vector-user-menu-overflow" class="vector-menu mw-portlet"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			<li id="pt-sitesupport-2" class="user-links-collapsible-item mw-list-item user-links-collapsible-item"><a data-mw-interface  href="https://donate.wikimedia.org/?wmf_source=donate&amp;wmf_medium=sidebar&amp;wmf_campaign=es.wikipedia.org&amp;uselang=es" class=""><span>Donaciones</span></a>
+</li>
+<li id="pt-createaccount-2" class="user-links-collapsible-item mw-list-item user-links-collapsible-item"><a data-mw-interface  href="/w/index.php?title=Especial:Crear_una_cuenta&amp;returnto=OwnCloud" title="Te recomendamos crear una cuenta e iniciar sesión; sin embargo, no es obligatorio" class=""><span>Crear una cuenta</span></a>
+</li>
+<li id="pt-login-2" class="user-links-collapsible-item mw-list-item user-links-collapsible-item"><a data-mw-interface  href="/w/index.php?title=Especial:Entrar&amp;returnto=OwnCloud" title="Te recomendamos iniciar sesión, aunque no es obligatorio [o]" accesskey="o" class=""><span>Acceder</span></a>
+</li>
+
+			
+		</ul>
+		
+	</div>
+</div>
+
+	</div>
+	
+<div id="vector-user-links-dropdown" class="vector-dropdown vector-user-menu vector-button-flush-right vector-user-menu-logged-out user-links-collapsible-item"  title="Más opciones" >
+	<input type="checkbox" id="vector-user-links-dropdown-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-vector-user-links-dropdown" class="vector-dropdown-checkbox "  aria-label="Herramientas personales"  >
+	<label id="vector-user-links-dropdown-label" for="vector-user-links-dropdown-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only " aria-hidden="true"  ><span class="vector-icon mw-ui-icon-ellipsis mw-ui-icon-wikimedia-ellipsis"></span>
+
+<span class="vector-dropdown-label-text">Herramientas personales</span>
+	</label>
+	<div class="vector-dropdown-content">
+
+
+		
+<div id="p-personal" class="vector-menu mw-portlet mw-portlet-personal user-links-collapsible-item"  title="Menú de usuario" >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="pt-sitesupport" class="user-links-collapsible-item mw-list-item"><a href="https://donate.wikimedia.org/?wmf_source=donate&amp;wmf_medium=sidebar&amp;wmf_campaign=es.wikipedia.org&amp;uselang=es"><span>Donaciones</span></a></li><li id="pt-createaccount" class="user-links-collapsible-item mw-list-item"><a href="/w/index.php?title=Especial:Crear_una_cuenta&amp;returnto=OwnCloud" title="Te recomendamos crear una cuenta e iniciar sesión; sin embargo, no es obligatorio"><span class="vector-icon mw-ui-icon-userAdd mw-ui-icon-wikimedia-userAdd"></span> <span>Crear una cuenta</span></a></li><li id="pt-login" class="user-links-collapsible-item mw-list-item"><a href="/w/index.php?title=Especial:Entrar&amp;returnto=OwnCloud" title="Te recomendamos iniciar sesión, aunque no es obligatorio [o]" accesskey="o"><span class="vector-icon mw-ui-icon-logIn mw-ui-icon-wikimedia-logIn"></span> <span>Acceder</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+	
+	</div>
+</div>
+
+</nav>
+
+		</div>
+	</header>
+</div>
+<div class="mw-page-container">
+	<div class="mw-page-container-inner">
+		<div class="vector-sitenotice-container">
+			<div id="siteNotice"><!-- CentralNotice --><div class="wp25eastereggs-sitenotice"><div class="wp25eastereggs-sitenotice-landmark"></div></div></div>
+		</div>
+		<div class="vector-column-start">
+			<div class="vector-main-menu-container">
+		<div id="mw-navigation">
+			<nav id="mw-panel" class="vector-main-menu-landmark" aria-label="Sitio">
+				<div id="vector-main-menu-pinned-container" class="vector-pinned-container">
+				
+				</div>
+		</nav>
+		</div>
+	</div>
+	<div class="vector-sticky-pinned-container">
+				<nav id="mw-panel-toc" aria-label="Contenidos" data-event-name="ui.sidebar-toc" class="mw-table-of-contents-container vector-toc-landmark">
+					<div id="vector-toc-pinned-container" class="vector-pinned-container">
+					<div id="vector-toc" class="vector-toc vector-pinnable-element">
+	<div
+	class="vector-pinnable-header vector-toc-pinnable-header vector-pinnable-header-pinned"
+	data-feature-name="toc-pinned"
+	data-pinnable-element-id="vector-toc"
+	
+	
+>
+	<h2 class="vector-pinnable-header-label">Contenidos</h2>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-pin-button" data-event-name="pinnable-header.vector-toc.pin">mover a la barra lateral</button>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-unpin-button" data-event-name="pinnable-header.vector-toc.unpin">ocultar</button>
+</div>
+
+
+	<ul class="vector-toc-contents" id="mw-panel-toc-list">
+		<li id="toc-mw-content-text"
+			class="vector-toc-list-item vector-toc-level-1">
+			<a href="#" class="vector-toc-link">
+				<div class="vector-toc-text">Inicio</div>
+			</a>
+		</li>
+		<li id="toc-Historia"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Historia">
+			<div class="vector-toc-text">
+				<span class="vector-toc-numb">1</span>
+				<span>Historia</span>
+			</div>
+		</a>
+		
+		<ul id="toc-Historia-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Funcionalidades"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Funcionalidades">
+			<div class="vector-toc-text">
+				<span class="vector-toc-numb">2</span>
+				<span>Funcionalidades</span>
+			</div>
+		</a>
+		
+		<ul id="toc-Funcionalidades-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Requerimientos"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Requerimientos">
+			<div class="vector-toc-text">
+				<span class="vector-toc-numb">3</span>
+				<span>Requerimientos</span>
+			</div>
+		</a>
+		
+		<ul id="toc-Requerimientos-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Referencias"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Referencias">
+			<div class="vector-toc-text">
+				<span class="vector-toc-numb">4</span>
+				<span>Referencias</span>
+			</div>
+		</a>
+		
+		<ul id="toc-Referencias-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Bibliografía"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Bibliografía">
+			<div class="vector-toc-text">
+				<span class="vector-toc-numb">5</span>
+				<span>Bibliografía</span>
+			</div>
+		</a>
+		
+		<ul id="toc-Bibliografía-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Véase_también"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Véase_también">
+			<div class="vector-toc-text">
+				<span class="vector-toc-numb">6</span>
+				<span>Véase también</span>
+			</div>
+		</a>
+		
+		<ul id="toc-Véase_también-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+	<li id="toc-Enlaces_externos"
+		class="vector-toc-list-item vector-toc-level-1 vector-toc-list-item-expanded">
+		<a class="vector-toc-link" href="#Enlaces_externos">
+			<div class="vector-toc-text">
+				<span class="vector-toc-numb">7</span>
+				<span>Enlaces externos</span>
+			</div>
+		</a>
+		
+		<ul id="toc-Enlaces_externos-sublist" class="vector-toc-list">
+		</ul>
+	</li>
+</ul>
+</div>
+
+					</div>
+		</nav>
+			</div>
+		</div>
+		<div class="mw-content-container">
+			<main id="content" class="mw-body">
+				<header class="mw-body-header vector-page-titlebar no-font-mode-scale">
+					<nav aria-label="Contenidos" class="vector-toc-landmark">
+						
+<div id="vector-page-titlebar-toc" class="vector-dropdown vector-page-titlebar-toc vector-button-flush-left"  title="Tabla de contenidos" >
+	<input type="checkbox" id="vector-page-titlebar-toc-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-vector-page-titlebar-toc" class="vector-dropdown-checkbox "  aria-label="Cambiar a la tabla de contenidos"  >
+	<label id="vector-page-titlebar-toc-label" for="vector-page-titlebar-toc-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only " aria-hidden="true"  ><span class="vector-icon mw-ui-icon-listBullet mw-ui-icon-wikimedia-listBullet"></span>
+
+<span class="vector-dropdown-label-text">Cambiar a la tabla de contenidos</span>
+	</label>
+	<div class="vector-dropdown-content">
+
+
+							<div id="vector-page-titlebar-toc-unpinned-container" class="vector-unpinned-container">
+			</div>
+		
+	</div>
+</div>
+
+					</nav>
+					<h1 id="firstHeading" class="firstHeading mw-first-heading"><span class="mw-page-title-main">OwnCloud</span></h1>
+							
+<div id="p-lang-btn" class="vector-dropdown mw-portlet mw-portlet-lang"  >
+	<input type="checkbox" id="p-lang-btn-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-p-lang-btn" class="vector-dropdown-checkbox mw-interlanguage-selector" aria-label="Ir a un artículo en otro idioma. Disponible en 21 idiomas"   >
+	<label id="p-lang-btn-label" for="p-lang-btn-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--action-progressive mw-portlet-lang-heading-21" aria-hidden="true"  ><span class="vector-icon mw-ui-icon-language-progressive mw-ui-icon-wikimedia-language-progressive"></span>
+
+<span class="vector-dropdown-label-text">21 idiomas</span>
+	</label>
+	<div class="vector-dropdown-content">
+
+		<div class="vector-menu-content">
+			
+			<ul class="vector-menu-content-list">
+				
+				<li class="interlanguage-link interwiki-ca mw-list-item"><a href="https://ca.wikipedia.org/wiki/OwnCloud" title="OwnCloud – catalán" lang="ca" hreflang="ca" data-title="OwnCloud" data-language-autonym="Català" data-language-local-name="catalán" class="interlanguage-link-target"><span>Català</span></a></li><li class="interlanguage-link interwiki-de mw-list-item"><a href="https://de.wikipedia.org/wiki/OwnCloud" title="OwnCloud – alemán" lang="de" hreflang="de" data-title="OwnCloud" data-language-autonym="Deutsch" data-language-local-name="alemán" class="interlanguage-link-target"><span>Deutsch</span></a></li><li class="interlanguage-link interwiki-el mw-list-item"><a href="https://el.wikipedia.org/wiki/OwnCloud" title="OwnCloud – griego" lang="el" hreflang="el" data-title="OwnCloud" data-language-autonym="Ελληνικά" data-language-local-name="griego" class="interlanguage-link-target"><span>Ελληνικά</span></a></li><li class="interlanguage-link interwiki-en mw-list-item"><a href="https://en.wikipedia.org/wiki/OwnCloud" title="OwnCloud – inglés" lang="en" hreflang="en" data-title="OwnCloud" data-language-autonym="English" data-language-local-name="inglés" class="interlanguage-link-target"><span>English</span></a></li><li class="interlanguage-link interwiki-eu mw-list-item"><a href="https://eu.wikipedia.org/wiki/OwnCloud" title="OwnCloud – euskera" lang="eu" hreflang="eu" data-title="OwnCloud" data-language-autonym="Euskara" data-language-local-name="euskera" class="interlanguage-link-target"><span>Euskara</span></a></li><li class="interlanguage-link interwiki-fa mw-list-item"><a href="https://fa.wikipedia.org/wiki/%D8%A7%D9%88%D9%86%E2%80%8C%DA%A9%D9%84%D8%A7%D9%88%D8%AF" title="اون‌کلاود – persa" lang="fa" hreflang="fa" data-title="اون‌کلاود" data-language-autonym="فارسی" data-language-local-name="persa" class="interlanguage-link-target"><span>فارسی</span></a></li><li class="interlanguage-link interwiki-fr mw-list-item"><a href="https://fr.wikipedia.org/wiki/OwnCloud" title="OwnCloud – francés" lang="fr" hreflang="fr" data-title="OwnCloud" data-language-autonym="Français" data-language-local-name="francés" class="interlanguage-link-target"><span>Français</span></a></li><li class="interlanguage-link interwiki-gl mw-list-item"><a href="https://gl.wikipedia.org/wiki/OwnCloud" title="OwnCloud – gallego" lang="gl" hreflang="gl" data-title="OwnCloud" data-language-autonym="Galego" data-language-local-name="gallego" class="interlanguage-link-target"><span>Galego</span></a></li><li class="interlanguage-link interwiki-id mw-list-item"><a href="https://id.wikipedia.org/wiki/OwnCloud" title="OwnCloud – indonesio" lang="id" hreflang="id" data-title="OwnCloud" data-language-autonym="Bahasa Indonesia" data-language-local-name="indonesio" class="interlanguage-link-target"><span>Bahasa Indonesia</span></a></li><li class="interlanguage-link interwiki-it mw-list-item"><a href="https://it.wikipedia.org/wiki/OwnCloud" title="OwnCloud – italiano" lang="it" hreflang="it" data-title="OwnCloud" data-language-autonym="Italiano" data-language-local-name="italiano" class="interlanguage-link-target"><span>Italiano</span></a></li><li class="interlanguage-link interwiki-ja mw-list-item"><a href="https://ja.wikipedia.org/wiki/OwnCloud" title="OwnCloud – japonés" lang="ja" hreflang="ja" data-title="OwnCloud" data-language-autonym="日本語" data-language-local-name="japonés" class="interlanguage-link-target"><span>日本語</span></a></li><li class="interlanguage-link interwiki-ko mw-list-item"><a href="https://ko.wikipedia.org/wiki/OwnCloud" title="OwnCloud – coreano" lang="ko" hreflang="ko" data-title="OwnCloud" data-language-autonym="한국어" data-language-local-name="coreano" class="interlanguage-link-target"><span>한국어</span></a></li><li class="interlanguage-link interwiki-nl mw-list-item"><a href="https://nl.wikipedia.org/wiki/OwnCloud" title="OwnCloud – neerlandés" lang="nl" hreflang="nl" data-title="OwnCloud" data-language-autonym="Nederlands" data-language-local-name="neerlandés" class="interlanguage-link-target"><span>Nederlands</span></a></li><li class="interlanguage-link interwiki-pl mw-list-item"><a href="https://pl.wikipedia.org/wiki/OwnCloud" title="OwnCloud – polaco" lang="pl" hreflang="pl" data-title="OwnCloud" data-language-autonym="Polski" data-language-local-name="polaco" class="interlanguage-link-target"><span>Polski</span></a></li><li class="interlanguage-link interwiki-pt mw-list-item"><a href="https://pt.wikipedia.org/wiki/OwnCloud" title="OwnCloud – portugués" lang="pt" hreflang="pt" data-title="OwnCloud" data-language-autonym="Português" data-language-local-name="portugués" class="interlanguage-link-target"><span>Português</span></a></li><li class="interlanguage-link interwiki-ru mw-list-item"><a href="https://ru.wikipedia.org/wiki/OwnCloud" title="OwnCloud – ruso" lang="ru" hreflang="ru" data-title="OwnCloud" data-language-autonym="Русский" data-language-local-name="ruso" class="interlanguage-link-target"><span>Русский</span></a></li><li class="interlanguage-link interwiki-sq mw-list-item"><a href="https://sq.wikipedia.org/wiki/OwnCloud" title="OwnCloud – albanés" lang="sq" hreflang="sq" data-title="OwnCloud" data-language-autonym="Shqip" data-language-local-name="albanés" class="interlanguage-link-target"><span>Shqip</span></a></li><li class="interlanguage-link interwiki-te mw-list-item"><a href="https://te.wikipedia.org/wiki/%E0%B0%93%E0%B0%A8%E0%B1%8D_%E0%B0%95%E0%B1%8D%E0%B0%B2%E0%B1%8C%E0%B0%A1%E0%B1%8D" title="ఓన్ క్లౌడ్ – telugu" lang="te" hreflang="te" data-title="ఓన్ క్లౌడ్" data-language-autonym="తెలుగు" data-language-local-name="telugu" class="interlanguage-link-target"><span>తెలుగు</span></a></li><li class="interlanguage-link interwiki-tr mw-list-item"><a href="https://tr.wikipedia.org/wiki/OwnCloud" title="OwnCloud – turco" lang="tr" hreflang="tr" data-title="OwnCloud" data-language-autonym="Türkçe" data-language-local-name="turco" class="interlanguage-link-target"><span>Türkçe</span></a></li><li class="interlanguage-link interwiki-uk mw-list-item"><a href="https://uk.wikipedia.org/wiki/OwnCloud" title="OwnCloud – ucraniano" lang="uk" hreflang="uk" data-title="OwnCloud" data-language-autonym="Українська" data-language-local-name="ucraniano" class="interlanguage-link-target"><span>Українська</span></a></li><li class="interlanguage-link interwiki-zh mw-list-item"><a href="https://zh.wikipedia.org/wiki/OwnCloud" title="OwnCloud – chino" lang="zh" hreflang="zh" data-title="OwnCloud" data-language-autonym="中文" data-language-local-name="chino" class="interlanguage-link-target"><span>中文</span></a></li>
+			</ul>
+			<div class="after-portlet after-portlet-lang"><span class="wb-langlinks-edit wb-langlinks-link"><a href="https://www.wikidata.org/wiki/Special:EntityPage/Q290284#sitelinks-wikipedia" title="Editar enlaces interlingüísticos" class="wbc-editpage">Editar enlaces</a></span></div>
+		</div>
+
+	</div>
+</div>
+</header>
+				<div class="vector-page-toolbar vector-feature-custom-font-size-clientpref--excluded">
+					<div class="vector-page-toolbar-container">
+						<div id="left-navigation">
+							<nav aria-label="Espacios de nombres">
+								
+<div id="p-associated-pages" class="vector-menu vector-menu-tabs mw-portlet mw-portlet-associated-pages"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-nstab-main" class="selected vector-tab-noicon mw-list-item"><a href="/wiki/OwnCloud" title="Ver la página de contenido [c]" accesskey="c"><span>Artículo</span></a></li><li id="ca-talk" class="vector-tab-noicon mw-list-item"><a href="/wiki/Discusi%C3%B3n:OwnCloud" rel="discussion" title="Discusión acerca de la página [t]" accesskey="t"><span>Discusión</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+								
+<div id="vector-variants-dropdown" class="vector-dropdown emptyPortlet"  >
+	<input type="checkbox" id="vector-variants-dropdown-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-vector-variants-dropdown" class="vector-dropdown-checkbox " aria-label="Cambiar la variante del idioma"   >
+	<label id="vector-variants-dropdown-label" for="vector-variants-dropdown-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet" aria-hidden="true"  ><span class="vector-dropdown-label-text">español</span>
+	</label>
+	<div class="vector-dropdown-content">
+
+
+					
+<div id="p-variants" class="vector-menu mw-portlet mw-portlet-variants emptyPortlet"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			
+		</ul>
+		
+	</div>
+</div>
+
+				
+	</div>
+</div>
+
+							</nav>
+						</div>
+						<div id="right-navigation" class="vector-collapsible">
+							<nav aria-label="Vistas">
+								
+<div id="p-views" class="vector-menu vector-menu-tabs mw-portlet mw-portlet-views"  >
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-view" class="selected vector-tab-noicon mw-list-item"><a href="/wiki/OwnCloud"><span>Leer</span></a></li><li id="ca-edit" class="vector-tab-noicon mw-list-item"><a href="/w/index.php?title=OwnCloud&amp;action=edit" title="Editar esta página [e]" accesskey="e"><span>Editar</span></a></li><li id="ca-history" class="vector-tab-noicon mw-list-item"><a href="/w/index.php?title=OwnCloud&amp;action=history" title="Versiones anteriores de esta página [h]" accesskey="h"><span>Ver historial</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+							</nav>
+				
+							<nav class="vector-page-tools-landmark" aria-label="Página de herramientas">
+								
+<div id="vector-page-tools-dropdown" class="vector-dropdown vector-page-tools-dropdown"  >
+	<input type="checkbox" id="vector-page-tools-dropdown-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-vector-page-tools-dropdown" class="vector-dropdown-checkbox "  aria-label="Herramientas"  >
+	<label id="vector-page-tools-dropdown-label" for="vector-page-tools-dropdown-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet" aria-hidden="true"  ><span class="vector-dropdown-label-text">Herramientas</span>
+	</label>
+	<div class="vector-dropdown-content">
+
+
+									<div id="vector-page-tools-unpinned-container" class="vector-unpinned-container">
+						
+<div id="vector-page-tools" class="vector-page-tools vector-pinnable-element">
+	<div
+	class="vector-pinnable-header vector-page-tools-pinnable-header vector-pinnable-header-unpinned"
+	data-feature-name="page-tools-pinned"
+	data-pinnable-element-id="vector-page-tools"
+	data-pinned-container-id="vector-page-tools-pinned-container"
+	data-unpinned-container-id="vector-page-tools-unpinned-container"
+>
+	<div class="vector-pinnable-header-label">Herramientas</div>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-pin-button" data-event-name="pinnable-header.vector-page-tools.pin">mover a la barra lateral</button>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-unpin-button" data-event-name="pinnable-header.vector-page-tools.unpin">ocultar</button>
+</div>
+
+	
+<div id="p-cactions" class="vector-menu mw-portlet mw-portlet-cactions emptyPortlet vector-has-collapsible-items"  title="Más opciones" >
+	<div class="vector-menu-heading">
+		Acciones
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="ca-more-view" class="selected vector-more-collapsible-item mw-list-item"><a href="/wiki/OwnCloud"><span>Leer</span></a></li><li id="ca-more-edit" class="vector-more-collapsible-item mw-list-item"><a href="/w/index.php?title=OwnCloud&amp;action=edit" title="Editar esta página [e]" accesskey="e"><span>Editar</span></a></li><li id="ca-more-history" class="vector-more-collapsible-item mw-list-item"><a href="/w/index.php?title=OwnCloud&amp;action=history"><span>Ver historial</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+<div id="p-tb" class="vector-menu mw-portlet mw-portlet-tb"  >
+	<div class="vector-menu-heading">
+		General
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="t-whatlinkshere" class="mw-list-item"><a href="/wiki/Especial:LoQueEnlazaAqu%C3%AD/OwnCloud" title="Lista de todas las páginas de la wiki que enlazan aquí [j]" accesskey="j"><span>Lo que enlaza aquí</span></a></li><li id="t-recentchangeslinked" class="mw-list-item"><a href="/wiki/Especial:CambiosEnEnlazadas/OwnCloud" rel="nofollow" title="Cambios recientes en las páginas que enlazan con esta [k]" accesskey="k"><span>Cambios en enlazadas</span></a></li><li id="t-upload" class="mw-list-item"><a href="//commons.wikimedia.org/wiki/Special:UploadWizard?uselang=es" title="Subir archivos [u]" accesskey="u"><span>Subir archivo</span></a></li><li id="t-permalink" class="mw-list-item"><a href="/w/index.php?title=OwnCloud&amp;oldid=158782359" title="Enlace permanente a esta versión de la página"><span>Enlace permanente</span></a></li><li id="t-info" class="mw-list-item"><a href="/w/index.php?title=OwnCloud&amp;action=info" title="Más información sobre esta página"><span>Información de la página</span></a></li><li id="t-cite" class="mw-list-item"><a href="/w/index.php?title=Especial:Citar&amp;page=OwnCloud&amp;id=158782359&amp;wpFormIdentifier=titleform" title="Información sobre cómo citar esta página"><span>Citar esta página</span></a></li><li id="t-urlshortener" class="mw-list-item"><a href="/w/index.php?title=Especial:Acortador_de_URL&amp;url=https%3A%2F%2Fes.wikipedia.org%2Fwiki%2FOwnCloud"><span>Obtener URL acortado</span></a></li><li id="t-urlshortener-qrcode" class="mw-list-item"><a href="/w/index.php?title=Especial:QrCode&amp;url=https%3A%2F%2Fes.wikipedia.org%2Fwiki%2FOwnCloud"><span>Descargar código QR</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+<div id="p-coll-print_export" class="vector-menu mw-portlet mw-portlet-coll-print_export"  >
+	<div class="vector-menu-heading">
+		Imprimir/exportar
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li id="coll-create_a_book" class="mw-list-item"><a href="/w/index.php?title=Especial:Libro&amp;bookcmd=book_creator&amp;referer=OwnCloud"><span>Crear un libro</span></a></li><li id="coll-download-as-rl" class="mw-list-item"><a href="/w/index.php?title=Especial:DownloadAsPdf&amp;page=OwnCloud&amp;action=show-download-screen"><span>Descargar como PDF</span></a></li><li id="t-print" class="mw-list-item"><a href="/w/index.php?title=OwnCloud&amp;printable=yes" title="Versión imprimible de esta página [p]" accesskey="p"><span>Versión para imprimir</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+<div id="p-wikibase-otherprojects" class="vector-menu mw-portlet mw-portlet-wikibase-otherprojects"  >
+	<div class="vector-menu-heading">
+		En otros proyectos
+	</div>
+	<div class="vector-menu-content">
+		
+		<ul class="vector-menu-content-list">
+			
+			<li class="wb-otherproject-link wb-otherproject-commons mw-list-item"><a href="https://commons.wikimedia.org/wiki/Category:OwnCloud" hreflang="en"><span>Wikimedia Commons</span></a></li><li id="t-wikibase" class="wb-otherproject-link wb-otherproject-wikibase-dataitem mw-list-item"><a href="https://www.wikidata.org/wiki/Special:EntityPage/Q290284" title="Enlace al elemento conectado del repositorio de datos [g]" accesskey="g"><span>Elemento de Wikidata</span></a></li>
+		</ul>
+		
+	</div>
+</div>
+
+</div>
+
+									</div>
+				
+	</div>
+</div>
+
+							</nav>
+						</div>
+					</div>
+				</div>
+				<div class="vector-column-end no-font-mode-scale">
+					<div class="vector-sticky-pinned-container">
+						<div class="wp25eastereggs-vector-sitenotice-landmark"></div>
+						<nav class="vector-page-tools-landmark" aria-label="Página de herramientas">
+							<div id="vector-page-tools-pinned-container" class="vector-pinned-container">
+				
+							</div>
+		</nav>
+						<nav class="vector-appearance-landmark" aria-label="Apariencia">
+							<div id="vector-appearance-pinned-container" class="vector-pinned-container">
+				<div id="vector-appearance" class="vector-appearance vector-pinnable-element">
+	<div
+	class="vector-pinnable-header vector-appearance-pinnable-header vector-pinnable-header-pinned"
+	data-feature-name="appearance-pinned"
+	data-pinnable-element-id="vector-appearance"
+	data-pinned-container-id="vector-appearance-pinned-container"
+	data-unpinned-container-id="vector-appearance-unpinned-container"
+>
+	<div class="vector-pinnable-header-label">Apariencia</div>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-pin-button" data-event-name="pinnable-header.vector-appearance.pin">mover a la barra lateral</button>
+	<button class="vector-pinnable-header-toggle-button vector-pinnable-header-unpin-button" data-event-name="pinnable-header.vector-appearance.unpin">ocultar</button>
+</div>
+
+
+</div>
+
+							</div>
+		</nav>
+					</div>
+				</div>
+				<div id="bodyContent" class="vector-body" aria-labelledby="firstHeading" data-mw-ve-target-container>
+					<div class="vector-body-before-content">
+							<div class="mw-indicators">
+		</div>
+
+						<div id="siteSub" class="noprint">De Wikipedia, la enciclopedia libre</div>
+					</div>
+					<div id="contentSub"><div id="mw-content-subtitle"></div></div>
+					
+					
+					<div id="mw-content-text" class="mw-body-content"><div class="mw-content-ltr mw-parser-output" lang="es" dir="ltr"><style data-mw-deduplicate="TemplateStyles:r157776694">.mw-parser-output .infobox .imagen{max-width:100%;margin:0 auto}.mw-parser-output .infobox .imagen img{max-width:100%;height:auto}.mw-parser-output .infobox .mw-kartographer-container .thumbinner,.mw-parser-output .infobox .mw-kartographer-map{box-sizing:border-box;width:100%!important}body.skin-timeless .mw-parser-output .infobox .imagen a.image>img{max-width:100%!important;height:auto!important}</style><table class="infobox" style="width:22.7em; line-height: 1.4em; text-align:left; padding:.23em;"><tbody><tr><th colspan="3" class="cabecera software" style="text-align:center;;background-color:#DCEAEC;">ownCloud</th></tr><tr><td colspan="3" class="imagen" style="text-align:center;width:65%;">
+<span typeof="mw:File"><a href="/wiki/Archivo:OwnCloud2-Logo.svg" class="mw-file-description"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/b/b6/OwnCloud2-Logo.svg/250px-OwnCloud2-Logo.svg.png" decoding="async" width="150" height="78" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/b/b6/OwnCloud2-Logo.svg/330px-OwnCloud2-Logo.svg.png 2x" data-file-width="595" data-file-height="311" /></a></span></td></tr><tr><td colspan="3" class="imagen" style="text-align:center;width:65%;">
+<span typeof="mw:File"><a href="/wiki/Archivo:Vue_de_fichiers_dans_ownCloud.png" class="mw-file-description"><img src="//upload.wikimedia.org/wikipedia/commons/thumb/7/77/Vue_de_fichiers_dans_ownCloud.png/250px-Vue_de_fichiers_dans_ownCloud.png" decoding="async" width="200" height="111" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/7/77/Vue_de_fichiers_dans_ownCloud.png/330px-Vue_de_fichiers_dans_ownCloud.png 1.5x, //upload.wikimedia.org/wikipedia/commons/thumb/7/77/Vue_de_fichiers_dans_ownCloud.png/500px-Vue_de_fichiers_dans_ownCloud.png 2x" data-file-width="1265" data-file-height="704" /></a></span><br /><div style="display:inline;">Vista ownCloud</div></td></tr><tr><th colspan="3" class="section" style="text-align:center;background-color:#DCEAEC;">Información general</th></tr><tr><th scope="row" class="label" style="text-align:left;width:35%;background-color:#eef5f6;"><a href="/wiki/Anexo:G%C3%A9neros_de_software" title="Anexo:Géneros de software">Tipo de programa</a></th><td colspan="2" style="width:65%;">
+<a href="/wiki/Cloud_computing" class="mw-redirect" title="Cloud computing">Cloud computing</a></td></tr><tr><th scope="row" class="label" style="text-align:left;width:35%;background-color:#eef5f6;"><a href="/wiki/Desarrollador_de_software" title="Desarrollador de software">Desarrollador</a></th><td colspan="2" style="width:65%;">
+ownCloud GmbH.<br />Comunidad</td></tr><tr><th scope="row" class="label" style="text-align:left;width:35%;background-color:#eef5f6;"><a href="/wiki/Licencia_de_software" title="Licencia de software">Licencia</a></th><td colspan="2" style="width:65%;">
+<a href="/wiki/GNU_Affero_General_Public_License" title="GNU Affero General Public License">AGPLv3</a></td></tr><tr><th scope="row" class="label" style="text-align:left;width:35%;background-color:#eef5f6;"><a href="/wiki/Idioma" title="Idioma">Idiomas</a></th><td colspan="2" style="width:65%;">
+<a href="/w/index.php?title=Multilengua&amp;action=edit&amp;redlink=1" class="new" title="Multilengua (aún no redactado)">Multilengua</a></td></tr><tr><th colspan="3" class="section" style="text-align:center;background-color:#DCEAEC;">Información técnica</th></tr><tr><th scope="row" class="label" style="text-align:left;width:35%;background-color:#eef5f6;"><a href="/wiki/Lenguaje_de_programaci%C3%B3n" title="Lenguaje de programación">Programado en</a></th><td colspan="2" style="width:65%;">
+<ul style="list-style-type:none;list-style-image:none;margin-left:0;padding-left:0"><li><a href="/wiki/PHP" title="PHP">PHP</a></li><li><a href="/wiki/JavaScript" title="JavaScript">JavaScript</a></li><li><a href="/wiki/Go_(lenguaje_de_programaci%C3%B3n)" title="Go (lenguaje de programación)">Go</a></li></ul></td></tr><tr><th scope="row" class="label" style="text-align:left;width:35%;background-color:#eef5f6;"><a href="/wiki/Plataforma_(inform%C3%A1tica)" title="Plataforma (informática)">Plataformas admitidas</a></th><td colspan="2" style="width:65%;">
+<ul style="list-style-type:none;list-style-image:none;margin-left:0;padding-left:0"><li><a href="/wiki/IOS" title="IOS">iOS</a></li><li><a href="/wiki/Android" title="Android">Android</a></li></ul></td></tr><tr><th colspan="3" class="section" style="text-align:center;background-color:#DCEAEC;">Versiones</th></tr><tr><th scope="row" class="label" style="text-align:left;width:35%;background-color:#eef5f6;"><a href="/wiki/Ciclo_de_vida_del_lanzamiento_de_software" title="Ciclo de vida del lanzamiento de software">Última versión estable</a></th><td colspan="2" style="text-align:left;">
+10.3.2 (<a rel="nofollow" class="external text" href="https://owncloud.org/changelog/">info</a>) <small>(04 de diciembre de 2019 (6 años,&#160;2 meses&#160;y&#160;28 días))</small></td></tr><tr><th colspan="3" class="section" style="text-align:center;background-color:#DCEAEC;">Enlaces</th></tr><tr><td colspan="3" style="text-align:center;width:65%;">
+<div><a rel="nofollow" class="external text" href="https://owncloud.com">Sitio web oficial</a></div>
+<div><a rel="nofollow" class="external text" href="https://github.com/owncloud">Repositorio de código</a></div>
+<div><a rel="nofollow" class="external text" href="https://github.com/owncloud/core/issues">Seguimiento de errores</a></div>
+</td></tr><tr><td class="noprint" colspan="3" style="text-align:left;"><div class="plainlinks wikidata-link" style="font-size: 0.85em">&#x5b;<a href="https://www.wikidata.org/wiki/Q290284" class="extiw" title="d:Q290284">editar datos en Wikidata</a>&#x5d;</div></td></tr></tbody></table>
+<p><b>ownCloud</b> es una aplicación <a href="/wiki/Software_libre" title="Software libre">de software libre</a> del tipo <a href="/wiki/Servicio_de_alojamiento_de_archivos" title="Servicio de alojamiento de archivos">Servicio de alojamiento de archivos</a>, que permite el almacenamiento en línea y aplicaciones en línea (<a href="/wiki/Cloud_computing" class="mw-redirect" title="Cloud computing">cloud computing</a>). ownCloud puede ser instalado dentro de un servidor que disponga de una versión reciente de <a href="/wiki/PHP" title="PHP">PHP</a> (mayor o igual a 5.6) y soporte de <a href="/wiki/SQLite" title="SQLite">SQLite</a> (base de datos por defecto), <a href="/wiki/MySQL" title="MySQL">MySQL</a> o <a href="/wiki/PostgreSQL" title="PostgreSQL">PostgreSQL</a>.
+</p>
+<meta property="mw:PageProp/toc" />
+<div class="mw-heading mw-heading2"><h2 id="Historia">Historia</h2><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=OwnCloud&amp;action=edit&amp;section=1" title="Editar sección: Historia"><span>editar</span></a><span class="mw-editsection-bracket">]</span></span></div>
+<p>El proyecto fue lanzado en enero de 2010 por <a href="/w/index.php?title=Frank_Karlitschek&amp;action=edit&amp;redlink=1" class="new" title="Frank Karlitschek (aún no redactado)">Frank Karlitschek</a>, un desarrollador del proyecto <a href="/wiki/KDE" title="KDE">KDE</a>, con el objetivo de dar a los usuarios el control de sus datos en la <i>nube</i>.<sup id="cite&#95;ref-Acerca&#95;de&#95;OwnCloud,2013&#95;1-0" class="mw-references reference separada"><a href="#cite_note-Acerca_de_OwnCloud,2013-1"><span class="cite-bracket">[</span>1<span class="cite-bracket">]</span></a></sup>&#8203; ownCloud formó parte de la comunidad <a href="/wiki/KDE" title="KDE">KDE</a> pero luego se independizó.<sup id="cite&#95;ref-2" class="mw-references reference separada"><a href="#cite_note-2"><span class="cite-bracket">[</span>2<span class="cite-bracket">]</span></a></sup>&#8203;
+</p><p>El 13 de diciembre de 2011 fue creada una entidad comercial fundada bajo el proyecto ownCloud.<sup id="cite&#95;ref-3" class="mw-references reference separada"><a href="#cite_note-3"><span class="cite-bracket">[</span>3<span class="cite-bracket">]</span></a></sup>&#8203; Dicha sociedad es una alternativa a las soluciones propuestas por <a href="/wiki/Dropbox" title="Dropbox">Dropbox</a> o Box.net, poniendo mucho énfasis en la flexibilidad y la seguridad. ownCloud es una alternativa libre a las soluciones privadas presentes en el mercado.
+</p><p>En abril de 2016 Karlitschek abandonó la sociedad ownCloud Inc.
+</p><p>En octubre de 2018 fue anunciada una asociación con <a href="/wiki/OnlyOffice" title="OnlyOffice">ONLYOFFICE</a>.<sup id="cite&#95;ref-4" class="mw-references reference separada"><a href="#cite_note-4"><span class="cite-bracket">[</span>4<span class="cite-bracket">]</span></a></sup>&#8203; La integración con ONLYOFFICE hace posible el acceso y la edición colaborativa de los formatos de archivo de <a href="/wiki/Microsoft_Office" title="Microsoft Office">Microsoft Office</a> desde el frontend de ownCloud en tiempo real. 
+</p>
+<div class="mw-heading mw-heading2"><h2 id="Funcionalidades">Funcionalidades</h2><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=OwnCloud&amp;action=edit&amp;section=2" title="Editar sección: Funcionalidades"><span>editar</span></a><span class="mw-editsection-bracket">]</span></span></div>
+<p>ownCloud gestiona <a href="/wiki/Servidor" title="Servidor">servidores</a> en la nube, le permite a los usuarios crear uno desde cero.<sup id="cite&#95;ref-FOOTNOTEGonzaliaMorellatoStrah1&#95;5-0" class="mw-references reference separada"><a href="#cite_note-FOOTNOTEGonzaliaMorellatoStrah1-5"><span class="cite-bracket">[</span>5<span class="cite-bracket">]</span></a></sup>&#8203; Usa la licencia AGPL adecuada para este tipo de software de red. Entre sus funcionalidades se destacan:<sup id="cite&#95;ref-FOOTNOTEThe&#95;ownCloud&#95;Team5&#95;de&#95;marzo&#95;de&#95;20223&#95;6-0" class="mw-references reference separada"><a href="#cite_note-FOOTNOTEThe_ownCloud_Team5_de_marzo_de_20223-6"><span class="cite-bracket">[</span>6<span class="cite-bracket">]</span></a></sup>&#8203;
+</p>
+<ul><li>Sincronización de archivos entre diversos equipos informáticos.</li>
+<li>Almacenamiento seguro (cifrado de archivos).</li>
+<li>Compartimiento de archivos entre usuarios o grupos.</li>
+<li>Administración de Usuarios (permisos: solo lectura o lectura y escritura).</li>
+<li>Lector de música en línea.</li>
+<li>Servidor de archivos <a href="/wiki/WebDAV" title="WebDAV">WebDAV</a>.</li>
+<li>Calendario (permite la sincronización <a href="/wiki/CalDAV" title="CalDAV">CalDAV</a>).</li>
+<li>Administración de contactos (<a href="/w/index.php?title=CardDAV&amp;action=edit&amp;redlink=1" class="new" title="CardDAV (aún no redactado)">CardDAV</a>).</li>
+<li><a href="/wiki/Editor_de_texto" title="Editor de texto">Editor de texto</a> en línea (propone la coloración sintáctica).</li>
+<li>Visor de documentos en línea (PDF, OpenDocument).</li>
+<li>Galería de imágenes, que permite la visualización y la clasificación en álbumes.</li>
+<li>Administración de favoritos.</li>
+<li><a href="/wiki/Control_de_versiones" title="Control de versiones">Control de Versiones</a> de archivos.</li>
+<li>Gestor de Papelera (recuperación de archivos o eliminación permanente).</li></ul>
+<div class="mw-heading mw-heading2"><h2 id="Requerimientos">Requerimientos</h2><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=OwnCloud&amp;action=edit&amp;section=3" title="Editar sección: Requerimientos"><span>editar</span></a><span class="mw-editsection-bracket">]</span></span></div>
+<p>Requiere tener instalado el servidor web <a href="/wiki/Servidor_HTTP_Apache" title="Servidor HTTP Apache">Apache</a> y el lenguaje <a href="/wiki/PHP" title="PHP">php5</a>.<sup id="cite&#95;ref-FOOTNOTEGonzaliaMorellatoStrah3&#95;7-0" class="mw-references reference separada"><a href="#cite_note-FOOTNOTEGonzaliaMorellatoStrah3-7"><span class="cite-bracket">[</span>7<span class="cite-bracket">]</span></a></sup>&#8203;
+</p>
+<div class="mw-heading mw-heading2"><h2 id="Referencias">Referencias</h2><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=OwnCloud&amp;action=edit&amp;section=4" title="Editar sección: Referencias"><span>editar</span></a><span class="mw-editsection-bracket">]</span></span></div>
+<div class="listaref" style="-moz-column-count:2; -webkit-column-count:2; column-count:2; list-style-type: decimal;"><ol class="references">
+<li id="cite&#95;note-Acerca&#95;de&#95;OwnCloud,2013-1"><span class="mw-cite-backlink"><a href="#cite_ref-Acerca_de_OwnCloud,2013_1-0">↑</a></span> <span class="reference-text"> <cite class="web"></cite><span class="citation web"><a rel="nofollow" class="external text" href="https://web.archive.org/web/20130925010959/http://owncloud.org/about/">«About ownCloud» &#91;Acerca de OwnCloud&#93;</a>. <i>html</i> <span style="color:var(--color-subtle, #555 );">(en inglés)</span>. Archivado desde <a rel="nofollow" class="external text" href="http://owncloud.org/about/">el original</a> el 25 de septiembre de 2013<span class="reference-accessdate">. Consultado el 28 de mayo de 2020</span>. «ownCloud started with a keynote by Frank Karlitschek at Camp KDE’10 where he talked about the need of a self-controlled free and open source cloud.»</span><span title="ctx&#95;ver=Z39.88-2004&amp;rfr&#95;id=info%3Asid%2Fes.wikipedia.org%3AOwnCloud&amp;rft.atitle=About+ownCloud&amp;rft.genre=article&amp;rft.jtitle=html&amp;rft&#95;id=http%3A%2F%2Fowncloud.org%2Fabout%2F&amp;rft&#95;val&#95;fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajournal" class="Z3988"><span style="display:none;">&#160;</span></span> </span>
+</li>
+<li id="cite&#95;note-2"><span class="mw-cite-backlink"><a href="#cite_ref-2">↑</a></span> <span class="reference-text"><a rel="nofollow" class="external free" href="https://mail.kde.org/mailman/listinfo/owncloud">https://mail.kde.org/mailman/listinfo/owncloud</a></span>
+</li>
+<li id="cite&#95;note-3"><span class="mw-cite-backlink"><a href="#cite_ref-3">↑</a></span> <span class="reference-text"><cite class="web"></cite><span class="citation web"><a rel="nofollow" class="external text" href="https://web.archive.org/web/20131003033129/https://owncloud.com/blog/welcome-to-owncloud-inc-2">«Copia archivada»</a>. Archivado desde <a rel="nofollow" class="external text" href="https://owncloud.com/blog/welcome-to-owncloud-inc-2">el original</a> el 3 de octubre de 2013<span class="reference-accessdate">. Consultado el 29 de septiembre de 2013</span>.</span><span title="ctx&#95;ver=Z39.88-2004&amp;rfr&#95;id=info%3Asid%2Fes.wikipedia.org%3AOwnCloud&amp;rft.btitle=Copia+archivada&amp;rft.genre=book&amp;rft&#95;id=https%3A%2F%2Fowncloud.com%2Fblog%2Fwelcome-to-owncloud-inc-2&amp;rft&#95;val&#95;fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&#160;</span></span></span>
+</li>
+<li id="cite&#95;note-4"><span class="mw-cite-backlink"><a href="#cite_ref-4">↑</a></span> <span class="reference-text"><cite class="web"></cite><span class="citation web"><a rel="nofollow" class="external text" href="https://owncloud.com/owncloud-delivers-easy-to-use-collaboration-solution-through-partnership-with-onlyoffice/">«ownCloud Delivers Easy-to-Use Collaboration Solution Through Partnership with ONLYOFFICE»</a> <span style="color:var(--color-subtle, #555 );">(en inglés)</span><span class="reference-accessdate">. Consultado el 19 de junio de 2020</span>.</span><span title="ctx&#95;ver=Z39.88-2004&amp;rfr&#95;id=info%3Asid%2Fes.wikipedia.org%3AOwnCloud&amp;rft.btitle=ownCloud+Delivers+Easy-to-Use+Collaboration+Solution+Through+Partnership+with+ONLYOFFICE&amp;rft.genre=book&amp;rft&#95;id=https%3A%2F%2Fowncloud.com%2Fowncloud-delivers-easy-to-use-collaboration-solution-through-partnership-with-onlyoffice%2F&amp;rft&#95;val&#95;fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&#160;</span></span></span>
+</li>
+<li id="cite&#95;note-FOOTNOTEGonzaliaMorellatoStrah1-5"><span class="mw-cite-backlink"><a href="#cite_ref-FOOTNOTEGonzaliaMorellatoStrah1_5-0">↑</a></span> <span class="reference-text"><a href="#CITAREFGonzaliaMorellatoStrah">Gonzalia y Morellato, Strah</a>, p.&#160;1.</span>
+</li>
+<li id="cite&#95;note-FOOTNOTEThe&#95;ownCloud&#95;Team5&#95;de&#95;marzo&#95;de&#95;20223-6"><span class="mw-cite-backlink"><a href="#cite_ref-FOOTNOTEThe_ownCloud_Team5_de_marzo_de_20223_6-0">↑</a></span> <span class="reference-text"><a href="#CITAREFThe_ownCloud_Team5_de_marzo_de_2022">The ownCloud Team, 5 de marzo de 2022</a>, p.&#160;3.</span>
+</li>
+<li id="cite&#95;note-FOOTNOTEGonzaliaMorellatoStrah3-7"><span class="mw-cite-backlink"><a href="#cite_ref-FOOTNOTEGonzaliaMorellatoStrah3_7-0">↑</a></span> <span class="reference-text"><a href="#CITAREFGonzaliaMorellatoStrah">Gonzalia y Morellato, Strah</a>, p.&#160;3.</span>
+</li>
+</ol></div>
+<div class="mw-heading mw-heading2"><h2 id="Bibliografía"><span id="Bibliograf.C3.ADa"></span>Bibliografía</h2><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=OwnCloud&amp;action=edit&amp;section=5" title="Editar sección: Bibliografía"><span>editar</span></a><span class="mw-editsection-bracket">]</span></span></div>
+<ul><li><cite class="book"></cite><span id="CITAREFThe&#95;ownCloud&#95;Team5&#95;de&#95;marzo&#95;de&#95;2022" class="citation libro">The ownCloud Team (5 de marzo de 2022). <a rel="nofollow" class="external text" href="https://doc.owncloud.com/pdf/server/10.8_ownCloud_User_Manual.pdf"><i>ownCloud User Manual</i></a><span class="reference-accessdate">. Consultado el 28 de junio de 2022</span>.</span><span title="ctx&#95;ver=Z39.88-2004&amp;rfr&#95;id=info%3Asid%2Fes.wikipedia.org%3AOwnCloud&amp;rft.au=The+ownCloud+Team&amp;rft.aulast=The+ownCloud+Team&amp;rft.btitle=ownCloud+User+Manual&amp;rft.date=5+de+marzo+de+2022&amp;rft.genre=book&amp;rft&#95;id=https%3A%2F%2Fdoc.owncloud.com%2Fpdf%2Fserver%2F10.8&#95;ownCloud&#95;User&#95;Manual.pdf&amp;rft&#95;val&#95;fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&#160;</span></span></li>
+<li><cite class="book"></cite><span id="CITAREFGonzaliaMorellatoStrah" class="citation libro">Gonzalia, Damián; Morellato, Ariel; Strah, Juan Pablo. <a rel="nofollow" class="external text" href="https://interorganic.com.ar/josx/owncloud.pdf"><i>TRABAJO PRÁCTICO LABORATORIO DE REDES Y SISTEMAS OPERATIVOS</i></a><span class="reference-accessdate">. Consultado el 28 de junio de 2022</span>.</span><span title="ctx&#95;ver=Z39.88-2004&amp;rfr&#95;id=info%3Asid%2Fes.wikipedia.org%3AOwnCloud&amp;rft.au=Gonzalia%2C+Dami%C3%A1n&amp;rft.au=Morellato%2C+Ariel&amp;rft.au=Strah%2C+Juan+Pablo&amp;rft.aufirst=Dami%C3%A1n&amp;rft.aulast=Gonzalia&amp;rft.btitle=TRABAJO+PR%C3%81CTICO+LABORATORIO+DE+REDES+Y+SISTEMAS+OPERATIVOS&amp;rft.genre=book&amp;rft&#95;id=https%3A%2F%2Finterorganic.com.ar%2Fjosx%2Fowncloud.pdf&amp;rft&#95;val&#95;fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&#160;</span></span></li>
+<li><cite class="book"></cite><span id="CITAREFMuñoz" class="citation libro">Muñoz, Antonio. <a rel="nofollow" class="external text" href="https://riuma.uma.es/xmlui/bitstream/handle/10630/16541/INSTALACION%20Y%20CONFIGURACIOCC%81N%20DE%20OWNCLOUD%20EN%20SISTEMAS%20WINDOWS.pdf?sequence=1"><i>INSTALACION Y CONFIGURACIÓN DE OWNCLOUD EN SISTEMAS WINDOWS</i></a><span class="reference-accessdate">. Consultado el 28 de junio de 2022</span>.</span><span title="ctx&#95;ver=Z39.88-2004&amp;rfr&#95;id=info%3Asid%2Fes.wikipedia.org%3AOwnCloud&amp;rft.au=Mu%C3%B1oz%2C+Antonio&amp;rft.aufirst=Antonio&amp;rft.aulast=Mu%C3%B1oz&amp;rft.btitle=INSTALACION+Y+CONFIGURACI%C3%93N+DE+OWNCLOUD+EN+SISTEMAS+WINDOWS&amp;rft.genre=book&amp;rft&#95;id=https%3A%2F%2Friuma.uma.es%2Fxmlui%2Fbitstream%2Fhandle%2F10630%2F16541%2FINSTALACION%2520Y%2520CONFIGURACIOCC%2581N%2520DE%2520OWNCLOUD%2520EN%2520SISTEMAS%2520WINDOWS.pdf%3Fsequence%3D1&amp;rft&#95;val&#95;fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" class="Z3988"><span style="display:none;">&#160;</span></span></li></ul>
+<div class="mw-heading mw-heading2"><h2 id="Véase_también"><span id="V.C3.A9ase_tambi.C3.A9n"></span>Véase también</h2><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=OwnCloud&amp;action=edit&amp;section=6" title="Editar sección: Véase también"><span>editar</span></a><span class="mw-editsection-bracket">]</span></span></div>
+<ul><li><a href="/wiki/CloudApp" title="CloudApp">CloudApp</a></li>
+<li><a href="/wiki/Dropbox" title="Dropbox">Dropbox</a></li>
+<li><a href="/wiki/Google_Drive" title="Google Drive">Google Drive</a></li>
+<li><a href="/wiki/Amazon_Web_Services" title="Amazon Web Services">Amazon S3</a></li>
+<li><a href="/wiki/Nextcloud" title="Nextcloud">Nextcloud</a></li>
+<li><a href="/wiki/Baidu_Cloud" title="Baidu Cloud">Baidu Cloud</a></li>
+<li><a href="/wiki/OneDrive" class="mw-redirect" title="OneDrive">OneDrive</a></li>
+<li>Apple <a href="/wiki/ICloud" title="ICloud">iCloud</a></li></ul>
+<div class="mw-heading mw-heading2"><h2 id="Enlaces_externos">Enlaces externos</h2><span class="mw-editsection"><span class="mw-editsection-bracket">[</span><a href="/w/index.php?title=OwnCloud&amp;action=edit&amp;section=7" title="Editar sección: Enlaces externos"><span>editar</span></a><span class="mw-editsection-bracket">]</span></span></div>
+<ul><li><a rel="nofollow" class="external text" href="https://owncloud.org/">Página web del proyecto</a></li>
+<li><a rel="nofollow" class="external text" href="https://github.com/owncloud">Código libre del proyecto</a></li>
+<li><a rel="nofollow" class="external text" href="https://owncloud.com/">Página comercial</a></li></ul>
+<style data-mw-deduplicate="TemplateStyles:r161257576">.mw-parser-output .mw-authority-control{margin-top:1.5em}.mw-parser-output .mw-authority-control .navbox table{margin:0}.mw-parser-output .mw-authority-control .navbox hr:last-child{display:none}.mw-parser-output .mw-authority-control .navbox+.mw-mf-linked-projects{display:none}.mw-parser-output .mw-authority-control .mw-mf-linked-projects{display:flex;padding:0.5em;border:1px solid var(--border-color-base,#a2a9b1);background-color:var(--background-color-neutral,#eaecf0);color:var(--color-base,#202122)}.mw-parser-output .mw-authority-control .mw-mf-linked-projects ul li{margin-bottom:0}.mw-parser-output .mw-authority-control .navbox{border:1px solid var(--border-color-base,#a2a9b1);background-color:var(--background-color-neutral-subtle,#f8f9fa)}.mw-parser-output .mw-authority-control .navbox-list{border-color:#f8f9fa}.mw-parser-output .mw-authority-control .navbox th{background-color:#eeeeff}html.skin-theme-clientpref-night .mw-parser-output .mw-authority-control .mw-mf-linked-projects{border:1px solid var(--border-color-base,#72777d);background-color:var(--background-color-neutral,#27292d);color:var(--color-base,#eaecf0)}html.skin-theme-clientpref-night .mw-parser-output .mw-authority-control .navbox{border:1px solid var(--border-color-base,#72777d)!important;background-color:var(--background-color-neutral-subtle,#202122)!important}html.skin-theme-clientpref-night .mw-parser-output .mw-authority-control .navbox-list{border-color:#202122!important}html.skin-theme-clientpref-night .mw-parser-output .mw-authority-control .navbox th{background-color:#27292d!important}@media(prefers-color-scheme:dark){html.skin-theme-clientpref-os .mw-parser-output .mw-authority-control .mw-mf-linked-projects{border:1px solid var(--border-color-base,#72777d)!important;background-color:var(--background-color-neutral,#27292d)!important;color:var(--color-base,#eaecf0)!important}html.skin-theme-clientpref-os .mw-parser-output .mw-authority-control .navbox{border:1px solid var(--border-color-base,#72777d)!important;background-color:var(--background-color-neutral-subtle,#202122)!important}html.skin-theme-clientpref-os .mw-parser-output .mw-authority-control .navbox-list{border-color:#202122!important}html.skin-theme-clientpref-os .mw-parser-output .mw-authority-control .navbox th{background-color:#27292d!important}}</style><div class="mw-authority-control"><div role="navigation" class="navbox" aria-label="Navbox" style="width: inherit;padding:3px"><table class="hlist navbox-inner" style="border-spacing:0;background:transparent;color:inherit"><tbody><tr><th scope="row" class="navbox-group" style="width: 12%; text-align:center;"><a href="/wiki/Control_de_autoridades" title="Control de autoridades">Control de autoridades</a></th><td class="navbox-list navbox-odd" style="text-align:left;border-left-width:2px;border-left-style:solid;width:100%;padding:0px"><div style="padding:0em 0.25em">
+<ul><li><b>Proyectos Wikimedia</b></li>
+<li><span style="white-space:nowrap;"><span typeof="mw:File"><a href="/wiki/Wikidata" title="Wikidata"><img alt="Wd" src="//upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Wikidata-logo.svg/20px-Wikidata-logo.svg.png" decoding="async" width="20" height="11" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Wikidata-logo.svg/40px-Wikidata-logo.svg.png 1.5x" data-file-width="1050" data-file-height="590" /></a></span> Datos:</span> <span class="uid"><a href="https://www.wikidata.org/wiki/Q290284" class="extiw" title="wikidata:Q290284">Q290284</a></span></li>
+<li><span style="white-space:nowrap;"><span typeof="mw:File"><a href="/wiki/Wikimedia_Commons" title="Commonscat"><img alt="Commonscat" src="//upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png" decoding="async" width="15" height="20" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/40px-Commons-logo.svg.png 1.5x" data-file-width="1024" data-file-height="1376" /></a></span> Multimedia:</span> <span class="uid"><span class="plainlinks"><a class="external text" href="https://commons.wikimedia.org/wiki/Category:OwnCloud">OwnCloud</a></span> / <span class="plainlinks"><a class="external text" href="https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&amp;search=%22Q290284%22">Q290284</a></span></span></li></ul>
+<hr />
+<ul><li><b>Informática</b></li>
+<li><span style="white-space:nowrap;">AUR:</span> <span class="uid"><a rel="nofollow" class="external text" href="https://aur.archlinux.org/packages/owncloud/">owncloud</a></span></li>
+<li><span style="white-space:nowrap;">Fedora:</span> <span class="uid"><a rel="nofollow" class="external text" href="https://packages.fedoraproject.org/pkgs/owncloud">owncloud</a></span></li>
+<li><span style="white-space:nowrap;">Free Software Directory:</span> <span class="uid"><a rel="nofollow" class="external text" href="https://directory.fsf.org/wiki/ownCloud">ownCloud</a></span></li>
+<li><span style="white-space:nowrap;">Gentoo:</span> <span class="uid"><a rel="nofollow" class="external text" href="https://packages.gentoo.org/packages/www-apps/owncloud">www-apps/owncloud</a></span></li>
+<li><span style="white-space:nowrap;"><a href="/wiki/Open_Hub" title="Open Hub">Open Hub</a>:</span> <span class="uid"><a rel="nofollow" class="external text" href="https://openhub.net/p/owncloud">owncloud</a></span></li></ul>
+</div></td></tr></tbody></table></div><div class="mw-mf-linked-projects hlist">
+<ul><li><span style="white-space:nowrap;"><span typeof="mw:File"><a href="/wiki/Wikidata" title="Wikidata"><img alt="Wd" src="//upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Wikidata-logo.svg/20px-Wikidata-logo.svg.png" decoding="async" width="20" height="11" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Wikidata-logo.svg/40px-Wikidata-logo.svg.png 1.5x" data-file-width="1050" data-file-height="590" /></a></span> Datos:</span> <span class="uid"><a href="https://www.wikidata.org/wiki/Q290284" class="extiw" title="wikidata:Q290284">Q290284</a></span></li>
+<li><span style="white-space:nowrap;"><span typeof="mw:File"><a href="/wiki/Wikimedia_Commons" title="Commonscat"><img alt="Commonscat" src="//upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/20px-Commons-logo.svg.png" decoding="async" width="15" height="20" class="mw-file-element" srcset="//upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Commons-logo.svg/40px-Commons-logo.svg.png 1.5x" data-file-width="1024" data-file-height="1376" /></a></span> Multimedia:</span> <span class="uid"><span class="plainlinks"><a class="external text" href="https://commons.wikimedia.org/wiki/Category:OwnCloud">OwnCloud</a></span> / <span class="plainlinks"><a class="external text" href="https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&amp;search=%22Q290284%22">Q290284</a></span></span></li></ul>
+</div></div>
+<!-- 
+NewPP limit report
+Parsed by mw‐web.codfw.main‐789c7c9fd6‐r8f2t
+Cached time: 20260301080028
+Cache expiry: 57586
+Reduced expiry: true
+Complications: [prevent‐selective‐update, show‐toc]
+CPU time usage: 0.286 seconds
+Real time usage: 0.461 seconds
+Preprocessor visited node count: 872/1000000
+Revision size: 5874/2097152 bytes
+Post‐expand include size: 25782/2097152 bytes
+Template argument size: 2321/2097152 bytes
+Highest expansion depth: 15/100
+Expensive parser function count: 6/500
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 8966/5000000 bytes
+Lua time usage: 0.194/10.000 seconds
+Lua memory usage: 4499643/52428800 bytes
+Number of Wikibase entities loaded: 7/500
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%  312.789      1 -total
+ 42.53%  133.044      1 Plantilla:Ficha_de_software
+ 36.83%  115.188      1 Plantilla:Control_de_autoridades
+ 12.83%   40.131      1 Plantilla:Listaref
+  9.92%   31.017      3 Plantilla:Cita_web
+  3.83%   11.988      3 Plantilla:Cita_libro
+  3.24%   10.140      1 Plantilla:Fecha_de_lanzamiento
+  2.85%    8.922      3 Plantilla:Harvnp
+  2.04%    6.391      3 Plantilla:Refn
+  1.67%    5.229      1 Plantilla:Edad_en_años,_meses_y_días
+-->
+
+<!-- Saved in parser cache with key eswiki:pcache:6008926:|#|:idhash:canonical and timestamp 20260301080028 and revision id 158782359. Rendering was triggered because: page_view
+ -->
+</div><noscript><img src="https://es.wikipedia.org/wiki/Special:CentralAutoLogin/start?useformat=desktop&amp;type=1x1&amp;usesul3=1" alt="" width="1" height="1" style="border: none; position: absolute;"></noscript>
+<div class="printfooter" data-nosnippet="">Obtenido de «<a dir="ltr" href="https://es.wikipedia.org/w/index.php?title=OwnCloud&amp;oldid=158782359">https://es.wikipedia.org/w/index.php?title=OwnCloud&amp;oldid=158782359</a>»</div></div>
+					<div id="catlinks" class="catlinks" data-mw-interface=""><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/wiki/Especial:Categor%C3%ADas" title="Especial:Categorías">Categorías</a>: <ul><li><a href="/wiki/Categor%C3%ADa:Computaci%C3%B3n_en_nube" title="Categoría:Computación en nube">Computación en nube</a></li><li><a href="/wiki/Categor%C3%ADa:Software_libre_programado_en_PHP" title="Categoría:Software libre programado en PHP">Software libre programado en PHP</a></li><li><a href="/wiki/Categor%C3%ADa:JavaScript" title="Categoría:JavaScript">JavaScript</a></li><li><a href="/wiki/Categor%C3%ADa:Almacenamiento_en_nube" title="Categoría:Almacenamiento en nube">Almacenamiento en nube</a></li><li><a href="/wiki/Categor%C3%ADa:Alojamiento_de_archivos" title="Categoría:Alojamiento de archivos">Alojamiento de archivos</a></li><li><a href="/wiki/Categor%C3%ADa:KDE" title="Categoría:KDE">KDE</a></li></ul></div></div>
+				</div>
+			</main>
+			
+		</div>
+		<div class="mw-footer-container">
+			
+<footer id="footer" class="mw-footer" >
+	<ul id="footer-info">
+	<li id="footer-info-lastmod"> Esta página se editó por última vez el 13 mar 2024 a las 14:32.</li>
+	<li id="footer-info-copyright">El texto está disponible bajo la <a href="/wiki/Wikipedia:Texto_de_la_Licencia_Creative_Commons_Atribuci%C3%B3n-CompartirIgual_4.0_Internacional" title="Wikipedia:Texto de la Licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional">Licencia Creative Commons Atribución-CompartirIgual 4.0</a>; pueden aplicarse cláusulas adicionales. Al usar este sitio aceptas nuestros <a class="external text" href="https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use/es">términos de uso</a> y nuestra <a class="external text" href="https://foundation.wikimedia.org/wiki/Policy:Privacy_policy/es">política de privacidad</a>.<br />Wikipedia&#174; es una marca registrada de la <a rel="nofollow" class="external text" href="https://wikimediafoundation.org/es/">Fundación Wikimedia</a>, una organización sin ánimo de lucro.</li>
+</ul>
+
+	<ul id="footer-places">
+	<li id="footer-places-privacy"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy/es">Política de privacidad</a></li>
+	<li id="footer-places-about"><a href="/wiki/Wikipedia:Acerca_de">Acerca de Wikipedia</a></li>
+	<li id="footer-places-disclaimers"><a href="/wiki/Wikipedia:Limitaci%C3%B3n_general_de_responsabilidad">Limitación de responsabilidad</a></li>
+	<li id="footer-places-legal-safety-contacts"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Legal:Wikimedia_Foundation_Legal_and_Safety_Contact_Information">Contacto legal y de seguridad</a></li>
+	<li id="footer-places-wm-codeofconduct"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct">Código de conducta</a></li>
+	<li id="footer-places-developers"><a href="https://developer.wikimedia.org">Desarrolladores</a></li>
+	<li id="footer-places-statslink"><a href="https://stats.wikimedia.org/#/es.wikipedia.org">Estadísticas</a></li>
+	<li id="footer-places-cookiestatement"><a href="https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement/es">Declaración de cookies</a></li>
+	<li id="footer-places-mobileview"><a href="//es.wikipedia.org/w/index.php?title=OwnCloud&amp;mobileaction=toggle_view_mobile" class="noprint stopMobileRedirectToggle">Versión para móviles</a></li>
+</ul>
+
+	<ul id="footer-icons" class="noprint">
+	<li id="footer-copyrightico"><a href="https://www.wikimedia.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><picture><source media="(min-width: 500px)" srcset="/static/images/footer/wikimedia-button.svg" width="84" height="29"><img src="/static/images/footer/wikimedia.svg" width="25" height="25" alt="Wikimedia Foundation" lang="en" loading="lazy"></picture></a></li>
+	<li id="footer-poweredbyico"><a href="https://www.mediawiki.org/" class="cdx-button cdx-button--fake-button cdx-button--size-large cdx-button--fake-button--enabled"><picture><source media="(min-width: 500px)" srcset="/w/resources/assets/poweredby_mediawiki.svg" width="88" height="31"><img src="/w/resources/assets/mediawiki_compact.svg" alt="Powered by MediaWiki" lang="en" width="25" height="25" loading="lazy"></picture></a></li>
+</ul>
+
+</footer>
+
+		</div>
+	</div> 
+</div> 
+<div class="vector-header-container vector-sticky-header-container no-font-mode-scale">
+	<div id="vector-sticky-header" class="vector-sticky-header">
+		<div class="vector-sticky-header-start">
+			<div class="vector-sticky-header-icon-start vector-button-flush-left" aria-hidden="true">
+				<button class="cdx-button cdx-button--weight-quiet cdx-button--icon-only vector-sticky-header-search-toggle" tabindex="-1" data-event-name="ui.vector-sticky-search-form.icon"><span class="vector-icon mw-ui-icon-search mw-ui-icon-wikimedia-search"></span>
+
+<span>Buscar</span>
+			</button>
+		</div>
+			
+		<div role="search" class="vector-search-box-vue  vector-search-box-show-thumbnail vector-search-box">
+			<div class="vector-typeahead-search-container">
+				<div class="cdx-typeahead-search cdx-typeahead-search--show-thumbnail">
+					<form action="/w/index.php" id="vector-sticky-search-form" class="cdx-search-input cdx-search-input--has-end-button">
+						<div  class="cdx-search-input__input-wrapper"  data-search-loc="header-moved">
+							<div class="cdx-text-input cdx-text-input--has-start-icon">
+								<input
+									class="cdx-text-input__input mw-searchInput" autocomplete="off"
+									
+									type="search" name="search" placeholder="Buscar en Wikipedia">
+								<span class="cdx-text-input__icon cdx-text-input__start-icon"></span>
+							</div>
+							<input type="hidden" name="title" value="Especial:Buscar">
+						</div>
+						<button class="cdx-button cdx-search-input__end-button">Buscar</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="vector-sticky-header-context-bar">
+				<nav aria-label="Contenidos" class="vector-toc-landmark">
+						
+					<div id="vector-sticky-header-toc" class="vector-dropdown mw-portlet mw-portlet-sticky-header-toc vector-sticky-header-toc vector-button-flush-left"  >
+						<input type="checkbox" id="vector-sticky-header-toc-checkbox" role="button" aria-haspopup="true" data-event-name="ui.dropdown-vector-sticky-header-toc" class="vector-dropdown-checkbox "  aria-label="Cambiar a la tabla de contenidos"  >
+						<label id="vector-sticky-header-toc-label" for="vector-sticky-header-toc-checkbox" class="vector-dropdown-label cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only " aria-hidden="true"  ><span class="vector-icon mw-ui-icon-listBullet mw-ui-icon-wikimedia-listBullet"></span>
+
+<span class="vector-dropdown-label-text">Cambiar a la tabla de contenidos</span>
+						</label>
+						<div class="vector-dropdown-content">
+					
+						<div id="vector-sticky-header-toc-unpinned-container" class="vector-unpinned-container">
+						</div>
+					
+						</div>
+					</div>
+			</nav>
+				<div class="vector-sticky-header-context-bar-primary" aria-hidden="true" ><span class="mw-page-title-main">OwnCloud</span></div>
+			</div>
+		</div>
+		<div class="vector-sticky-header-end" aria-hidden="true">
+			<div class="vector-sticky-header-icons">
+				<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only" id="ca-talk-sticky-header" tabindex="-1" data-event-name="talk-sticky-header"><span class="vector-icon mw-ui-icon-speechBubbles mw-ui-icon-wikimedia-speechBubbles"></span>
+
+<span></span>
+			</a>
+			<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only" id="ca-subject-sticky-header" tabindex="-1" data-event-name="subject-sticky-header"><span class="vector-icon mw-ui-icon-article mw-ui-icon-wikimedia-article"></span>
+
+<span></span>
+			</a>
+			<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only" id="ca-history-sticky-header" tabindex="-1" data-event-name="history-sticky-header"><span class="vector-icon mw-ui-icon-wikimedia-history mw-ui-icon-wikimedia-wikimedia-history"></span>
+
+<span></span>
+			</a>
+			<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only mw-watchlink" id="ca-watchstar-sticky-header" tabindex="-1" data-event-name="watch-sticky-header"><span class="vector-icon mw-ui-icon-wikimedia-star mw-ui-icon-wikimedia-wikimedia-star"></span>
+
+<span></span>
+			</a>
+			<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only" id="ca-edit-sticky-header" tabindex="-1" data-event-name="wikitext-edit-sticky-header"><span class="vector-icon mw-ui-icon-wikimedia-wikiText mw-ui-icon-wikimedia-wikimedia-wikiText"></span>
+
+<span></span>
+			</a>
+			<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only" id="ca-ve-edit-sticky-header" tabindex="-1" data-event-name="ve-edit-sticky-header"><span class="vector-icon mw-ui-icon-wikimedia-edit mw-ui-icon-wikimedia-wikimedia-edit"></span>
+
+<span></span>
+			</a>
+			<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--icon-only" id="ca-viewsource-sticky-header" tabindex="-1" data-event-name="ve-edit-protected-sticky-header"><span class="vector-icon mw-ui-icon-wikimedia-editLock mw-ui-icon-wikimedia-wikimedia-editLock"></span>
+
+<span></span>
+			</a>
+		</div>
+			<div class="vector-sticky-header-buttons">
+				<button class="cdx-button cdx-button--weight-quiet mw-interlanguage-selector" id="p-lang-btn-sticky-header" tabindex="-1" data-event-name="ui.dropdown-p-lang-btn-sticky-header"><span class="vector-icon mw-ui-icon-wikimedia-language mw-ui-icon-wikimedia-wikimedia-language"></span>
+
+<span>21 idiomas</span>
+			</button>
+			<a href="#" class="cdx-button cdx-button--fake-button cdx-button--fake-button--enabled cdx-button--weight-quiet cdx-button--action-progressive" id="ca-addsection-sticky-header" tabindex="-1" data-event-name="addsection-sticky-header"><span class="vector-icon mw-ui-icon-speechBubbleAdd-progressive mw-ui-icon-wikimedia-speechBubbleAdd-progressive"></span>
+
+<span>Añadir tema</span>
+			</a>
+		</div>
+			<div class="vector-sticky-header-icon-end">
+				<div class="vector-user-links">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="mw-portlet mw-portlet-dock-bottom emptyPortlet" id="p-dock-bottom">
+	<ul>
+		
+	</ul>
+</div>
+<script>(RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgHostname":"mw-web.eqiad.main-6947d99787-jgksk","wgBackendResponseTime":168,"wgPageParseReport":{"limitreport":{"cputime":"0.286","walltime":"0.461","ppvisitednodes":{"value":872,"limit":1000000},"revisionsize":{"value":5874,"limit":2097152},"postexpandincludesize":{"value":25782,"limit":2097152},"templateargumentsize":{"value":2321,"limit":2097152},"expansiondepth":{"value":15,"limit":100},"expensivefunctioncount":{"value":6,"limit":500},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":8966,"limit":5000000},"entityaccesscount":{"value":7,"limit":500},"timingprofile":["100.00%  312.789      1 -total"," 42.53%  133.044      1 Plantilla:Ficha_de_software"," 36.83%  115.188      1 Plantilla:Control_de_autoridades"," 12.83%   40.131      1 Plantilla:Listaref","  9.92%   31.017      3 Plantilla:Cita_web","  3.83%   11.988      3 Plantilla:Cita_libro","  3.24%   10.140      1 Plantilla:Fecha_de_lanzamiento","  2.85%    8.922      3 Plantilla:Harvnp","  2.04%    6.391      3 Plantilla:Refn","  1.67%    5.229      1 Plantilla:Edad_en_años,_meses_y_días"]},"scribunto":{"limitreport-timeusage":{"value":"0.194","limit":"10.000"},"limitreport-memusage":{"value":4499643,"limit":52428800}},"cachereport":{"origin":"mw-web.codfw.main-789c7c9fd6-r8f2t","timestamp":"20260301080028","ttl":57586,"transientcontent":true}}});});</script>
+<script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"Article","name":"OwnCloud","url":"https:\/\/es.wikipedia.org\/wiki\/OwnCloud","sameAs":"http:\/\/www.wikidata.org\/entity\/Q290284","mainEntity":"http:\/\/www.wikidata.org\/entity\/Q290284","author":{"@type":"Organization","name":"Colaboradores de los proyectos Wikimedia"},"publisher":{"@type":"Organization","name":"Wikimedia Foundation, Inc.","logo":{"@type":"ImageObject","url":"https:\/\/www.wikimedia.org\/static\/images\/wmf-hor-googpub.png"}},"datePublished":"2013-09-29T12:59:58Z","dateModified":"2024-03-13T14:32:43Z","image":"https:\/\/upload.wikimedia.org\/wikipedia\/commons\/b\/b6\/OwnCloud2-Logo.svg","headline":"software libre para computaci\u00f3n en la nube"}</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
     "image": "friendica/node:stable",
     "category": "Social",
     "isStack": true,
-    "logo": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Friendica_Logo.png",
+    "logo": "/friendica.png",
     "description": "Full-featured social network (Facebook-like). Contacts, groups, events, and connection with other protocols. Connects with Mastodon, Diaspora, and older protocols.",
     "default_ports": [
         "8080:8080"
@@ -22,7 +22,7 @@
             "description": "MariaDB database for Friendica",
             "category": "Database",
             "image": "mariadb:10.11",
-            "logo": "https://cdn.simpleicons.org/mariadb",
+            "logo": "/mariadb.png",
             "env_vars": {
                 "MYSQL_ROOT_PASSWORD": "password",
                 "MYSQL_DATABASE": "friendica",

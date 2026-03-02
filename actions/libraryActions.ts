@@ -29,21 +29,21 @@ export async function getLibraryServices(): Promise<TemplateService[]> {
 
 const categoryOrder: Record<string, number> = {
     'Database': 0,
-    'CMS': 1,
-    'Social': 2,
-    'AI': 3,
-    'Automation': 4,
-    'Web Server': 5,
-    'Cache': 6,
-    'Queue': 7,
-    'Messaging': 8,
-    'Network': 9,
-    'Monitoring': 10,
-    'Development': 11,
-    'Cloud': 12,
+    'Web Server': 1,
+    'Cache': 2,
+    'Social': 3,
+    'CMS': 4,
+    'Network': 5,
+    'Monitoring': 6,
+    'Automation': 7,
+    'Cloud': 8,
+    'AI': 9,
+    'Development': 10,
+    'Messaging': 11,
+    'Queue': 12,
     'Applications': 13,
-    'Other': 14,
-    'OS': 15,
+    'OS': 14,
+    'Other': 15,
 };
 
 const dbPopularity: Record<string, number> = {
@@ -135,6 +135,60 @@ const automationPopularity: Record<string, number> = {
     'Budibase': 10,
 };
 
+const webServerPopularity: Record<string, number> = {
+    'Nginx': 1,
+    'Apache': 2,
+    'Caddy': 3,
+    'Traefik': 4,
+};
+
+const cachePopularity: Record<string, number> = {
+    'Redis': 1,
+    'Memcached': 2,
+    'Dragonfly': 3,
+};
+
+const queuePopularity: Record<string, number> = {
+    'RabbitMQ': 1,
+    'Kafka': 2,
+    'Beanstalkd': 3,
+};
+
+const messagingPopularity: Record<string, number> = {
+    'Rocket.Chat': 1,
+    'Mattermost': 2,
+    'Zulip': 3,
+    'Matrix': 4,
+    'Element': 5,
+};
+
+const monitoringPopularity: Record<string, number> = {
+    'Grafana': 1,
+    'Prometheus': 2,
+    'Uptime Kuma': 3,
+    'Netdata': 4,
+    'Zabbix': 5,
+};
+
+const developmentPopularity: Record<string, number> = {
+    'GitLab': 1,
+    'Jenkins': 2,
+    'SonarQube': 3,
+};
+
+const applicationsPopularity: Record<string, number> = {
+    'Portainer': 1,
+    'Watchtower': 2,
+    'Duplicati': 3,
+};
+
+const osPopularity: Record<string, number> = {
+    'Ubuntu': 1,
+    'Debian': 2,
+    'Alpine': 3,
+    'CentOS': 4,
+};
+
 function readFromDir(dir: string): TemplateService[] {
     const files = fs.readdirSync(dir);
     console.log(`[Library] Reading ${files.length} files from ${dir}`);
@@ -205,6 +259,54 @@ function readFromDir(dir: string): TemplateService[] {
         if (a.category === 'Automation' && b.category === 'Automation') {
             const popA = automationPopularity[a.name] ?? 99;
             const popB = automationPopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Web Server' && b.category === 'Web Server') {
+            const popA = webServerPopularity[a.name] ?? 99;
+            const popB = webServerPopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Cache' && b.category === 'Cache') {
+            const popA = cachePopularity[a.name] ?? 99;
+            const popB = cachePopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Queue' && b.category === 'Queue') {
+            const popA = queuePopularity[a.name] ?? 99;
+            const popB = queuePopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Messaging' && b.category === 'Messaging') {
+            const popA = messagingPopularity[a.name] ?? 99;
+            const popB = messagingPopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Monitoring' && b.category === 'Monitoring') {
+            const popA = monitoringPopularity[a.name] ?? 99;
+            const popB = monitoringPopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Development' && b.category === 'Development') {
+            const popA = developmentPopularity[a.name] ?? 99;
+            const popB = developmentPopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Applications' && b.category === 'Applications') {
+            const popA = applicationsPopularity[a.name] ?? 99;
+            const popB = applicationsPopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'OS' && b.category === 'OS') {
+            const popA = osPopularity[a.name] ?? 99;
+            const popB = osPopularity[b.name] ?? 99;
             return popA - popB;
         }
 

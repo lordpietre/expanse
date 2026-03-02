@@ -2,7 +2,7 @@
     "name": "MongoDB",
     "image": "mongo:latest",
     "category": "Database",
-    "logo": "https://img.icons8.com/color/512/mongodb.png",
+    "logo": "/mongodb.png",
     "description": "Document (NoSQL). Applications with unstructured data. Popular in agile dev.",
     "default_ports": [
         "27017:27017"

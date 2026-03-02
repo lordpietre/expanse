@@ -1,0 +1,11 @@
+{
+    "name": "Icinga2",
+    "image": "icinga/icinga2:latest",
+    "category": "Monitoring",
+    "logo": "https://cdn.simpleicons.org/icinga",
+    "description": "Open source monitoring system which checks the availability of your network resources and sends notifications.",
+    "default_ports": [
+        "5665:5665",
+        "8080:80"
+    ]
+}

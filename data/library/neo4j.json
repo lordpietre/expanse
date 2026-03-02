@@ -2,7 +2,7 @@
     "name": "Neo4j",
     "image": "neo4j:ubi9",
     "category": "Database",
-    "logo": "https://img.icons8.com/color/512/neo4j.png",
+    "logo": "/neo4j.svg",
     "description": "Graph Database. Social networks, recommendations, fraud. Most used graph DB.",
     "default_ports": [
         "7474:7474",

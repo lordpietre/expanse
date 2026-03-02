@@ -3,7 +3,7 @@
     "image": "jkjoy/pleroma:latest",
     "category": "Social",
     "isStack": true,
-    "logo": "https://cdn.simpleicons.org/pleroma",
+    "logo": "/pleroma.png",
     "description": "Ultra-lightweight microblogging platform. Extremely low resource consumption (Elixir). Can handle 10k+ users on modest hardware, ideal for Raspberry Pi or cheap VPS.",
     "default_ports": [
         "4000:4000"
@@ -23,7 +23,7 @@
             "description": "PostgreSQL database for Pleroma",
             "category": "Database",
             "image": "postgres:15-alpine",
-            "logo": "https://cdn.simpleicons.org/postgresql",
+            "logo": "/postgresql.png",
             "env_vars": {
                 "POSTGRES_DB": "pleroma",
                 "POSTGRES_USER": "pleroma",
@@ -38,7 +38,7 @@
             "description": "Redis cache for Pleroma",
             "category": "Cache",
             "image": "redis:7-alpine",
-            "logo": "https://cdn.simpleicons.org/redis",
+            "logo": "/redis.png",
             "volumes": [
                 "pleroma_redis:/data"
             ]

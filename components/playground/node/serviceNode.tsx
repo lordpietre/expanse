@@ -169,6 +169,11 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                                     <div className="flex items-center gap-1.5 mb-1">
                                         <Network className="w-3 h-3 text-emerald-400" />
                                         <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Networks</span>
+                                        {isRunning && serviceStatuses[service.name]?.ports && (
+                                            <span className="ml-auto text-[8px] font-mono text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+                                                {serviceStatuses[service.name]?.ports?.split(',')[0]?.replace('0.0.0.0:', '').replace(':::', '').replace('::', '') || serviceStatuses[service.name]?.ports?.split(',')[0]}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {Array.from(service.networks || []).map(net => (

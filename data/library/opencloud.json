@@ -2,6 +2,7 @@
     "name": "OpenCloud",
     "image": "opencloud/opencloud:latest",
     "category": "Cloud",
+    "logo": "/opencloud.png",
     "description": "Next-generation collaboration platform with a modern Go/Node backend. Focused on performance and simplicity.",
     "default_ports": [
         "80:80"

@@ -2,7 +2,7 @@
     "name": "PostgreSQL",
     "image": "postgres:18-alpine",
     "category": "Database",
-    "logo": "https://cdn.simpleicons.org/postgresql",
+    "logo": "/postgresql.png",
     "description": "Powerful, open source object-relational database system with a strong reputation for reliability.",
     "default_ports": [
         "5432:5432"

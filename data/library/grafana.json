@@ -9,5 +9,5 @@
     "volumes": [
         "./grafana_data:/var/lib/grafana"
     ],
-    "logo": "https://cdn.simpleicons.org/grafana"
+    "logo": "/grafana.png"
 }

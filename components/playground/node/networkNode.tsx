@@ -209,9 +209,10 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                                     <span className="text-[8px] font-black uppercase text-slate-500 tracking-wider">Interface Discovery</span>
                                 </div>
                                 {connectedServices.length > 0 ? (
-                                    <div className="grid grid-cols-2 gap-1.5">
+                                    <div className="grid grid-cols-1 gap-1.5">
                                         {connectedServices.map(service => {
                                             const isRunning = serviceStatuses[service.name]?.status === 'running';
+                                            const ports = serviceStatuses[service.name]?.ports;
                                             return (
                                                 <div key={service.id} className={cn(
                                                     "flex items-center justify-between px-2.5 py-2 rounded-lg border transition-all duration-300",
@@ -222,7 +223,14 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                                                     <span className={cn("text-[8px] font-black uppercase tracking-tight truncate", isRunning ? "text-emerald-400" : "text-slate-500")}>
                                                         {service.name}
                                                     </span>
-                                                    <div className={cn("w-1.5 h-1.5 rounded-full ml-1 shrink-0", isRunning ? "bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)] animate-pulse" : "bg-slate-700")} />
+                                                    <div className="flex items-center gap-1">
+                                                        {ports && isRunning && (
+                                                            <span className="text-[7px] font-mono text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 rounded border border-cyan-500/20">
+                                                                {ports.split(',')[0]?.replace('0.0.0.0:', '').replace(':::', '').replace('::', '') || ports.split(',')[0]}
+                                                            </span>
+                                                        )}
+                                                        <div className={cn("w-1.5 h-1.5 rounded-full ml-1 shrink-0", isRunning ? "bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.8)] animate-pulse" : "bg-slate-700")} />
+                                                    </div>
                                                 </div>
                                             );
                                         })}

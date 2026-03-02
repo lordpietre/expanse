@@ -5,6 +5,7 @@ export interface ServiceStatus {
     name: string;
     status: 'running' | 'exited' | 'restarting' | 'created' | 'dead' | 'paused' | 'unknown';
     health?: string;
+    ports?: string;
 }
 
 interface ExecutionState {
@@ -34,7 +35,8 @@ export const useExecutionStore = create<ExecutionState>((set) => ({
                     id: s.ID,
                     name: s.Name,
                     status: s.State.toLowerCase() as any,
-                    health: s.Health
+                    health: s.Health,
+                    ports: s.Ports
                 };
             }
         });

@@ -2,12 +2,12 @@
     "name": "Nextcloud",
     "image": "nextcloud:latest",
     "category": "Cloud",
+    "logo": "https://cdn.simpleicons.org/nextcloud",
     "description": "The self-hosted productivity platform that keeps you in control. File sync & share, mail, calendar, contacts and more.",
     "default_ports": [
         "8080:80"
     ],
     "volumes": [
         "./nextcloud_data:/var/www/html"
-    ],
-    "logo": "https://img.icons8.com/color/512/nextcloud.png"
+    ]
 }

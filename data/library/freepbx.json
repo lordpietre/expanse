@@ -1,0 +1,12 @@
+{
+    "name": "FreePBX",
+    "image": "flaviostutz/freepbx:15.0.17.17.6",
+    "category": "Network",
+    "logo": "https://cdn.simpleicons.org/freepbx",
+    "description": "Open Source GUI for controlling and managing Asterisk PBX. Voice mail, conferencing, IVR, and call recording.",
+    "default_ports": [
+        "80:80",
+        "443:443",
+        "5060:5060"
+    ]
+}

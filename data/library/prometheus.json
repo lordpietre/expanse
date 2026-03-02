@@ -9,5 +9,5 @@
     "volumes": [
         "./prometheus:/etc/prometheus"
     ],
-    "logo": "https://cdn.simpleicons.org/prometheus"
+    "logo": "/prometheus.png"
 }

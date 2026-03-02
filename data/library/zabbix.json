@@ -11,5 +11,5 @@
         "MYSQL_USER": "zabbix",
         "MYSQL_PASSWORD": "zabbix_password"
     },
-    "logo": "https://cdn.simpleicons.org/zabbix"
+    "logo": "/zabbix.svg",
 }

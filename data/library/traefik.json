@@ -12,5 +12,5 @@
         "/var/run/docker.sock:/var/run/docker.sock:ro"
     ],
     "command": "--api.insecure=true --providers.docker",
-    "logo": "https://img.icons8.com/color/512/traefik.png"
+    "logo": "/traefik.png",
 }

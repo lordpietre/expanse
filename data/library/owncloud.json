@@ -1,0 +1,10 @@
+{
+    "name": "OwnCloud",
+    "image": "owncloud/server:latest",
+    "category": "Cloud",
+    "logo": "/owncloud.svg",
+    "description": "Open-source file sync and share solution. Access your files from anywhere, on any device.",
+    "default_ports": [
+        "8080:8080"
+    ]
+}
