@@ -2,6 +2,7 @@
     "name": "Mastodon",
     "image": "tootsuite/mastodon:latest",
     "category": "Social",
+    "isStack": true,
     "logo": "https://cdn.simpleicons.org/mastodon",
     "description": "Classic federated microblogging platform. Mature with thousands of instances, excellent mobile apps, and powerful moderation tools. Heavy on resources (Ruby + Node + Postgres + Redis).",
     "default_ports": [
@@ -19,5 +20,32 @@
         "OTP_SECRET": "replace-with-random-value",
         "VAPID_PRIVATE_KEY": "replace-with-random-value",
         "VAPID_PUBLIC_KEY": "replace-with-random-value"
-    }
+    },
+    "related_services": [
+        {
+            "name": "postgres",
+            "description": "PostgreSQL database for Mastodon",
+            "category": "Database",
+            "image": "postgres:15-alpine",
+            "logo": "https://cdn.simpleicons.org/postgresql",
+            "env_vars": {
+                "POSTGRES_DB": "mastodon",
+                "POSTGRES_USER": "mastodon",
+                "POSTGRES_PASSWORD": "password"
+            },
+            "volumes": [
+                "mastodon_db:/var/lib/postgresql/data"
+            ]
+        },
+        {
+            "name": "redis",
+            "description": "Redis cache for Mastodon",
+            "category": "Cache",
+            "image": "redis:7-alpine",
+            "logo": "https://cdn.simpleicons.org/redis",
+            "volumes": [
+                "mastodon_redis:/data"
+            ]
+        }
+    ]
 }

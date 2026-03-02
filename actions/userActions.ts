@@ -361,7 +361,7 @@ export const deleteUser = async () => {
 
 export const logout = async () => {
     (await cookies()).delete("token");
-    redirect("/");
+    return { success: true };
 };
 
 export const deleteCompose = async (composeId: string) => {

@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { logout } from "@/actions/userActions";
+import { useRouter } from "next/navigation";
 
 export default function UnifiedLayout({ children, version }: { children: ReactNode, version: string }) {
     const pathname = usePathname();
+    const router = useRouter();
 
     const navItems = [
         { href: "/", label: "Home", icon: House },
@@ -68,7 +70,7 @@ export default function UnifiedLayout({ children, version }: { children: ReactNo
                             <Settings className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-2xl border-slate-100">
-                            <DropdownMenuItem onClick={() => logout()} className="flex items-center gap-2 text-rose-600 font-bold cursor-pointer hover:bg-rose-50 rounded-lg">
+                            <DropdownMenuItem onClick={async () => { await logout(); router.push("/"); }} className="flex items-center gap-2 text-rose-600 font-bold cursor-pointer hover:bg-rose-50 rounded-lg">
                                 <LogOut className="w-4 h-4" />
                                 Logout
                             </DropdownMenuItem>

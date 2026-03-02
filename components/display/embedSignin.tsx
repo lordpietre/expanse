@@ -94,12 +94,12 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
     return (
         <div className="flex flex-col gap-5">
             <h1 className="text-3xl text-primary font-bold bg-gradient-to-r from-[#1A96F8] via-[#3AA8FF] to-[#62BEFF] w-fit text-transparent bg-clip-text">
-                {mode === "register" ? "Create an account" : "Welcome back"}
+                {mode === "register" ? "Create an account" : "Welcome to Expanse"}
             </h1>
             <form onSubmit={mode === "register" ? handleRegister : handleLogin} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" required name="email" placeholder="your@email.fr" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input id="email" required name="email" placeholder="MrNobody@expanse.omg" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 <div className="flex flex-col gap-2">
                     <Label htmlFor="password">password</Label>

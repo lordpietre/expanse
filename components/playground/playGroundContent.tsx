@@ -535,11 +535,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                                 <span className="text-xs font-medium">Collapse</span>
                             </Button>
                         )}
-                        <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-6 shadow-2xl">
-                            <EditMenu />
-                        </div>
-
-                        <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-5 shadow-2xl flex flex-col gap-4 mt-auto">
+                        <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
                             <div className="flex flex-col gap-3">
                                 {/* Deploy progress bar — shown during launch */}
                                 <DeployProgress phase={deployPhase} />
@@ -581,6 +577,10 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                                     </div>
                                 )}
                             </div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-xl border border-emerald-500/10 rounded-2xl p-6 shadow-2xl">
+                            <EditMenu />
                         </div>
                     </div>
                 )}

@@ -2,6 +2,7 @@
     "name": "Pixelfed",
     "image": "pixelfed/pixelfed:v0.12",
     "category": "Social",
+    "isStack": true,
     "logo": "https://cdn.simpleicons.org/pixelfed",
     "description": "Federated photo sharing platform (Instagram-like). Federates with Mastodon, supports stories, filters, and collections.",
     "default_ports": [
@@ -15,5 +16,32 @@
         "DB_PASSWORD": "password",
         "REDIS_HOST": "redis",
         "ADMIN_EMAIL": "admin@example.com"
-    }
+    },
+    "related_services": [
+        {
+            "name": "postgres",
+            "description": "PostgreSQL database for Pixelfed",
+            "category": "Database",
+            "image": "postgres:15-alpine",
+            "logo": "https://cdn.simpleicons.org/postgresql",
+            "env_vars": {
+                "POSTGRES_DB": "pixelfed",
+                "POSTGRES_USER": "pixelfed",
+                "POSTGRES_PASSWORD": "password"
+            },
+            "volumes": [
+                "pixelfed_db:/var/lib/postgresql/data"
+            ]
+        },
+        {
+            "name": "redis",
+            "description": "Redis cache for Pixelfed",
+            "category": "Cache",
+            "image": "redis:7-alpine",
+            "logo": "https://cdn.simpleicons.org/redis",
+            "volumes": [
+                "pixelfed_redis:/data"
+            ]
+        }
+    ]
 }

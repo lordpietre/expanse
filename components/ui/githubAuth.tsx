@@ -3,7 +3,7 @@ import {AuthWithGithub} from "@/actions/github";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
-import ghLogo from "@/assets/github-mark-white.png"
+import ghLogo from "@/assets/expanse.png"
 
 export default function GithubAuth({cli=false}:{cli?:boolean}){
     // OAuth is not available in CORE_ONLY deployment

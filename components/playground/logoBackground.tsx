@@ -3,7 +3,7 @@
 import { CSSProperties, memo, useRef } from "react";
 import { shallow } from "zustand/shallow";
 
-import logo from "@/assets/logo_mark.jpg"
+import logo from "@/assets/expanse.png"
 
 import { useStore, type ReactFlowState, type BackgroundProps } from "@xyflow/react";
 

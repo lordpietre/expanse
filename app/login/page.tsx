@@ -10,6 +10,8 @@ import { loginUser } from "@/actions/userActions";
 import toast from "react-hot-toast";
 
 import { Suspense } from "react";
+import Image from "next/image";
+import logo from "@/assets/expanse.png";
 
 function LoginForm() {
     const router = useRouter()
@@ -52,10 +54,10 @@ function LoginForm() {
         <Card className="w-full max-w-[480px]">
             <CardContent className="p-5">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                    <h1 className="text-3xl text-primary font-bold">Welcome back !</h1>
+                    <h1 className="text-3xl text-primary font-bold">Welcome to Expanse</h1>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input required name="email" placeholder="your@email.fr" />
+                        <Input required name="email" placeholder="MrNobody@expanse.omg" />
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="password">password</Label>
@@ -80,7 +82,18 @@ export default function Dashboard() {
     return (
         <div className="flex h-screen items-center justify-center">
             <Suspense fallback={<div>Loading...</div>}>
-                <LoginForm />
+                <div className="animate-in fade-in zoom-in duration-500">
+                    <div className="flex justify-center mb-6">
+                        <Image 
+                            src={logo} 
+                            alt="Expanse Logo" 
+                            width={120} 
+                            height={120}
+                            className="rounded-lg"
+                        />
+                    </div>
+                    <LoginForm />
+                </div>
             </Suspense>
         </div>
     )
