@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "sync-icons": "node scripts/sync-icons.mjs"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.4",
@@ -69,7 +70,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^20.17.6",
+    "@types/node": "^20.19.35",
     "@types/react": "19.1.11",
     "@types/react-dom": "19.1.7",
     "@typescript-eslint/eslint-plugin": "^8.40.0",

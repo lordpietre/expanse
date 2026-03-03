@@ -3,7 +3,7 @@
     "image": "pixelfed/pixelfed:v0.12",
     "category": "Social",
     "isStack": true,
-    "logo": "/pixelfed.png",
+    "logo": "pixelfed",
     "description": "Federated photo sharing platform (Instagram-like). Federates with Mastodon, supports stories, filters, and collections.",
     "default_ports": [
         "8080:80"
@@ -23,7 +23,7 @@
             "description": "PostgreSQL database for Pixelfed",
             "category": "Database",
             "image": "postgres:15-alpine",
-            "logo": "/postgresql.png",
+            "logo": "postgresql",
             "env_vars": {
                 "POSTGRES_DB": "pixelfed",
                 "POSTGRES_USER": "pixelfed",
@@ -38,7 +38,7 @@
             "description": "Redis cache for Pixelfed",
             "category": "Cache",
             "image": "redis:7-alpine",
-            "logo": "/redis.png",
+            "logo": "redis",
             "volumes": [
                 "pixelfed_redis:/data"
             ]

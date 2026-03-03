@@ -2,7 +2,7 @@
     "name": "ClickHouse",
     "image": "clickhouse/clickhouse-server:latest",
     "category": "Database",
-    "logo": "/clickhouse.png",
+    "logo": "clickhouse",
     "description": "Columnar Analytics. Data Warehouse, real-time analytics. Fastest for OLAP.",
     "default_ports": [
         "8123:8123",

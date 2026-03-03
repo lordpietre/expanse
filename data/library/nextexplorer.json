@@ -2,7 +2,7 @@
     "name": "NextExplorer",
     "image": "nextexplorer/nextexplorer:latest",
     "category": "Cloud",
-    "logo": "/nextexplorer.png",
+    "logo": "nextexplorer",
     "description": "Minimal and modern web file explorer. Clean interface, fast navigation, and no bloat.",
     "default_ports": [
         "80:80"

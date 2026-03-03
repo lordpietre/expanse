@@ -2,7 +2,7 @@
     "name": "SQLite",
     "image": "nouchka/sqlite3:latest",
     "category": "Database",
-    "logo": "/sqlite.png",
+    "logo": "sqlite",
     "description": "Embedded / File. Tests, small applications. Image-based for server use.",
     "volumes": [
         "./sqlite_data:/root/db"

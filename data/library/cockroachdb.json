@@ -2,7 +2,7 @@
     "name": "CockroachDB",
     "image": "cockroachdb/cockroach:latest",
     "category": "Database",
-    "logo": "/cockroachdb.png",
+    "logo": "cockroachdb",
     "description": "Distributed Relational. Horizontal scalability, Postgres-wire compatible.",
     "default_ports": [
         "26257:26257",

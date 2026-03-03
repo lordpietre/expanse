@@ -5,14 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     getGlobalDockerStats, getSystemInfo,
     stopProjectByName, removeProjectByName,
-    stopContainer, removeContainer, getProjectContainers,
-    removeVolume
+    stopContainer, removeContainer, removeContainers, getProjectContainers,
+    removeVolume, removeVolumes
 } from "@/actions/dockerActions";
 import {
     Layers, Database, Activity, RefreshCw, HardDrive, Cpu,
     Container, ArrowLeft, ChevronRight, Square, Trash2, X,
     Lock, AlertTriangle, Box, Boxes, MemoryStick, Network,
-    Info
+    Info, CheckSquare, Square as SquareIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -61,15 +61,17 @@ function PortChips({ ports }: { ports: { host: string; container: string }[] }) 
 }
 
 // ─── Password Modal ───────────────────────────────────────────────────────────
-function PasswordModal({
-    open, title, description, onConfirm, onCancel
-}: {
+interface PasswordModalProps {
     open: boolean;
     title: string;
     description: string;
     onConfirm: (password: string) => void;
     onCancel: () => void;
-}) {
+}
+
+function PasswordModal({
+    open, title, description, onConfirm, onCancel
+}: PasswordModalProps) {
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -131,15 +133,17 @@ function PasswordModal({
 }
 
 // ─── Project Detail Drawer ────────────────────────────────────────────────────
+interface ProjectDetailProps {
+    project: any;
+    onClose: () => void;
+    onRefresh: () => void;
+}
+
 function ProjectDetail({
     project,
     onClose,
     onRefresh
-}: {
-    project: any;
-    onClose: () => void;
-    onRefresh: () => void;
-}) {
+}: ProjectDetailProps) {
     const [detail, setDetail] = useState<{ containers: any[]; volumes: any[] } | null>(null);
     const [loadingDetail, setLoadingDetail] = useState(true);
     const [modalAction, setModalAction] = useState<null | { label: string; desc: string; fn: () => Promise<any> }>(null);
@@ -202,9 +206,16 @@ function ProjectDetail({
                                 <Boxes className="w-5 h-5 text-blue-400" />
                             </div>
                             <div>
-                                <h2 className="font-black text-white text-base uppercase tracking-widest">
-                                    {project.Name}
-                                </h2>
+                                <div className="flex items-center gap-3">
+                                    <h2 className="font-black text-white text-base uppercase tracking-widest">
+                                        {project.Name}
+                                    </h2>
+                                    {project.Status?.includes("running") && detail?.containers?.[0] && (
+                                        <span className="text-[10px] font-mono font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 whitespace-nowrap shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                                            {parsePorts(detail.containers[0].Ports)?.[0]?.host || ''}
+                                        </span>
+                                    )}
+                                </div>
                                 <p className="text-[10px] text-slate-500 truncate max-w-[300px] font-mono mt-0.5">
                                     {project.ConfigFiles}
                                 </p>
@@ -269,9 +280,15 @@ function ProjectDetail({
                                                         c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-400/50" : "bg-slate-600"
                                                     )} />
                                                     <div className="min-w-0 flex-1">
-                                                        <div className="font-bold text-sm text-white truncate">{c.Names}</div>
-                                                        <div className="text-[10px] text-slate-500 font-mono">{c.Image}</div>
-                                                        <PortChips ports={ports} />
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="font-bold text-sm text-white truncate">{c.Names}</div>
+                                                            {c.State === 'running' && ports.length > 0 && (
+                                                                <span className="text-[9px] font-mono font-black text-cyan-400 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-500/30 whitespace-nowrap">
+                                                                    {ports[0].host}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-[10px] text-slate-500 font-mono italic">{c.Image}</div>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 shrink-0 ml-2">
@@ -305,6 +322,20 @@ function ProjectDetail({
                                             </div>
                                         );
                                     })}
+                                    {detail.containers.length > 0 && (
+                                        <Button
+                                            onClick={() => runWithPassword(
+                                                "Delete all containers",
+                                                `Permanently delete all ${detail.containers.length} containers of project "${project.Name}"`,
+                                                () => removeContainers(detail.containers.map((c: any) => c.ID))
+                                            )}
+                                            variant="outline"
+                                            className="w-full mt-2 border-rose-500/20 text-rose-400 hover:bg-rose-500/10 h-10 text-[10px] font-black uppercase tracking-widest"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5 mr-2" />
+                                            Delete Project Containers
+                                        </Button>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -334,7 +365,7 @@ function ProjectDetail({
                                             <div className="flex items-center gap-3 shrink-0">
                                                 {v.Size && (
                                                     <div className="flex flex-col items-end mr-1">
-                                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Tamaño</span>
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Size</span>
                                                         <span className="text-xs font-black text-purple-400">{v.Size}</span>
                                                     </div>
                                                 )}
@@ -354,6 +385,20 @@ function ProjectDetail({
                                             </div>
                                         </div>
                                     ))}
+                                    {detail.volumes.length > 0 && (
+                                        <Button
+                                            onClick={() => runWithPassword(
+                                                "Delete all volumes",
+                                                `Permanently delete all ${detail.volumes.length} volumes of project "${project.Name}"`,
+                                                () => removeVolumes(detail.volumes.map((v: any) => v.Name))
+                                            )}
+                                            variant="outline"
+                                            className="w-full mt-2 border-rose-500/20 text-rose-400 hover:bg-rose-500/10 h-10 text-[10px] font-black uppercase tracking-widest"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5 mr-2" />
+                                            Delete Project Volumes
+                                        </Button>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -371,6 +416,10 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
     const [selectedProject, setSelectedProject] = useState<any>(null);
+
+    // Selection state for group deletion
+    const [selectedContainers, setSelectedContainers] = useState<string[]>([]);
+    const [selectedVolumes, setSelectedVolumes] = useState<string[]>([]);
 
     // Global action state
     const [modalAction, setModalAction] = useState<null | { label: string; desc: string; fn: () => Promise<any> }>(null);
@@ -455,10 +504,10 @@ export default function DashboardPage() {
         const res = await modalAction.fn();
         setActionLoading(false);
         if (res?.success) {
-            toast.success("Operación completada");
+            toast.success("Operation completed");
             fetchData();
         } else {
-            toast.error(res?.error || "Error en la operación");
+            toast.error(res?.error || "Operation error");
         }
     };
 
@@ -495,10 +544,10 @@ export default function DashboardPage() {
 
                     <div className="flex items-center gap-3">
                         <div className={cn(
-                            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border",
+                            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all duration-500",
                             loading
-                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+                                : "bg-slate-500/10 border-slate-500/20 text-slate-400"
                         )}>
                             <RefreshCw className={cn("w-3 h-3", loading && "animate-spin")} />
                             {loading ? "Updating" : `Synced ${lastUpdated.toLocaleTimeString()}`}
@@ -535,15 +584,15 @@ export default function DashboardPage() {
                             value: sysInfo ? formatUptime(sysInfo.uptime) : "—",
                             sub: "Host system"
                         }
-                    ].map((card) => (
+                    ].map((card: { icon: React.ReactNode; label: string; value: string; sub: string }) => (
                         <div key={card.label}
-                            className="bg-[#0d1117]/80 border border-white/5 rounded-xl p-5 flex flex-col gap-2 hover:border-white/10 transition-colors">
+                            className="group bg-[#0d1117]/80 border border-white/5 rounded-xl p-5 flex flex-col gap-2 hover:border-emerald-500/20 transition-all duration-300">
                             <div className="flex items-center gap-2">
-                                {card.icon}
+                                <div className="group-hover:scale-110 transition-transform duration-300">{card.icon}</div>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{card.label}</span>
                             </div>
                             <div className="text-xl font-black text-white">{card.value}</div>
-                            <div className="text-[10px] text-slate-600 truncate">{card.sub}</div>
+                            <div className="text-[10px] text-slate-600 truncate group-hover:text-slate-400 transition-colors">{card.sub}</div>
                         </div>
                     ))}
                 </div>
@@ -589,10 +638,15 @@ export default function DashboardPage() {
                                                     <Boxes className="w-4 h-4 text-emerald-400" />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <div className="font-bold text-sm text-white truncate">{proj.Name}</div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="font-bold text-sm text-white truncate">{proj.Name}</div>
+                                                        {proj.Status?.includes("running") && projPorts.length > 0 && (
+                                                            <span className="text-[9px] font-mono font-black text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 whitespace-nowrap">
+                                                                {projPorts[0].host}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <div className="text-[10px] text-slate-600 font-mono truncate max-w-[200px]">{proj.ConfigFiles}</div>
-                                                    {/* Port badges for this project */}
-                                                    <PortChips ports={projPorts} />
                                                 </div>
                                             </button>
                                             <div className="flex items-center gap-2 shrink-0 ml-3">
@@ -652,27 +706,85 @@ export default function DashboardPage() {
 
                     {/* Containers Tab */}
                     <TabsContent value="containers" className="mt-0">
+                        {selectedContainers.length > 0 && (
+                            <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-rose-500/20">
+                                        <Trash2 className="w-4 h-4 text-rose-400" />
+                                    </div>
+                                    <span className="text-xs font-bold text-rose-400 uppercase tracking-widest">
+                                        {selectedContainers.length} containers selected
+                                    </span>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setSelectedContainers([])}
+                                        className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
+                                    >
+                                        Deselect
+                                    </Button>
+                                    <Button
+                                        onClick={() => runWithPassword(
+                                            "Delete selected containers",
+                                            `Permanently delete ${selectedContainers.length} selected containers`,
+                                            () => removeContainers(selectedContainers).then(r => {
+                                                if (r.success) setSelectedContainers([]);
+                                                return r;
+                                            })
+                                        )}
+                                        className="bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
+                                    >
+                                        Delete Group
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
                         {!stats || stats.containers.length === 0 ? (
                             <EmptyState icon={<Container className="w-12 h-12" />} label="No containers" />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {stats.containers.map((c: any) => {
                                     const ports = parsePorts(c.Ports);
+                                    const isSelected = selectedContainers.includes(c.ID);
                                     return (
                                         <div key={c.ID}
-                                            className="flex items-start justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
+                                            className={cn(
+                                                "flex items-start justify-between p-4 bg-[#0d1117]/80 border rounded-xl hover:border-white/10 transition-all group cursor-pointer",
+                                                isSelected ? "border-rose-500/50 bg-rose-500/5" : "border-white/5"
+                                            )}
+                                            onClick={() => {
+                                                if (isSelected) setSelectedContainers((prev: string[]) => prev.filter(id => id !== c.ID));
+                                                else setSelectedContainers((prev: string[]) => [...prev, c.ID]);
+                                            }}
+                                        >
                                             <div className="flex items-start gap-3 min-w-0 flex-1">
-                                                <div className={cn(
-                                                    "w-2 h-2 rounded-full shrink-0 mt-2",
-                                                    c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-500/50" : "bg-slate-600"
-                                                )} />
+                                                <div className="flex flex-col items-center gap-2 mt-1">
+                                                    <div className={cn(
+                                                        "w-2 h-2 rounded-full shrink-0",
+                                                        c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-500/50" : "bg-slate-600"
+                                                    )} />
+                                                    <div className={cn(
+                                                        "p-1 rounded bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors",
+                                                        isSelected && "bg-rose-500/20 border-rose-500/30"
+                                                    )}>
+                                                        {isSelected ? <CheckSquare className="w-3 h-3 text-rose-400" /> : <SquareIcon className="w-3 h-3 text-slate-600" />}
+                                                    </div>
+                                                </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="font-bold text-sm text-white truncate">{c.Names}</div>
-                                                    <div className="text-[10px] text-slate-500">{c.Image}</div>
-                                                    <PortChips ports={ports} />
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="font-bold text-sm text-white truncate">{c.Names}</div>
+                                                        {c.State === 'running' && ports.length > 0 && (
+                                                            <span className="text-[9px] font-mono font-black text-cyan-400 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-500/30 whitespace-nowrap">
+                                                                {ports[0].host}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-[10px] text-slate-500 font-mono italic">{c.Image}</div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                                            <div className="flex items-center gap-2 shrink-0 ml-2" onClick={e => e.stopPropagation()}>
                                                 <span className={cn(
                                                     "px-2 py-0.5 rounded-full font-black uppercase tracking-widest text-[9px] border",
                                                     c.State === "running"
@@ -711,43 +823,95 @@ export default function DashboardPage() {
 
                     {/* Volumes Tab */}
                     <TabsContent value="volumes" className="mt-0">
+                        {selectedVolumes.length > 0 && (
+                            <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-rose-500/20">
+                                        <Trash2 className="w-4 h-4 text-rose-400" />
+                                    </div>
+                                    <span className="text-xs font-bold text-rose-400 uppercase tracking-widest">
+                                        {selectedVolumes.length} volumes selected
+                                    </span>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setSelectedVolumes([])}
+                                        className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
+                                    >
+                                        Deselect
+                                    </Button>
+                                    <Button
+                                        onClick={() => runWithPassword(
+                                            "Delete selected volumes",
+                                            `Permanently delete ${selectedVolumes.length} selected volumes`,
+                                            () => removeVolumes(selectedVolumes).then(r => {
+                                                if (r.success) setSelectedVolumes([]);
+                                                return r;
+                                            })
+                                        )}
+                                        className="bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
+                                    >
+                                        Delete Group
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
                         {!stats || stats.volumes.length === 0 ? (
-                            <EmptyState icon={<Database className="w-12 h-12" />} label="No volumes" />
+                            <EmptyState icon={<HardDrive className="w-12 h-12" />} label="No volumes" />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {stats.volumes.map((v: any) => (
-                                    <div key={v.Name}
-                                        className="flex items-center gap-4 p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
-                                        <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/10">
-                                            <HardDrive className="w-4 h-4 text-purple-400" />
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <div className="font-bold text-sm text-white truncate">{v.Name}</div>
-                                            <div className="text-[10px] text-slate-600 font-mono truncate">{v.Mountpoint}</div>
-                                        </div>
-                                        <div className="flex items-center gap-3 shrink-0">
-                                            {v.Size && (
-                                                <div className="flex flex-col items-end mr-1">
-                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Size</span>
-                                                    <span className="text-xs font-black text-purple-400">{v.Size}</span>
-                                                </div>
+                                {stats.volumes.map((v: any) => {
+                                    const isSelected = selectedVolumes.includes(v.Name);
+                                    return (
+                                        <div key={v.Name}
+                                            className={cn(
+                                                "flex items-center gap-4 p-4 bg-[#0d1117]/80 border rounded-xl hover:border-white/10 transition-all group cursor-pointer",
+                                                isSelected ? "border-rose-500/50 bg-rose-500/5" : "border-white/5"
                                             )}
-                                            <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400">
-                                                {v.Driver}
-                                            </span>
-                                            <button
-                                                onClick={() => runWithPassword(
-                                                    "Delete volume",
-                                                    `Permanently delete "${v.Name}"`,
-                                                    () => removeVolume(v.Name)
+                                            onClick={() => {
+                                                if (isSelected) setSelectedVolumes((prev: string[]) => prev.filter(name => name !== v.Name));
+                                                else setSelectedVolumes((prev: string[]) => [...prev, v.Name]);
+                                            }}
+                                        >
+                                            <div className={cn(
+                                                "p-1 rounded bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors shrink-0",
+                                                isSelected && "bg-rose-500/20 border-rose-500/30"
+                                            )}>
+                                                {isSelected ? <CheckSquare className="w-3 h-3 text-rose-400" /> : <SquareIcon className="w-3 h-3 text-slate-600" />}
+                                            </div>
+                                            <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/10">
+                                                <HardDrive className="w-4 h-4 text-purple-400" />
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="font-bold text-sm text-white truncate">{v.Name}</div>
+                                                <div className="text-[10px] text-slate-600 font-mono truncate">{v.Mountpoint}</div>
+                                            </div>
+                                            <div className="flex items-center gap-3 shrink-0" onClick={e => e.stopPropagation()}>
+                                                {v.Size && (
+                                                    <div className="flex flex-col items-end mr-1">
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Size</span>
+                                                        <span className="text-xs font-black text-purple-400">{v.Size}</span>
+                                                    </div>
                                                 )}
-                                                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
-                                                title="Delete">
-                                                <Trash2 className="w-3 h-3" />
-                                            </button>
+                                                <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                                                    {v.Driver}
+                                                </span>
+                                                <button
+                                                    onClick={() => runWithPassword(
+                                                        "Delete volume",
+                                                        `Permanently delete "${v.Name}"`,
+                                                        () => removeVolume(v.Name)
+                                                    )}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all"
+                                                    title="Delete">
+                                                    <Trash2 className="w-3 h-3" />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </TabsContent>

@@ -9,5 +9,5 @@
     "volumes": [
         "./prometheus:/etc/prometheus"
     ],
-    "logo": "/prometheus.png"
+    "logo": "prometheus"
 }

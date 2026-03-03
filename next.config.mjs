@@ -16,6 +16,9 @@ const nextConfig = {
         images: {
                 remotePatterns: [new URL('https://directus.composecraft.com/assets/**')],
         },
+        experimental: {
+                instrumentationHook: true,
+        },
         env: {
                 NEXT_PUBLIC_VERSION: json.version,
         },

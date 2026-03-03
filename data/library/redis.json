@@ -2,7 +2,7 @@
     "name": "Redis",
     "image": "redis:7-alpine",
     "category": "Database",
-    "logo": "/redis.png",
+    "logo": "redis",
     "description": "Extraordinarily fast in-memory data structure store, used as a database, cache, and broker.",
     "default_ports": [
         "6379:6379"

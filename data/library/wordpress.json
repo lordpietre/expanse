@@ -2,7 +2,7 @@
     "name": "WordPress",
     "image": "wordpress:latest",
     "category": "CMS",
-    "logo": "/wordpress.png",
+    "logo": "wordpress",
     "description": "The world's most popular website builder and content management system.",
     "default_ports": [
         "8080:80"

@@ -3,7 +3,7 @@
     "image": "tootsuite/mastodon:latest",
     "category": "Social",
     "isStack": true,
-    "logo": "/assets/mastodon.png",
+    "logo": "mastodon",
     "description": "Classic federated microblogging platform. Mature with thousands of instances, excellent mobile apps, and powerful moderation tools. Heavy on resources (Ruby + Node + Postgres + Redis).",
     "default_ports": [
         "3000:3000",
@@ -27,7 +27,7 @@
             "description": "PostgreSQL database for Mastodon",
             "category": "Database",
             "image": "postgres:15-alpine",
-            "logo": "/postgresql.png",
+            "logo": "postgresql",
             "env_vars": {
                 "POSTGRES_DB": "mastodon",
                 "POSTGRES_USER": "mastodon",
@@ -42,7 +42,7 @@
             "description": "Redis cache for Mastodon",
             "category": "Cache",
             "image": "redis:7-alpine",
-            "logo": "/redis.png",
+            "logo": "redis",
             "volumes": [
                 "mastodon_redis:/data"
             ]

@@ -2,7 +2,7 @@
     "name": "SurrealDB",
     "image": "surrealdb/surrealdb:latest",
     "category": "Database",
-    "logo": "/surrealdb.png",
+    "logo": "surrealdb",
     "description": "Multi-model (2025). SQL + Graph + Document. Promising and fast-growing.",
     "default_ports": [
         "8000:8000"

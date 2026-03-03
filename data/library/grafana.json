@@ -9,5 +9,5 @@
     "volumes": [
         "./grafana_data:/var/lib/grafana"
     ],
-    "logo": "/grafana.png"
+    "logo": "grafana"
 }

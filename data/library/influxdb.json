@@ -2,7 +2,7 @@
     "name": "InfluxDB",
     "image": "influxdb:latest",
     "category": "Database",
-    "logo": "/influxdb.png",
+    "logo": "influxdb",
     "description": "Time Series. Monitoring, IoT, metrics. Classic in observability (v2.x).",
     "default_ports": [
         "8086:8086"

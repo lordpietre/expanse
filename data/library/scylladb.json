@@ -2,7 +2,7 @@
     "name": "ScyllaDB",
     "image": "scylladb/scylla:latest",
     "category": "Database",
-    "logo": "/scylladb.png",
+    "logo": "scylladb",
     "description": "Cassandra Compatible. Same API as Cassandra, much faster and efficient.",
     "default_ports": [
         "9042:9042"

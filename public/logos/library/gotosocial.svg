@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/assets/base.css">
+	<style>
+	html, body {
+	margin: 0;
+	padding: 0;
+	color: #e7ebf1;
+	background: #2d3241;
+	font-size: 1.1rem;
+	font-family: sans-serif;
+}
+body {
+	margin: 4rem auto;
+	width: 60%;
+	width: 80ch;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+}
+
+h1, h2, h3 {
+	color: rgb(200, 209, 223);
+}
+
+h1::before {
+	content: "# ";
+	color: #93b379;
+}
+
+h2::before {
+	content: "## ";
+	color: #e5c179;
+}
+
+h3::before {
+	content: "### ";
+	color: #6f8fb4;
+}
+
+a {
+	color: #e5c179;
+}
+
+code {
+	border: 1px solid #e5c179;
+	color: #e5c179;
+	margin: 0 0.1rem;
+	padding: 0 0.2rem;
+}
+
+ul.urlList {
+	margin: 0;
+	padding-left: 0.5rem;
+	list-style: none;
+}
+
+form {
+	display: flex;
+	width: 100%;
+	gap: 0.3rem;
+}
+
+form #site {
+	flex: 1 1 auto;
+}
+
+div.grid-2 {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.6rem;
+}
+
+div.grid-2 > * {
+	padding: 0.2rem;
+}
+
+div.grid-2 b {
+	text-align: right;
+}
+
+div.border {
+	border: 1px solid #6f8fb4;
+	padding: 0.8rem;
+	margin: 0.8rem -0.8rem;
+}
+
+div.border > h1, div.border > h2 {
+	margin-top: 0.4rem;
+}
+
+@media screen and (orientation: portrait) {
+	body {
+		padding: 1rem;
+		width: 100vw;
+	}
+}
+
+
+	</style>
+
+	<title>An error occured: 404</title>
+</head>
+<body>
+	<h1>404: File not found</h1>
+	<div>
+			
+					Couldn&#39;t find the requested file, tried repository paths:
+				
+			<ul class="urlList">
+					<li>
+						<a href="https:&#x2F;&#x2F;git.pixie.town&#x2F;gotosocial&#x2F;gotosocial-landingpage&#x2F;src&#x2F;branch&#x2F;main&#x2F;static&#x2F;logo.svg">&#x2F;static&#x2F;logo.svg</a>
+					</li>
+					<li>
+						<a href="https:&#x2F;&#x2F;git.pixie.town&#x2F;gotosocial&#x2F;gotosocial-landingpage&#x2F;src&#x2F;branch&#x2F;main&#x2F;static&#x2F;logo.svg&#x2F;index.html">&#x2F;static&#x2F;logo.svg&#x2F;index.html</a>
+					</li>
+					<li>
+						<a href="https:&#x2F;&#x2F;git.pixie.town&#x2F;gotosocial&#x2F;gotosocial-landingpage&#x2F;src&#x2F;branch&#x2F;main&#x2F;static&#x2F;logo.svg&#x2F;README.md">&#x2F;static&#x2F;logo.svg&#x2F;README.md</a>
+					</li>
+			</ul>
+				
+	</div>
+	<p>
+		You can use the <a href="https:&#x2F;&#x2F;pixie.homes&#x2F;checker">Site Tester</a> to check for any configuration errors.
+	</p>
+</body>
+</html>

@@ -450,6 +450,32 @@ export async function removeVolume(volumeName: string) {
     }
 }
 
+export async function removeContainers(containerIds: string[]) {
+    await ensureAuth();
+    if (!containerIds.length) return { success: true };
+    try {
+        const ids = containerIds.join(' ');
+        const { stdout } = await execAsync(`docker rm -f ${ids}`);
+        console.log('Batch remove containers:', stdout);
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function removeVolumes(volumeNames: string[]) {
+    await ensureAuth();
+    if (!volumeNames.length) return { success: true };
+    try {
+        const names = volumeNames.join(' ');
+        const { stdout } = await execAsync(`docker volume rm -f ${names}`);
+        console.log('Batch remove volumes:', stdout);
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}
+
 export async function getProjectContainers(projectName: string) {
     await ensureAuth();
     try {

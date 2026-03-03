@@ -6,14 +6,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function addExtraDots(input:string,maxLength:number,start:boolean=true):string{
+export function addExtraDots(input: string, maxLength: number, start: boolean = true): string {
   const isInputTooLong = input.length > maxLength
-  if(!isInputTooLong){
+  if (!isInputTooLong) {
     return input
   }
-  if(start){
-    return input.substring(0,maxLength-3)+"..."
-  }else{
+  if (start) {
+    return input.substring(0, maxLength - 3) + "..."
+  } else {
     return "..." + input.substring(input.length - maxLength + 3);
   }
 }
@@ -55,11 +55,11 @@ export function isWithinOneDay(timestamp1: number, timestamp2: number): boolean 
   return difference <= oneDayInMilliseconds;
 }
 
-export async function GetLastVersion():Promise<string>{
+export async function GetLastVersion(): Promise<string> {
   console.log("fetching")
   const res = await axios.get(
-        "https://api.github.com/repos/lordpietre/expanse/releases/latest",
-    );
+    "https://api.github.com/repos/lordpietre/expanse/releases/latest",
+  );
   const data = res.data
   return data?.tag_name
 }
@@ -70,25 +70,47 @@ const CACHE_DURATION = 6 * 60 * 60 * 1000 // 6 hours in milliseconds
 
 export const getCachedLastVersion = async (): Promise<string | undefined> => {
   const now = Date.now()
-  
+
   // Return cached version if it exists and hasn't expired
   if (cachedVersion && (now - cachedVersion.timestamp) < CACHE_DURATION) {
     return cachedVersion.version
   }
-  
+
   try {
     const res = await axios.get(
       "https://api.github.com/repos/lordpietre/expanse/releases/latest",
     );
     const data = res.data
     const version = data?.tag_name.substring(1)
-    
+
     // Update cache with new version and current timestamp
     cachedVersion = { version, timestamp: now }
-    
+
     return version
   } catch (error) {
     console.error("Failed to fetch latest version:", error)
     return undefined
   }
 }
+
+/**
+ * Resolves a logo path to ensure it loads correctly from the public directory.
+ * With the new automated system, we use a dynamic API route to handle
+ * extension fallback (svg vs png) independently of build-time manifests.
+ */
+export const resolveLogoPath = (path: string | undefined | null): string | null => {
+  if (!path) return null;
+
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  const inputFilename = cleanPath.split('/').pop() || cleanPath;
+  const baseName = inputFilename.replace(/\.[^/.]+$/, "");
+
+  const normalized = baseName
+    .toLowerCase()
+    .replace(/[\s\-_]+/g, '-')
+    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/^-|-$/g, '');
+
+  return `/api/logos/library/${normalized}`;
+};
+

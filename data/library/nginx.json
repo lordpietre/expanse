@@ -2,7 +2,7 @@
     "name": "Nginx",
     "image": "nginx:alpine",
     "category": "Web Server",
-    "logo": "/nginx.png",
+    "logo": "nginx",
     "description": "High-performance HTTP server and reverse proxy, known for its stability and low resource consumption.",
     "default_ports": [
         "80:80"

@@ -2,7 +2,7 @@
     "name": "Mastodon",
     "image": "tootsuite/mastodon:latest",
     "category": "Social",
-    "logo": "/mastodon.png",
+    "logo": "mastodon",
     "description": "Classic federated microblogging platform. Mature with thousands of instances, excellent mobile apps, and powerful moderation tools.",
     "default_ports": [
         "3000:3000",

@@ -16,7 +16,7 @@ import { useComposeStore } from "@/store/compose";
 import useUIStore from "@/store/ui";
 import useLibraryStore from "@/store/library";
 import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor, Share2, Cloud, Library, Brain, Workflow, Activity, FileText, Users, Network, Shield } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, resolveLogoPath } from "@/lib/utils";
 
 interface LibraryModalProps {
     open: boolean;
@@ -159,7 +159,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             <div className="flex items-center gap-3 overflow-hidden">
                 <div className="flex-shrink-0 w-6 h-6 rounded bg-slate-800 flex items-center justify-center overflow-hidden">
                     {service.logo ? (
-                        <img src={service.logo} alt={service.name} className="w-4 h-4 object-contain" />
+                        <img src={resolveLogoPath(service.logo) || ''} alt={service.name} className="w-4 h-4 object-contain" />
                     ) : (
                         <span className="text-[10px] text-slate-500 font-bold">
                             {service.name.substring(0, 2).toUpperCase()}
@@ -281,7 +281,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                     <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/10 flex items-center justify-center p-12 shadow-2xl overflow-hidden relative group">
                                         <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
                                         {selectedService.logo ? (
-                                            <img src={selectedService.logo} alt={selectedService.name} className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
+                                            <img src={resolveLogoPath(selectedService.logo) || ''} alt={selectedService.name} className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
                                         ) : (
                                             <div className="text-7xl relative z-10">
                                                 {categoryIcons[selectedService.category as keyof typeof categoryIcons] || <Box className="w-32 h-32" />}

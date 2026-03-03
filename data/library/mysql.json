@@ -2,7 +2,7 @@
     "name": "MySQL",
     "image": "mysql:8.0",
     "category": "Database",
-    "logo": "/mysql.png",
+    "logo": "mysql",
     "description": "Relational database. Web classica, CMS, e-commerce. The most historically known.",
     "default_ports": [
         "3306:3306"

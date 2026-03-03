@@ -2,7 +2,7 @@
     "name": "Nagios",
     "image": "instantlinux/nagios:latest",
     "category": "Monitoring",
-    "logo": "/nagios.png",
+    "logo": "nagios",
     "description": "Enterprise-class open source system, network and infrastructure monitoring software. Alerts and notifications for outages.",
     "default_ports": [
         "8080:80"

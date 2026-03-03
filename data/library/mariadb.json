@@ -2,7 +2,7 @@
     "name": "MariaDB",
     "image": "mariadb:10.11",
     "category": "Database",
-    "logo": "/mariadb.png",
+    "logo": "mariadb",
     "description": "An open source relational database created by the original developers of MySQL.",
     "default_ports": [
         "3306:3306"

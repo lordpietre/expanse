@@ -2,7 +2,7 @@
     "name": "Pleroma",
     "image": "jkjoy/pleroma:latest",
     "category": "Social",
-    "logo": "/pleroma.png",
+    "logo": "pleroma",
     "description": "Ultra-lightweight microblogging platform. Extremely low resource consumption (Elixir).",
     "default_ports": [
         "4000:4000"
