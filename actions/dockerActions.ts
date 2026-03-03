@@ -540,7 +540,6 @@ export async function getProjectContainers(projectName: string) {
 
 export async function validateComposePorts(yamlContent: string) {
     await ensureAuth();
-    const YAML = await import('yaml');
     const doc = YAML.parse(yamlContent);
     const reassignments: Record<string, { old: number, new: number }[]> = {};
     let hasChanges = false;

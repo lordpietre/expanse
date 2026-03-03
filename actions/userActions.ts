@@ -342,20 +342,25 @@ export const deleteUser = async () => {
     const db = await getDb();
     const userId = new ObjectId(payload.userId as string);
 
-    const userCollection = db.collection("users");
-    const composeCollection = db.collection("composes");
+    try {
+        const userCollection = db.collection("users");
+        const composeCollection = db.collection("composes");
 
-    // Anonymize user's composes
-    await composeCollection.updateMany({ userId: userId }, { $set: { userId: null } });
+        // Anonymize user's composes
+        await composeCollection.updateMany({ userId: userId }, { $set: { userId: null } });
 
-    const user = await userCollection.findOne({ _id: userId }, { projection: { email: 1 } });
-    if (user?.email) {
-        await updateUserList(user.email, [], [9]);
+        const user = await userCollection.findOne({ _id: userId }, { projection: { email: 1 } });
+        if (user?.email) {
+            await updateUserList(user.email, [], [9]);
+        }
+
+        await userCollection.deleteOne({ _id: userId });
+        (await cookies()).delete("token");
+        console.log("account " + userId.toString() + " deleted");
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        throw new Error("Failed to delete account");
     }
-
-    await userCollection.deleteOne({ _id: userId });
-    (await cookies()).delete("token");
-    console.log("account " + userId.toString() + " deleted");
     redirect("https://form.expanse.com/s/cm40i9zod000hwl0z6005uvwp");
 }
 
@@ -404,7 +409,7 @@ export async function askPasswordReset(prevState: any, formData: FormData) {
         });
 
         if (inserted) {
-            sendRecoverPassdEmail(email, code);
+            await sendRecoverPassdEmail(email, code);
             return { success: true };
         }
 

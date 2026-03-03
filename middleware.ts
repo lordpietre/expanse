@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
     // Protected routes: redirect to home if not authenticated
-    if (pathname.startsWith("/dashboard")) {
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/playground")) {
         const valid = await verifyToken(rawToken, secretKey);
         if (!valid) {
             const response = NextResponse.redirect(new URL("/", req.url));
@@ -49,5 +49,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/login/:path*', '/signin/:path*'],
+    matcher: ['/dashboard/:path*', '/playground/:path*', '/login/:path*', '/signin/:path*'],
 };

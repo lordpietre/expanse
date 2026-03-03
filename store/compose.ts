@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from 'zustand';
-import { Compose, Translator, Service, Env, Binding, Image, PortMapping, SuperSet, KeyValue } from "expanse-docker-lib";
+import { Compose, Translator, Service, Env, Binding, Image, PortMapping, SuperSet, KeyValue, Network } from "expanse-docker-lib";
 import { generateRandomName } from "@/lib/utils";
 import { registerCompose } from "@/actions/userActions";
 import { toPng } from 'html-to-image';
@@ -170,16 +170,54 @@ export const useComposeStore = create<ComposeState>((set, get) => {
             };
 
             await setCompose((compose) => {
+                const addNetwork = !!template.related_services;
+                let stackNetwork: Network | undefined;
+                if (addNetwork) {
+                    const netName = template.name.toLowerCase().replace(/\s+/g, '') + "_net";
+                    stackNetwork = new Network({ name: netName });
+                    compose.addNetwork(stackNetwork);
+                }
+
                 const mainService = createService(template);
+                if (stackNetwork) {
+                    mainService.networks = new SuperSet<Network>([stackNetwork]);
+                }
                 compose.addService(mainService);
 
                 if (template.related_services) {
+                    const nameMap = new Map<string, string>();
+
                     template.related_services.forEach(rel => {
                         const relService = createService(rel, true);
+                        if (stackNetwork) {
+                            relService.networks = new SuperSet<Network>([stackNetwork]);
+                        }
+
+                        const baseName = rel.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                        nameMap.set(baseName, relService.name);
+
                         compose.addService(relService);
                         // Automatically make the main service depend on the related one
-                        mainService.depends_on.push(relService);
+                        mainService.depends_on.add(relService);
                     });
+
+                    // Update main service environment with the dynamically generated names
+                    if (mainService.environment) {
+                        const updatedEnv = new SuperSet<Readonly<Env>>();
+                        mainService.environment.forEach(env => {
+                            let newValue = env.value;
+                            if (newValue && nameMap.has(newValue)) {
+                                newValue = nameMap.get(newValue) as string;
+                            } else if (newValue) {
+                                nameMap.forEach((finalName, originalName) => {
+                                    const regex = new RegExp(`(?<=[@\\/:]|^)${originalName}(?=[@\\/:]|$)`, 'g');
+                                    newValue = newValue!.replace(regex, finalName);
+                                });
+                            }
+                            updatedEnv.add(new Env(env.key, newValue));
+                        });
+                        mainService.environment = updatedEnv;
+                    }
                 }
 
                 toast.success(`${template.name} added to compose`);

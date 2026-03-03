@@ -49,7 +49,7 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
     };
 
     const displayPort = isRunning && serviceStatuses[service.name] && serviceStatuses[service.name].ports
-        ? serviceStatuses[service.name].ports.split(',')[0].replace('0.0.0.0:', '').replace(':::', '').replace('::', '')
+        ? serviceStatuses[service.name].ports?.split(',')[0].replace('0.0.0.0:', '').replace(':::', '').replace('::', '')
         : null;
 
     return (
@@ -196,16 +196,6 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                                     <div className="flex items-center gap-1.5 mb-1">
                                         <Database className="w-3 h-3 text-cyan-400" />
                                         <span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">DB</span>
-                                        {/* DB connector in expanded view */}
-                                        <div className="relative ml-auto flex items-center gap-1">
-                                            <span className="text-[7px] font-black text-cyan-600 uppercase tracking-widest">link</span>
-                                            <Handle
-                                                id="service"
-                                                type="target"
-                                                position={Position.Bottom}
-                                                className="!relative !w-3.5 !h-3.5 !rounded-full !bg-cyan-500 !border-[#0d1117] !border-2 shadow-[0_0_8px_rgba(6,182,212,0.6)] hover:scale-125 transition-transform !z-50 !opacity-100 !visible cursor-pointer !top-0 !left-0 !transform-none"
-                                            />
-                                        </div>
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {Array.from(service.depends_on || []).filter(dep => {

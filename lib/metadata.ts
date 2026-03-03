@@ -70,7 +70,6 @@ export function extractMetadata(compose: Compose, positionMap: Map<string, NodeD
         key,
         targetHandle
     }))
-    console.log(result)
     return result
 }
 

@@ -6,15 +6,11 @@ import { TemplateService } from "@/types/library";
 
 export async function getLibraryServices(): Promise<TemplateService[]> {
     const libraryDir = path.resolve(process.cwd(), "data/library");
-    console.log(`[Library] process.cwd(): ${process.cwd()}`);
-    console.log(`[Library] libraryDir: ${libraryDir}`);
 
     try {
         if (!fs.existsSync(libraryDir)) {
-            console.warn(`[Library] NOT FOUND: ${libraryDir}`);
-            // Fallback: try relative to __dirname in case we are in a different context
+            console.warn(`[Library] Directory not found: ${libraryDir}`);
             const fallbackDir = path.resolve(__dirname, "../../../data/library");
-            console.log(`[Library] Trying fallback: ${fallbackDir}`);
             if (fs.existsSync(fallbackDir)) {
                 return readFromDir(fallbackDir);
             }
@@ -191,7 +187,6 @@ const osPopularity: Record<string, number> = {
 
 function readFromDir(dir: string): TemplateService[] {
     const files = fs.readdirSync(dir);
-    console.log(`[Library] Reading ${files.length} files from ${dir}`);
     const services: TemplateService[] = [];
 
     for (const file of files) {
@@ -210,7 +205,7 @@ function readFromDir(dir: string): TemplateService[] {
             }
         }
     }
-    console.log(`[Library] Success: loaded ${services.length} services`);
+    console.log(`[Library] Loaded ${services.length} services`);
 
     services.sort((a, b) => {
         const catOrderA = categoryOrder[a.category] ?? 99;

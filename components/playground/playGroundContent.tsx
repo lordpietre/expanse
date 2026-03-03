@@ -16,7 +16,7 @@ import { toPng } from "html-to-image";
 
 import LibraryModal from "./libraryModal";
 import EditMenu from "@/components/playground/editMenu";
-import { runCompose as executeCompose, stopCompose, getComposeStatus, getComposeLogs, validateComposePorts, restartCompose } from "@/actions/dockerActions";
+import { runCompose as executeCompose, stopCompose, getComposeStatus, getComposeLogs, validateComposePorts, restartCompose, getAvailablePort } from "@/actions/dockerActions";
 import ExecutionPanel from "./executionPanel";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
@@ -53,6 +53,29 @@ function DeployProgress({ phase }: { phase: DeployPhase }) {
                     style={{ width: `${cfg.progress}%` }}
                 />
             </div>
+        </div>
+    );
+}
+
+function ExposedPortsSummary() {
+    const services = Array.from(useComposeStore.getState().compose.services);
+    if (!services.some(s => s.ports && s.ports.length > 0)) return null;
+
+    return (
+        <div className="flex flex-col gap-1 mt-1 border-t border-slate-100 pt-2">
+            <span className="text-[10px] uppercase font-bold text-slate-400">Exposed Ports</span>
+            {services.filter(s => s.ports && s.ports.length > 0).map(s => (
+                <div key={s.name} className="flex justify-between items-center text-xs">
+                    <span className="text-slate-600 font-medium">{s.name}</span>
+                    <div className="flex gap-1">
+                        {s.ports!.map(p => (
+                            <span key={`${p.hostPort} `} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
+                                {p.hostPort}:{p.containerPort}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
@@ -257,23 +280,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                         (_t: any) => (
                             <div className="flex flex-col gap-1 w-full min-w-[200px]">
                                 <span className="font-bold">Compose execution started</span>
-                                {Array.from(useComposeStore.getState().compose.services).some(s => s.ports && s.ports.length > 0) && (
-                                    <div className="flex flex-col gap-1 mt-1 border-t border-slate-100 pt-2">
-                                        <span className="text-[10px] uppercase font-bold text-slate-400">Exposed Ports</span>
-                                        {Array.from(useComposeStore.getState().compose.services).filter(s => s.ports && s.ports.length > 0).map(s => (
-                                            <div key={s.name} className="flex justify-between items-center text-xs">
-                                                <span className="text-slate-600 font-medium">{s.name}</span>
-                                                <div className="flex gap-1">
-                                                    {s.ports!.map(p => (
-                                                        <span key={`${p.hostPort} `} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
-                                                            {p.hostPort}:{p.containerPort}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                <ExposedPortsSummary />
                             </div>
                         ),
                         { duration: 8000 }
@@ -282,11 +289,12 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 } else if (res.collisionPort) {
                     toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
+                    const newPort = await getAvailablePort(res.collisionPort + 1);
                     await setCompose((currentCompose) => {
                         currentCompose.services.forEach(service => {
                             service.ports?.forEach(portMapping => {
                                 if (portMapping.hostPort === res.collisionPort) {
-                                    portMapping.hostPort += 1; // Increment and retry
+                                    portMapping.hostPort = newPort;
                                 }
                             });
                         });
@@ -337,23 +345,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                         (_t: any) => (
                             <div className="flex flex-col gap-1 w-full min-w-[200px]">
                                 <span className="font-bold">Compose restarted</span>
-                                {Array.from(useComposeStore.getState().compose.services).some(s => s.ports && s.ports.length > 0) && (
-                                    <div className="flex flex-col gap-1 mt-1 border-t border-slate-100 pt-2">
-                                        <span className="text-[10px] uppercase font-bold text-slate-400">Exposed Ports</span>
-                                        {Array.from(useComposeStore.getState().compose.services).filter(s => s.ports && s.ports.length > 0).map(s => (
-                                            <div key={s.name} className="flex justify-between items-center text-xs">
-                                                <span className="text-slate-600 font-medium">{s.name}</span>
-                                                <div className="flex gap-1">
-                                                    {s.ports!.map(p => (
-                                                        <span key={`${p.hostPort} `} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-mono font-bold">
-                                                            {p.hostPort}:{p.containerPort}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                <ExposedPortsSummary />
                             </div>
                         ),
                         { duration: 8000 }
@@ -362,11 +354,12 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 } else if (res.collisionPort) {
                     toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
+                    const newPort = await getAvailablePort(res.collisionPort + 1);
                     await setCompose((currentCompose) => {
                         currentCompose.services.forEach(service => {
                             service.ports?.forEach(portMapping => {
                                 if (portMapping.hostPort === res.collisionPort) {
-                                    portMapping.hostPort += 1; // Increment and retry
+                                    portMapping.hostPort = newPort;
                                 }
                             });
                         });

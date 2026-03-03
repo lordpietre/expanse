@@ -5,7 +5,10 @@ import { ObjectId } from "bson";
 import { ensureAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-const URL = process.env.URL;
+const SITE_URL = process.env.URL || '';
+if (!SITE_URL) {
+    console.warn('[composeActions] WARNING: URL env variable is not set. Share links will be broken.');
+}
 
 export async function shareCompose(composeId: string) {
     const payload = await ensureAuth();
@@ -21,7 +24,7 @@ export async function shareCompose(composeId: string) {
     revalidatePath("/dashboard/shares");
 
     if (existingShare) {
-        return `${URL}/share?id=${existingShare._id.toString()}`;
+        return `${SITE_URL}/share?id=${existingShare._id.toString()}`;
     }
 
     const insert = await shares.insertOne({
@@ -35,7 +38,7 @@ export async function shareCompose(composeId: string) {
         throw new Error("Could not share the docker compose file");
     }
 
-    return `${URL}/share?id=${insert.insertedId.toString()}`;
+    return `${SITE_URL}/share?id=${insert.insertedId.toString()}`;
 }
 
 export const getComposeByShareId = async (shareId: string) => {

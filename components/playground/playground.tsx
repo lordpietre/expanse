@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import {
     Node,
     XYPosition,
@@ -195,6 +195,10 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
     const { setSelectedString } = useSelectionStore()
     const [isDraggable, setIsDraggable] = useState(true)
     const [hideControls, setHideControls] = useState(hideControlsByDefault)
+    const elkRef = useRef<InstanceType<typeof ELK> | null>(null);
+    if (!elkRef.current) {
+        elkRef.current = new ELK();
+    }
 
     const updatePosition = useCallback((key: string, newPosition: XYPosition) => {
         const currentEntry = positionMap.get(key);
@@ -269,7 +273,6 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
         }
     ), [])
 
-    const elk = new ELK();
     const defaultOptions = {
         'elk.algorithm': 'force',
         'elk.force.iterations': '300',
@@ -347,7 +350,6 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
 
     function composeToEdge(compose: Compose): Edge[] {
         const result: Edge[] = []
-        const connectionMap = usePositionMap.getState().connectionMap;
         const networkPortCounts: Record<string, number> = {};
 
         compose.services.forEach((service) => {
@@ -454,10 +456,10 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                 }))
             };
 
-            elk.layout(graph).then(({ children }) => {
+            elkRef.current!.layout(graph).then(({ children }: { children?: any[] }) => {
                 if (children) {
                     const updates = new Map();
-                    children.forEach((node) => {
+                    children.forEach((node: any) => {
                         updates.set(node.id, {
                             position: {
                                 x: node.x || 0,
@@ -467,7 +469,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                     });
                     setPositionMap(updates);
                 }
-            }).catch(error => {
+            }).catch((error: any) => {
                 console.error('ELK layout error:', error);
             });
         }, 0);

@@ -42,6 +42,7 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
         e.preventDefault()
         const data = getPlaygroundData()
         const registerPromise = registerUser(email, password, companyType, true, data)
+            .then(result => (result === true ? "" : result));
         toast.promise(registerPromise, {
             success: (data: string) => {
                 setSaveState(false)
