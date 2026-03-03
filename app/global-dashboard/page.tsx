@@ -175,7 +175,11 @@ function ProjectDetail({
         const res = await modalAction.fn();
         setActionLoading(false);
         if (res?.success) {
-            toast.success("Operation completed");
+            if (res.warning) {
+                toast.error(res.warning, { duration: 5000 });
+            } else {
+                toast.success(res.message || "Operation completed");
+            }
             fetchDetail();
             onRefresh();
         } else {
@@ -322,7 +326,7 @@ function ProjectDetail({
                                             </div>
                                         );
                                     })}
-                                    {detail.containers.length > 0 && (
+                                    {detail?.containers && detail.containers.length > 0 && (
                                         <Button
                                             onClick={() => runWithPassword(
                                                 "Delete all containers",
@@ -385,7 +389,7 @@ function ProjectDetail({
                                             </div>
                                         </div>
                                     ))}
-                                    {detail.volumes.length > 0 && (
+                                    {detail?.volumes && detail.volumes.length > 0 && (
                                         <Button
                                             onClick={() => runWithPassword(
                                                 "Delete all volumes",
@@ -504,7 +508,11 @@ export default function DashboardPage() {
         const res = await modalAction.fn();
         setActionLoading(false);
         if (res?.success) {
-            toast.success("Operation completed");
+            if (res.warning) {
+                toast.error(res.warning, { duration: 5000 });
+            } else {
+                toast.success(res.message || "Operation completed");
+            }
             fetchData();
         } else {
             toast.error(res?.error || "Operation error");
@@ -719,6 +727,13 @@ export default function DashboardPage() {
                                 <div className="flex gap-2">
                                     <Button
                                         variant="outline"
+                                        onClick={() => setSelectedContainers(stats?.containers.map((c: any) => c.ID) || [])}
+                                        className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
+                                    >
+                                        Select All
+                                    </Button>
+                                    <Button
+                                        variant="outline"
                                         onClick={() => setSelectedContainers([])}
                                         className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
                                     >
@@ -834,6 +849,13 @@ export default function DashboardPage() {
                                     </span>
                                 </div>
                                 <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setSelectedVolumes(stats?.volumes.map((v: any) => v.Name) || [])}
+                                        className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
+                                    >
+                                        Select All
+                                    </Button>
                                     <Button
                                         variant="outline"
                                         onClick={() => setSelectedVolumes([])}

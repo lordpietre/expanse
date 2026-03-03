@@ -466,14 +466,32 @@ export async function removeContainers(containerIds: string[]) {
 export async function removeVolumes(volumeNames: string[]) {
     await ensureAuth();
     if (!volumeNames.length) return { success: true };
-    try {
-        const names = volumeNames.join(' ');
-        const { stdout } = await execAsync(`docker volume rm -f ${names}`);
-        console.log('Batch remove volumes:', stdout);
-        return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
+
+    const deleted: string[] = [];
+    const failed: { name: string, error: string }[] = [];
+
+    for (const name of volumeNames) {
+        try {
+            await execAsync(`docker volume rm -f ${name}`);
+            deleted.push(name);
+        } catch (error: any) {
+            let errMsg = error.message || String(error);
+            if (errMsg.includes("in use")) {
+                errMsg = "in use";
+            }
+            failed.push({ name, error: errMsg });
+        }
     }
+
+    if (failed.length > 0) {
+        const failedNames = failed.map(f => f.name).join(', ');
+        return {
+            success: true,
+            warning: `Deleted ${deleted.length} volumes. Skipped ${failed.length}: ${failedNames} (in use)`
+        };
+    }
+
+    return { success: true, message: `Successfully deleted ${deleted.length} volumes.` };
 }
 
 export async function getProjectContainers(projectName: string) {
@@ -583,10 +601,11 @@ export async function validateComposePorts(yamlContent: string) {
 export async function execDockerCommand(containerId: string, command: string) {
     await ensureAuth();
     try {
-        // Execute the command inside the container. We use -i for non-interactive mode with output.
-        // Note: For a real terminal, we'd want a specialized TTY handler, but for this web UI, 
-        // a simple exec with output capture is the first stable step.
-        const { stdout, stderr } = await execAsync(`docker exec ${containerId} ${command}`);
+        // We wrap the command in sh -c to handle complex strings, spaces, and shell built-ins.
+        // We escape double quotes to safely pass the string into the exec command.
+        const escapedCommand = command.replace(/"/g, '\\"');
+        const { stdout, stderr } = await execAsync(`docker exec ${containerId} sh -c "${escapedCommand}"`);
+
         return { success: true, output: stdout || stderr || "Command executed" };
     } catch (error: any) {
         console.error('Docker Exec Error:', error);

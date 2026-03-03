@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { execDockerCommand } from "@/actions/dockerActions";
-import { Terminal as TerminalIcon, Send, Loader2, ChevronRight, Maximize2 } from "lucide-react";
+import { Terminal as TerminalIcon, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
@@ -17,16 +17,88 @@ interface TerminalDialogProps {
 }
 
 export default function TerminalDialog({ open, onOpenChange, containerId, containerName }: TerminalDialogProps) {
-    const [command, setCommand] = useState("");
     const [isExecuting, setIsExecuting] = useState(false);
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-[900px] w-[90vw] bg-[hsl(222,47%,5%)] border-emerald-500/10 p-0 overflow-hidden shadow-2xl rounded-[1.5rem]">
+                <DialogHeader className="p-4 bg-slate-900/50 border-b border-emerald-500/10 flex flex-row items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                            <TerminalIcon className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <DialogTitle className="text-sm font-bold text-slate-300">
+                            Expanse TTY: <span className="text-emerald-400">{containerName}</span>
+                        </DialogTitle>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {isExecuting && <Loader2 className="w-3 h-3 text-emerald-400 animate-spin" />}
+                        <div className={cn("w-2 h-2 rounded-full animate-pulse", isExecuting ? "bg-amber-500" : "bg-emerald-500")} />
+                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{isExecuting ? 'Executing...' : 'Active Session'}</span>
+                    </div>
+                </DialogHeader>
+
+                <div className="flex flex-col h-[500px] bg-black/40 relative">
+                    {/* Render inner shell only when dialog is open to ensure ref is attached */}
+                    {open && (
+                        <TerminalShell
+                            containerId={containerId}
+                            containerName={containerName}
+                            isExecutingStatus={isExecuting}
+                            setExecutingStatus={setIsExecuting}
+                        />
+                    )}
+
+                    {/* Decor Overlay */}
+                    <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function TerminalShell({
+    containerId,
+    containerName,
+    isExecutingStatus,
+    setExecutingStatus
+}: {
+    containerId: string;
+    containerName: string;
+    isExecutingStatus: boolean;
+    setExecutingStatus: (v: boolean) => void;
+}) {
     const terminalRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
-    const fitAddonRef = useRef<FitAddon | null>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const cmdBuf = useRef("");
+    const isExecutingRef = useRef(false);
 
-    // Initialize xterm.js
+    // Keep ref in sync
     useEffect(() => {
-        if (!terminalRef.current || xtermRef.current) return;
+        isExecutingRef.current = isExecutingStatus;
+    }, [isExecutingStatus]);
+
+    const executeCommand = useCallback(async (cmd: string, term: Terminal) => {
+        setExecutingStatus(true);
+        try {
+            const res = await execDockerCommand(containerId, cmd);
+            if (res.success) {
+                const lines = (res.output || "").split('\n');
+                lines.forEach(line => term.writeln(line));
+            } else {
+                term.write(`\r\n\x1b[31mError: ${res.error || "Execution failed"}\x1b[0m\r\n`);
+            }
+        } catch (error: any) {
+            term.write(`\r\n\x1b[31mUnexpected Error: ${error.message || "Unknown error"}\x1b[0m\r\n`);
+        } finally {
+            term.write("\x1b[1;32m➜\x1b[0m ");
+            setExecutingStatus(false);
+            setTimeout(() => term.focus(), 10);
+        }
+    }, [containerId, setExecutingStatus]);
+
+    useEffect(() => {
+        if (!terminalRef.current) return;
 
         const term = new Terminal({
             cursorBlink: true,
@@ -53,125 +125,57 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
         term.loadAddon(fitAddon);
 
         term.open(terminalRef.current);
-        fitAddon.fit();
+
+        // Initial fit with small delay to ensure container size is final
+        setTimeout(() => fitAddon.fit(), 50);
 
         term.writeln("\x1b[1;32mWelcome to Expanse Terminal\x1b[0m");
         term.writeln(`\x1b[2mConnected to: ${containerName}\x1b[0m`);
         term.writeln("\x1b[2mType a command below to execute...\x1b[0m\r\n");
+        term.write("\x1b[1;32m➜\x1b[0m ");
+
+        term.onData((data) => {
+            if (isExecutingRef.current) return;
+
+            if (data === '\r') {
+                const currentCmd = cmdBuf.current.trim();
+                cmdBuf.current = "";
+                term.write('\r\n');
+
+                if (currentCmd) {
+                    executeCommand(currentCmd, term);
+                } else {
+                    term.write("\x1b[1;32m➜\x1b[0m ");
+                }
+            } else if (data === '\x7f' || data === '\b') {
+                if (cmdBuf.current.length > 0) {
+                    cmdBuf.current = cmdBuf.current.slice(0, -1);
+                    term.write('\b \b');
+                }
+            } else if (data.startsWith('\x1b')) {
+                return;
+            } else {
+                cmdBuf.current += data;
+                term.write(data);
+            }
+        });
 
         xtermRef.current = term;
-        fitAddonRef.current = fitAddon;
+
+        const handleResize = () => fitAddon.fit();
+        window.addEventListener('resize', handleResize);
+
+        // Autofocus
+        setTimeout(() => term.focus(), 150);
 
         return () => {
+            window.removeEventListener('resize', handleResize);
             term.dispose();
             xtermRef.current = null;
         };
-    }, [open, containerName]);
-
-    // Handle resizing
-    useEffect(() => {
-        const handleResize = () => {
-            fitAddonRef.current?.fit();
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    // Refit when open status changes
-    useEffect(() => {
-        if (open) {
-            setTimeout(() => {
-                fitAddonRef.current?.fit();
-                inputRef.current?.focus();
-            }, 100);
-        }
-    }, [open]);
-
-    const handleExecute = async (e?: React.FormEvent) => {
-        e?.preventDefault();
-        if (!command.trim() || isExecuting || !xtermRef.current) return;
-
-        const currentCmd = command.trim();
-        const term = xtermRef.current;
-
-        // Display command in terminal
-        term.write(`\r\n\x1b[1;32m➜\x1b[0m \x1b[1m${currentCmd}\x1b[0m\r\n`);
-
-        setCommand("");
-        setIsExecuting(true);
-
-        try {
-            const res = await execDockerCommand(containerId, currentCmd);
-            if (res.success) {
-                // Handle results that might contain multiple lines
-                const lines = (res.output || "").split('\n');
-                lines.forEach(line => term.writeln(line));
-            } else {
-                term.write(`\x1b[31mError: ${res.error || "Execution failed"}\x1b[0m\r\n`);
-            }
-        } catch (error: any) {
-            term.write(`\x1b[31mUnexpected Error: ${error.message || "Unknown error"}\x1b[0m\r\n`);
-        } finally {
-            setIsExecuting(false);
-            inputRef.current?.focus();
-        }
-    };
+    }, [containerName, executeCommand]);
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[900px] w-[90vw] bg-[hsl(222,47%,5%)] border-emerald-500/10 p-0 overflow-hidden shadow-2xl rounded-[1.5rem]">
-                <DialogHeader className="p-4 bg-slate-900/50 border-b border-emerald-500/10 flex flex-row items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-                            <TerminalIcon className="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <DialogTitle className="text-sm font-bold text-slate-300">
-                            Expanse TTY: <span className="text-emerald-400">{containerName}</span>
-                        </DialogTitle>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Active Session</span>
-                    </div>
-                </DialogHeader>
-
-                <div className="flex flex-col h-[500px] bg-black/40 relative">
-                    {/* Terminal Area */}
-                    <div
-                        ref={terminalRef}
-                        className="flex-grow p-4 overflow-hidden"
-                    />
-
-                    {/* Input Area */}
-                    <form
-                        onSubmit={handleExecute}
-                        className="p-4 bg-slate-900/30 border-t border-emerald-500/10 flex items-center gap-3"
-                    >
-                        <div className="flex-grow relative group">
-                            <ChevronRight className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500/30 group-focus-within:text-emerald-500 transition-colors" />
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                value={command}
-                                onChange={(e) => setCommand(e.target.value)}
-                                disabled={isExecuting}
-                                placeholder="Type command here..."
-                                className="w-full bg-black/60 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs font-mono text-emerald-400 placeholder:text-slate-700 outline-none focus:border-emerald-500/20 focus:ring-1 focus:ring-emerald-500/20 transition-all shadow-inner"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={isExecuting || !command.trim()}
-                            className="p-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-30 disabled:bg-slate-800 rounded-xl transition-all shadow-lg shadow-emerald-500/10 flex items-center justify-center min-w-[48px]"
-                        >
-                            {isExecuting ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Send className="w-4 h-4 text-white" />}
-                        </button>
-                    </form>
-
-                    {/* Decor Overlay */}
-                    <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
-                </div>
-            </DialogContent>
-        </Dialog>
+        <div ref={terminalRef} className="flex-grow p-4 overflow-hidden h-full" />
     );
 }
