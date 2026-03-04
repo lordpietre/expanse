@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity, CheckCircle2, Loader2, ChevronLeft, ChevronRight, PanelLeftClose, PanelLeftCloseIcon, Terminal, Globe, Search, Plus, FolderOpen, Save, Share2, LayoutGrid, ListPlus } from "lucide-react";
 import Playground, { PlaygroundHandle } from "@/components/playground/playground";
-import { useComposeStore } from "@/store/compose";
+import { useComposeStore, save } from "@/store/compose";
 import useSelectionStore from "@/store/selection";
 import { useExecutionStore } from "@/store/execution";
 import useComposeIdStore from "@/store/composeId";
@@ -88,7 +88,7 @@ import { getComposeById } from "@/actions/userActions";
 import { reHydrateComposeIds, recreatePositionMap, recreateConnectionMap } from "@/lib/metadata";
 
 export default function PlaygroundContent({ inviteMode = false }: { inviteMode?: boolean }) {
-    const { compose, setCompose, replaceCompose } = useComposeStore();
+    const { compose, setCompose, replaceCompose, isDirty, resetCompose } = useComposeStore();
     const { id: composeId } = useComposeIdStore();
     const { setSelectedString } = useSelectionStore();
     const { isExecuting, setExecuting, clearStatuses, updateStatuses, setLogs } = useExecutionStore();
@@ -103,6 +103,17 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
             setIsSidebarCollapsed(true);
         }
     }, [isExecuting]);
+
+    const handleNew = async () => {
+        if (isDirty) {
+            const confirmDiscard = window.confirm("You have unsaved changes. Do you want to save them before creating a new project?");
+            if (confirmDiscard) {
+                await save(compose);
+            }
+        }
+        resetCompose();
+        toast.success("New project started");
+    };
 
     const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -428,6 +439,13 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     />
                     <Button
                         variant="secondary"
+                        onClick={handleNew}
+                        className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm font-bold flex gap-2 transition-all"
+                    >
+                        <Plus className="w-4 h-4 text-emerald-400" /> New
+                    </Button>
+                    <Button
+                        variant="secondary"
                         onClick={() => fileInputRef.current?.click()}
                         className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm font-bold flex gap-2 transition-all"
                     >
@@ -485,12 +503,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                         <Zap className="w-4 h-4 text-amber-400 mr-2" />
                         <span className="font-bold">Layout</span>
                     </Button>
-                    <Link href="/deploy/settings">
-                        <Button variant="secondary" className="bg-white/5 hover:bg-white/10 border-white/10 text-white shadow-sm transition-all" >
-                            <Activity className="w-4 h-4 text-rose-500 mr-2" />
-                            <span className="font-bold">System</span>
-                        </Button>
-                    </Link>
+
                 </div>
 
                 <div className="flex gap-3">

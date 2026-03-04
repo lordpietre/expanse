@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
+import { useComposeStore } from "@/store/compose";
 
 // ── Port parsing util ──────────────────────────────────────────────────────────
 /** Parse Docker Ports string e.g. "0.0.0.0:8080->80/tcp, :::443->443/tcp, 3306/tcp" into chips */
@@ -241,7 +242,13 @@ function ProjectDetail({
                                 onClick={() => runWithPassword(
                                     "Delete project",
                                     `All containers and volumes of "${project.Name}" will be deleted`,
-                                    () => removeProjectByName(project.Name)
+                                    () => removeProjectByName(project.Name).then(r => {
+                                        if (r.success) {
+                                            const { compose, resetCompose } = useComposeStore.getState();
+                                            if (compose.name === project.Name) resetCompose();
+                                        }
+                                        return r;
+                                    })
                                 )}
                                 disabled={actionLoading}
                                 className="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 rounded-xl text-[10px] font-black uppercase tracking-widest px-3 py-2 h-auto gap-1.5"
@@ -688,6 +695,12 @@ export default function DashboardPage() {
                                                         if (!confirm(`Completely delete "${proj.Name}"? This will erase all containers and volumes.`)) return;
                                                         toast.promise(
                                                             removeProjectByName(proj.Name).then(r => {
+                                                                if (r.success) {
+                                                                    const { compose, resetCompose } = useComposeStore.getState();
+                                                                    if (compose.name === proj.Name) resetCompose();
+                                                                }
+                                                                return r;
+                                                            }).then(r => {
                                                                 if (r.success) fetchData(); else throw new Error(r.error);
                                                             }),
                                                             { loading: 'Deleting...', success: 'Deleted', error: (e: Error) => e.message || 'Error' }

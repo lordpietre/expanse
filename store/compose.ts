@@ -16,9 +16,11 @@ import { useSystemStore } from "@/store/systemStore";
 interface ComposeState {
     compose: Compose;
     tick: number;
+    isDirty: boolean;
     setCompose: (updater: (currentCompose: Compose) => void) => Promise<boolean>;
     replaceCompose: (newCompose: Compose, options?: { disableSave?: boolean }) => void;
     addServiceFromTemplate: (template: TemplateService) => Promise<void>;
+    resetCompose: () => void;
 }
 
 export async function save(compose: Compose) {
@@ -52,6 +54,9 @@ export async function save(compose: Compose) {
     );
     setId(id);
 
+    // After successful save, mark as clean
+    useComposeStore.setState({ isDirty: false });
+
     // Persist ID in URL to ensure F5 doesn't lose the project
     if (typeof window !== 'undefined' && id) {
         const url = new URL(window.location.href);
@@ -82,6 +87,7 @@ export const useComposeStore = create<ComposeState>((set, get) => {
     return {
         compose: new Compose({ name: generateRandomName() }),
         tick: 0,
+        isDirty: false,
         setCompose: async (updater: (currentCompose: Compose) => void) => {
             const { state: disabledSave } = useDisableStateStore.getState();
             const { compose, tick } = get();
@@ -92,7 +98,7 @@ export const useComposeStore = create<ComposeState>((set, get) => {
             const hasChanged = newHash !== previousHash;
 
             if (hasChanged) {
-                set({ tick: tick + 1 });
+                set({ tick: tick + 1, isDirty: true });
                 if (!disabledSave) {
                     debouncedSave(compose);
                 }
@@ -107,10 +113,30 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                 newCompose.name = generateRandomName();
             }
 
-            set({ compose: newCompose, tick: get().tick + 1 });
+            set({ compose: newCompose, tick: get().tick + 1, isDirty: !disableSave });
 
             if (!disableSave) {
                 debouncedSave(newCompose);
+            }
+        },
+        resetCompose: () => {
+            const newCompose = new Compose({ name: generateRandomName() });
+            set({
+                compose: newCompose,
+                tick: get().tick + 1,
+                isDirty: false
+            });
+
+            // Reset metadata and ID
+            useComposeIdStore.getState().setId(undefined);
+            usePositionMap.getState().setPositionMap(new Map());
+            usePositionMap.getState().setConnectionMap(new Map());
+
+            // Clean URL
+            if (typeof window !== 'undefined') {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('id');
+                window.history.replaceState({}, '', url.toString());
             }
         },
         addServiceFromTemplate: async (template: TemplateService) => {
