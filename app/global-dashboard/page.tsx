@@ -851,6 +851,27 @@ export default function DashboardPage() {
 
                     {/* Volumes Tab */}
                     <TabsContent value="volumes" className="mt-0">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">Global Volumes</h3>
+                            <Button
+                                onClick={() => {
+                                    const unused = stats?.volumes.filter((v: any) => !v.Links || v.Links === 0).map((v: any) => v.Name) || [];
+                                    if (unused.length === 0) {
+                                        toast.success("No unused volumes to prune");
+                                        return;
+                                    }
+                                    runWithPassword(
+                                        "Prune unused volumes",
+                                        `Delete all ${unused.length} volumes that are not currently in use by any container`,
+                                        () => removeVolumes(unused)
+                                    )
+                                }}
+                                className="bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-400 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3 gap-2"
+                            >
+                                <Trash2 className="w-3 h-3" /> Prune Unused
+                            </Button>
+                        </div>
+
                         {selectedVolumes.length > 0 && (
                             <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="flex items-center gap-3">
@@ -868,6 +889,13 @@ export default function DashboardPage() {
                                         className="bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
                                     >
                                         Select All
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setSelectedVolumes(stats?.volumes.filter((v: any) => !v.Links || v.Links === 0).map((v: any) => v.Name) || [])}
+                                        className="bg-purple-500/10 border-purple-500/20 text-purple-400 hover:bg-purple-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest h-8 px-3"
+                                    >
+                                        Select All Unused
                                     </Button>
                                     <Button
                                         variant="outline"
@@ -929,6 +957,15 @@ export default function DashboardPage() {
                                                         <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">Size</span>
                                                         <span className="text-xs font-black text-purple-400">{v.Size}</span>
                                                     </div>
+                                                )}
+                                                {v.Links > 0 ? (
+                                                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                                                        In Use ({v.Links})
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-400">
+                                                        Unused
+                                                    </span>
                                                 )}
                                                 <span className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400">
                                                     {v.Driver}

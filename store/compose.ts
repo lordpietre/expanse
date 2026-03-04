@@ -12,6 +12,7 @@ import { extractMetadata } from "@/lib/metadata";
 import useDisableStateStore from "@/store/disabled";
 import { TemplateService } from "@/types/library";
 import { useSystemStore } from "@/store/systemStore";
+import useSelectionStore from "@/store/selection";
 
 interface ComposeState {
     compose: Compose;
@@ -127,8 +128,9 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                 isDirty: false
             });
 
-            // Reset metadata and ID
+            // Reset metadata, selection and ID
             useComposeIdStore.getState().setId(undefined);
+            useSelectionStore.getState().setSelectedString("");
             usePositionMap.getState().setPositionMap(new Map());
             usePositionMap.getState().setConnectionMap(new Map());
 

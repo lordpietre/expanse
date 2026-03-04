@@ -1,12 +1,24 @@
 {
     "name": "FreePBX",
-    "image": "flaviostutz/freepbx:15.0.17.17.6",
+    "image": "tiredofit/freepbx:latest",
     "category": "Network",
-    "logo": "https://cdn.simpleicons.org/freepbx",
-    "description": "Open Source GUI for controlling and managing Asterisk PBX. Voice mail, conferencing, IVR, and call recording.",
+    "logo": "https://img.icons8.com/color/512/asterisk.png",
+    "description": "The world's most popular open source PBX (Private Branch Exchange) system.",
     "default_ports": [
         "80:80",
         "443:443",
-        "5060:5060"
-    ]
+        "5060:5060/udp",
+        "5160:5160/udp",
+        "18000-20000:18000-20000/udp"
+    ],
+    "env_vars": {
+        "DB_EMBEDDED": "FALSE",
+        "DB_HOST": "db",
+        "DB_NAME": "asterisk",
+        "DB_USER": "asterisk",
+        "DB_PASS": "password",
+        "ADMIN_USER": "admin",
+        "ADMIN_PASSWORD": "password",
+        "ADMIN_PASS": "password"
+    }
 }

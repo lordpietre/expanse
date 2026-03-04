@@ -251,7 +251,7 @@ export async function getGlobalDockerStats() {
         if (dfOutput) {
             const volumeLines = dfOutput.split('\n');
             let inVolumesSection = false;
-            const sizeMap: Record<string, string> = {};
+            const sizeMap: Record<string, { size: string, links: number }> = {};
 
             for (const line of volumeLines) {
                 if (line.includes('VOLUME NAME') && line.includes('SIZE')) {
@@ -260,16 +260,15 @@ export async function getGlobalDockerStats() {
                 }
                 if (inVolumesSection) {
                     if (line.trim() === '') {
-                        // End of section if we hit an empty line after starting
                         if (Object.keys(sizeMap).length > 0) break;
                         continue;
                     }
-                    // Match "NAME   LINKS   SIZE"
                     const parts = line.trim().split(/\s+/);
                     if (parts.length >= 3) {
                         const name = parts[0];
-                        const size = parts[parts.length - 1]; // Size is usually the last column
-                        sizeMap[name] = size;
+                        const links = parseInt(parts[parts.length - 2]) || 0;
+                        const size = parts[parts.length - 1];
+                        sizeMap[name] = { size, links };
                     }
                 }
             }
@@ -277,7 +276,8 @@ export async function getGlobalDockerStats() {
             // Inject sizes into volume objects
             for (const vol of volumes) {
                 if (sizeMap[vol.Name]) {
-                    vol.Size = sizeMap[vol.Name];
+                    vol.Size = sizeMap[vol.Name].size;
+                    vol.Links = sizeMap[vol.Name].links;
                 }
             }
         }

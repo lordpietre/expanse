@@ -1,6 +1,6 @@
 {
     "name": "Joomla (Full Stack)",
-    "description": "Complete Joomla CMS deployment with integrated MariaDB and persistence.",
+    "description": "Complete Joomla CMS deployment with integrated PostgreSQL and persistence.",
     "category": "CMS",
     "isStack": true,
     "image": "joomla:latest",
@@ -12,7 +12,8 @@
         "JOOMLA_DB_HOST": "db",
         "JOOMLA_DB_USER": "joomla",
         "JOOMLA_DB_PASSWORD": "password",
-        "JOOMLA_DB_NAME": "joomla"
+        "JOOMLA_DB_NAME": "joomla",
+        "JOOMLA_DB_DRIVER": "pgsql"
     },
     "volumes": [
         "joomla_data:/var/www/html"
@@ -20,18 +21,17 @@
     "related_services": [
         {
             "name": "db",
-            "description": "MariaDB database for Joomla",
+            "description": "PostgreSQL database for Joomla",
             "category": "Database",
-            "image": "mariadb:10.6",
-            "logo": "https://img.icons8.com/color/512/mariadb.png",
+            "image": "postgres:18-alpine",
+            "logo": "postgresql",
             "env_vars": {
-                "MYSQL_ROOT_PASSWORD": "password",
-                "MYSQL_DATABASE": "joomla",
-                "MYSQL_USER": "joomla",
-                "MYSQL_PASSWORD": "password"
+                "POSTGRES_USER": "joomla",
+                "POSTGRES_PASSWORD": "password",
+                "POSTGRES_DB": "joomla"
             },
             "volumes": [
-                "joomla_db_data:/var/lib/mysql"
+                "joomla_db_data:/var/lib/postgresql/data"
             ]
         }
     ]

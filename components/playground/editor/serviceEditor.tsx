@@ -46,15 +46,18 @@ export default function ServiceEditor() {
         }
     }, [services.length]);
 
-    function getService(): Service {
-        const service = compose.services.get("id", selectedId)
-        if (service) {
-            return service
+    function getService(): Service | null {
+        const src = compose.services.get("id", selectedId)
+        if (src) {
+            return src
         }
-        throw Error(`${selectedId} service is not found`)
+        return null;
     }
 
-    const serviceName = getService().name;
+    const service = getService();
+    if (!service) return null;
+
+    const serviceName = service.name;
     const isRunning = serviceStatuses[serviceName]?.status === 'running';
 
     return (
@@ -65,7 +68,7 @@ export default function ServiceEditor() {
                     Service
                 </h2>
                 <div className="text-lg font-bold text-blue-400 truncate py-1">
-                    {getService().image?.name || "No image"}:{getService().image?.tag || "latest"}
+                    {service.image?.name || "No image"}:{service.image?.tag || "latest"}
                 </div>
                 <div className="flex items-center gap-2 mt-2">
                     <Button
@@ -109,14 +112,14 @@ export default function ServiceEditor() {
                         <label htmlFor="name" className="text-sm font-bold text-slate-400">Name</label>
                         <Input
                             name="name"
-                            value={getService().name}
+                            value={service.name}
                             disabled={isRunning}
                             className={cn(
                                 isRunning ? "opacity-60 cursor-not-allowed bg-white/5 border-amber-500/20" : "bg-white/5 border-white/10",
                                 "text-white focus:ring-emerald-500/40"
                             )}
                             onChange={(e) => {
-                                setCompose(() => getService().name = e.target.value)
+                                setCompose(() => service.name = e.target.value)
                             }}
                         />
                         {isRunning && (
@@ -131,14 +134,14 @@ export default function ServiceEditor() {
                             <label className="text-sm font-bold text-slate-400" htmlFor="image">Image</label>
                             <Input name="image"
                                 className="bg-white/5 border-white/10 text-white"
-                                value={getService().image?.name || ""}
+                                value={service.image?.name || ""}
                                 onChange={(e) => {
                                     setCompose(() => {
-                                        const image = getService().image
+                                        const image = service.image
                                         if (image) {
                                             image.name = e.target.value
                                         } else {
-                                            getService().image = new Image({ name: e.target.value })
+                                            service.image = new Image({ name: e.target.value })
                                         }
                                     })
                                 }}
@@ -147,14 +150,14 @@ export default function ServiceEditor() {
                         <div className="flex flex-col gap-2">
                             <label htmlFor="tag">Tag</label>
                             <Input defaultValue="latest" name="tag"
-                                value={getService().image?.tag}
+                                value={service.image?.tag}
                                 onChange={(e) => {
                                     setCompose(() => {
-                                        const image = getService().image
+                                        const image = service.image
                                         if (image) {
                                             image.tag = e.target.value
                                         } else {
-                                            getService().image = new Image({ name: "", tag: e.target.value })
+                                            service.image = new Image({ name: "", tag: e.target.value })
                                         }
                                     })
                                 }}
@@ -172,13 +175,13 @@ export default function ServiceEditor() {
                             <strong> unless-stopped</strong> es ideal para servicios de larga duración.
                         </p>
                         {/* @ts-expect-error tkt*/}
-                        <Select value={RestartPolicyCondition[getService().restart]}
+                        <Select value={RestartPolicyCondition[service.restart]}
                             onValueChange={(value) => {
                                 setCompose(() => {
                                     //@ts-expect-error tkt
                                     const newValue = RestartPolicyCondition[value]
                                     if (newValue) {
-                                        getService().restart = newValue
+                                        service.restart = newValue
                                     }
                                 })
                             }}
@@ -206,9 +209,9 @@ export default function ServiceEditor() {
                         <p className="text-[10px] text-slate-500 leading-tight">
                             Sobrescribe el comando por defecto definido en la imagen. Se usa para pasar parámetros o cambiar el comportamiento inicial.
                         </p>
-                        <Input name="command" value={getService().command?.join(" ")}
+                        <Input name="command" value={service.command?.join(" ")}
                             onChange={(e) => {
-                                setCompose(() => getService().command = e.target.value.split(" "))
+                                setCompose(() => service.command = e.target.value.split(" "))
                             }}
                         />
                     </div>
@@ -221,9 +224,9 @@ export default function ServiceEditor() {
                         <p className="text-[10px] text-slate-500 leading-tight">
                             El ejecutable base. Si se define, el campo 'Command' se tratará como parámetros añadidos a este binario. Ideal para scripts de inicio.
                         </p>
-                        <Input name="entryPoint" value={getService().entrypoint}
+                        <Input name="entryPoint" value={service.entrypoint}
                             onChange={(e) => {
-                                setCompose(() => getService().entrypoint = e.target.value)
+                                setCompose(() => service.entrypoint = e.target.value)
                             }}
                         />
                     </div>
@@ -231,10 +234,10 @@ export default function ServiceEditor() {
                         <Button type="button"
                             className="flex flex-row gap-2" onClick={() => {
                                 setCompose(() => {
-                                    if (getService().labels) {
-                                        getService().labels?.push(new KeyValue("com.to_set", "", "lab_"))
+                                    if (service.labels) {
+                                        service.labels?.push(new KeyValue("com.to_set", "", "lab_"))
                                     } else {
-                                        getService().labels = [new KeyValue("com.to_set", "", "lab_")]
+                                        service.labels = [new KeyValue("com.to_set", "", "lab_")]
                                     }
                                 })
                             }}>
@@ -253,7 +256,7 @@ export default function ServiceEditor() {
                         <Button type="button"
                             className="flex flex-row gap-2" onClick={() => {
                                 setCompose(() => {
-                                    getService().bindings.add(new Binding({
+                                    service.bindings.add(new Binding({
                                         source: "./",
                                         target: "/"
                                     }))
@@ -263,7 +266,7 @@ export default function ServiceEditor() {
                             Add binding
                         </Button>
                         {
-                            Array.from(getService().bindings).filter((binding) => (binding.source as Volume)?.id === undefined) //get only the direct bindings
+                            Array.from(service.bindings).filter((binding) => (binding.source as Volume)?.id === undefined) //get only the direct bindings
                                 .map((binding) => {
                                     return (
                                         <div className='flex flex-row gap-2 items-center'>
@@ -271,14 +274,14 @@ export default function ServiceEditor() {
                                             <Input value={binding.target}
                                                 className="bg-white/5 border-white/10 text-white"
                                                 onChange={(e) => setCompose(() => {
-                                                    const vol = getService().bindings.get("id", binding.id)
+                                                    const vol = service.bindings.get("id", binding.id)
                                                     if (vol) {
                                                         vol.target = e.target.value
                                                     }
                                                 })} />
                                             <Button type="button" className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20" variant="secondary"
                                                 onClick={() => setCompose(() => {
-                                                    getService().bindings.delete(binding)
+                                                    service.bindings.delete(binding)
                                                 })}>
                                                 <Eraser className="w-4 h-4" />
                                             </Button>
@@ -293,7 +296,7 @@ export default function ServiceEditor() {
                                 message={"Volumes are docker managed folder mounted inside the container"} />
                         </label>
                         {
-                            Array.from(getService().bindings).filter((binding) => (binding.source as Volume)?.id !== undefined) //get only the volumes bindings
+                            Array.from(service.bindings).filter((binding) => (binding.source as Volume)?.id !== undefined) //get only the volumes bindings
                                 .map((binding) => {
                                     return (
                                         <div className='flex flex-row gap-2 items-center'>
@@ -301,14 +304,14 @@ export default function ServiceEditor() {
                                             <Input value={binding.target}
                                                 className="bg-white/5 border-white/10 text-white"
                                                 onChange={(e) => setCompose(() => {
-                                                    const vol = getService().bindings.get("id", binding.id)
+                                                    const vol = service.bindings.get("id", binding.id)
                                                     if (vol) {
                                                         vol.target = e.target.value
                                                     }
                                                 })} />
                                             <Button type="button" className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20" variant="secondary"
                                                 onClick={() => setCompose(() => {
-                                                    getService().bindings.delete(binding)
+                                                    service.bindings.delete(binding)
                                                 })}>
                                                 <Eraser className="w-4 h-4" />
                                             </Button>
@@ -324,7 +327,7 @@ export default function ServiceEditor() {
                             Ports
                             <QuickToolType className="" message={"Ports you want to expose from the container"} />
                         </label>
-                        {getService().ports?.map((port, index) => (
+                        {service.ports?.map((port, index) => (
                             <>
                                 <div className='flex flex-row gap-2 items-end'>
                                     <div className='flex flex-col w-full'>
@@ -332,16 +335,16 @@ export default function ServiceEditor() {
                                         <Input value={port.hostPort}
                                             className="bg-white/5 border-white/10 text-white"
                                             {...{}/*@ts-expect-error tkt*/}
-                                            onChange={(e) => setCompose(() => getService().ports[index].hostPort = Number(e.target.value))} />
+                                            onChange={(e) => setCompose(() => service.ports[index].hostPort = Number(e.target.value))} />
                                     </div>
                                     <div className='flex flex-col w-full'>
                                         <label className="text-sm">Container</label>
                                         {/*@ts-expect-error tkt*/}
-                                        <Input value={port.containerPort} className="bg-white/5 border-white/10 text-white" onChange={(e) => setCompose(() => getService().ports[index].containerPort = Number(e.target.value))} />
+                                        <Input value={port.containerPort} className="bg-white/5 border-white/10 text-white" onChange={(e) => setCompose(() => service.ports[index].containerPort = Number(e.target.value))} />
                                     </div>
                                     <Button type="button" className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20" variant="secondary"
                                         onClick={() => setCompose(() => {
-                                            getService().ports?.splice(index, 1)
+                                            service.ports?.splice(index, 1)
                                         })}>
                                         <Eraser className="w-4 h-4" />
                                     </Button>
@@ -351,11 +354,11 @@ export default function ServiceEditor() {
                         ))}
                         <Button type="button"
                             onClick={() => setCompose(() => {
-                                const servicePorts = getService().ports
+                                const servicePorts = service.ports
                                 if (servicePorts) {
                                     servicePorts.push(new PortMapping({ containerPort: 80, hostPort: 80 }))
                                 } else {
-                                    getService().ports = [
+                                    service.ports = [
                                         new PortMapping({ containerPort: 80, hostPort: 80 })
                                     ]
                                 }
@@ -365,9 +368,9 @@ export default function ServiceEditor() {
                         <Separator />
                         <div className="flex flex-col gap-2">
                             <label htmlFor="network_mode">Network mode</label>
-                            <Input name="network_mode" value={getService().network_mode || ""}
+                            <Input name="network_mode" value={service.network_mode || ""}
                                 onChange={(e) => {
-                                    setCompose(() => getService().network_mode = e.target.value)
+                                    setCompose(() => service.network_mode = e.target.value)
                                 }}
                             />
                         </div>
@@ -377,18 +380,18 @@ export default function ServiceEditor() {
                                 Connected Networks
                                 <QuickToolType className="" message={"Manage static IP addresses for connected networks"} />
                             </label>
-                            {Array.from(getService().networks || []).length === 0 && (
+                            {Array.from(service.networks || []).length === 0 && (
                                 <p className="text-sm text-gray-400">No networks connected. Link this service to a network node.</p>
                             )}
-                            {Array.from(getService().networks || []).map((net) => (
+                            {Array.from(service.networks || []).map((net) => (
                                 <div key={net.id} className="flex flex-col gap-2">
                                     <label className="text-sm">{net.name} IPv4 Address</label>
                                     <Input
                                         placeholder="e.g. 172.16.238.10"
-                                        value={getService().ipv4_addresses?.[net.name] || ""}
+                                        value={service.ipv4_addresses?.[net.name] || ""}
                                         onChange={(e) => {
                                             setCompose(() => {
-                                                const srv = getService();
+                                                const srv = service;
                                                 if (!srv.ipv4_addresses) srv.ipv4_addresses = {};
                                                 srv.ipv4_addresses[net.name] = e.target.value;
                                                 if (e.target.value === "") {
@@ -405,7 +408,6 @@ export default function ServiceEditor() {
                 <TabsContent value="db" className="flex flex-col gap-6 mt-2">
                     <div className="flex flex-col gap-3">
                         {(() => {
-                            const service = getService();
                             const imageName = service.image?.name?.toLowerCase() || "";
                             const isDatabase = imageName.includes('db') || imageName.includes('sql') ||
                                 imageName.includes('mongo') || imageName.includes('redis') ||
@@ -442,19 +444,18 @@ export default function ServiceEditor() {
                                     </label>
                                     <div className="flex flex-col gap-2 relative">
                                         <Select
-                                            value={Array.from(getService().depends_on || []).find(dep => {
+                                            value={Array.from(service.depends_on || []).find((dep: any) => {
                                                 const name = dep.image?.name?.toLowerCase() || "";
                                                 return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
                                             })?.id || "none"}
                                             onValueChange={(selectedDbId) => {
                                                 setCompose(() => {
-                                                    const service = getService()
                                                     if (selectedDbId === "none") {
-                                                        const currentDBs = Array.from(service.depends_on || []).filter(dep => {
+                                                        const currentDBs = Array.from(service.depends_on || []).filter((dep: any) => {
                                                             const name = dep.image?.name?.toLowerCase() || "";
                                                             return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
                                                         });
-                                                        currentDBs.forEach(db => service.depends_on.delete(db))
+                                                        currentDBs.forEach((db: any) => service.depends_on.delete(db))
                                                         return;
                                                     }
 
@@ -466,7 +467,7 @@ export default function ServiceEditor() {
                                                         );
                                                         if (templateApp && templateApp.env_vars && service.environment) {
                                                             Object.entries(templateApp.env_vars).forEach(([key, value]) => {
-                                                                const exists = Array.from(service.environment!).some(env => env.key === key);
+                                                                const exists = Array.from(service.environment!).some((env: any) => env.key === key);
                                                                 if (!exists) {
                                                                     const valStr = String(value);
                                                                     service.environment!.add(new Env(key, valStr));
@@ -483,7 +484,7 @@ export default function ServiceEditor() {
                                             <SelectContent>
                                                 <SelectItem value="none">None</SelectItem>
                                                 {Array.from(compose.services).filter(s => {
-                                                    if (s.id === getService().id) return false;
+                                                    if (s.id === service.id) return false;
                                                     const name = s.image?.name?.toLowerCase() || "";
                                                     return name.includes('db') || name.includes('sql') || name.includes('mongo') || name.includes('redis') || name.includes('postgres') || name.includes('maria');
                                                 }).map(dbService => (
@@ -512,7 +513,7 @@ export default function ServiceEditor() {
                             Environment Variables
                             <QuickToolType className="" message={"Define environment variables mapped to this service"} />
                         </label>
-                        {getService().environment && Array.from(getService().environment!).map((envItem) => (
+                        {service.environment && Array.from(service.environment!).map((envItem) => (
                             <div key={envItem.id}>
                                 <div className='flex flex-row gap-2 items-end'>
                                     <div className='flex flex-col w-full'>
@@ -520,7 +521,7 @@ export default function ServiceEditor() {
                                         <Input value={envItem.key}
                                             className="bg-white/5 border-white/10 text-white"
                                             onChange={(e) => setCompose(() => {
-                                                const env = getService().environment?.get("id", envItem.id);
+                                                const env = service.environment?.get("id", envItem.id);
                                                 // @ts-expect-error tkt
                                                 if (env) env.key = e.target.value;
                                             })} />
@@ -530,14 +531,14 @@ export default function ServiceEditor() {
                                         <Input value={envItem.value}
                                             className="bg-white/5 border-white/10 text-white"
                                             onChange={(e) => setCompose(() => {
-                                                const env = getService().environment?.get("id", envItem.id);
+                                                const env = service.environment?.get("id", envItem.id);
                                                 // @ts-expect-error tkt
                                                 if (env) env.value = e.target.value;
                                             })} />
                                     </div>
                                     <Button type="button" className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20" variant="secondary"
                                         onClick={() => setCompose(() => {
-                                            const envSet = getService().environment;
+                                            const envSet = service.environment;
                                             if (envSet) {
                                                 envSet.delete(envItem);
                                             }
@@ -553,11 +554,11 @@ export default function ServiceEditor() {
                                 const newEnv = new Env("NEW_VAR", "value");
                                 // No longer adding to global pool to keep grid clean
 
-                                if (getService().environment) {
-                                    getService().environment!.add(newEnv);
+                                if (service.environment) {
+                                    service.environment!.add(newEnv);
                                 } else {
-                                    getService().environment = new SuperSet<Readonly<Env>>();
-                                    getService().environment!.add(newEnv);
+                                    service.environment = new SuperSet<Readonly<Env>>();
+                                    service.environment!.add(newEnv);
                                 }
                             })} className="flex flex-row gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold border border-emerald-500/50 shadow-lg shadow-emerald-500/20">
                             <ListPlus height={20} />Add variable
@@ -571,14 +572,14 @@ export default function ServiceEditor() {
                             <QuickToolType className=""
                                 message={"The command that will be ran to check container health"} />
                         </label>
-                        <Input name="test" value={getService().healthcheck?.test?.join(" ")}
+                        <Input name="test" value={service.healthcheck?.test?.join(" ")}
                             onChange={(e) => {
                                 setCompose(() => {
-                                    const health = getService().healthcheck
+                                    const health = service.healthcheck
                                     if (health) {
                                         health.test = e.target.value.split(" ")
                                     } else {
-                                        getService().healthcheck = new HealthCheck({
+                                        service.healthcheck = new HealthCheck({
                                             test: e.target.value.split(" "),
                                             interval: new Delay(30, TimeUnits.SECONDS)
                                         })
@@ -593,14 +594,14 @@ export default function ServiceEditor() {
                             <QuickToolType className=""
                                 message={"Number of retry before the container become unhealthy"} />
                         </label>
-                        <Input name="retry" placeholder="3" value={getService().healthcheck?.retries}
+                        <Input name="retry" placeholder="3" value={service.healthcheck?.retries}
                             onChange={(e) => {
                                 setCompose(() => {
-                                    const health = getService().healthcheck
+                                    const health = service.healthcheck
                                     if (health) {
                                         health.retries = Number(e.target.value)
                                     } else {
-                                        getService().healthcheck = new HealthCheck({
+                                        service.healthcheck = new HealthCheck({
                                             test: [],
                                             interval: new Delay(30, TimeUnits.SECONDS),
                                             retries: Number(e.target.value)
@@ -617,11 +618,11 @@ export default function ServiceEditor() {
                         </label>
                         <DurationInput onValueChange={(newDelay) => {
                             setCompose(() => {
-                                const health = getService().healthcheck
+                                const health = service.healthcheck
                                 if (health) {
                                     health.timeout = newDelay
                                 } else {
-                                    getService().healthcheck = new HealthCheck({
+                                    service.healthcheck = new HealthCheck({
                                         test: [],
                                         interval: new Delay(30, TimeUnits.SECONDS),
                                         timeout: newDelay
@@ -637,11 +638,11 @@ export default function ServiceEditor() {
                         </label>
                         <DurationInput onValueChange={(newDelay) => {
                             setCompose(() => {
-                                const health = getService().healthcheck
+                                const health = service.healthcheck
                                 if (health) {
                                     health.start_period = newDelay
                                 } else {
-                                    getService().healthcheck = new HealthCheck({
+                                    service.healthcheck = new HealthCheck({
                                         test: [],
                                         interval: new Delay(30, TimeUnits.SECONDS),
                                         start_period: newDelay
@@ -657,11 +658,11 @@ export default function ServiceEditor() {
                         </label>
                         <DurationInput onValueChange={(newDelay) => {
                             setCompose(() => {
-                                const health = getService().healthcheck
+                                const health = service.healthcheck
                                 if (health) {
                                     health.start_interval = newDelay
                                 } else {
-                                    getService().healthcheck = new HealthCheck({
+                                    service.healthcheck = new HealthCheck({
                                         test: [],
                                         interval: new Delay(30, TimeUnits.SECONDS),
                                         start_interval: newDelay

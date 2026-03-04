@@ -9,9 +9,16 @@ export default function EnvEditor() {
     const { selectedId } = useSelectionStore();
     const { compose, setCompose } = useComposeStore();
 
-    function getEnv(): Env | undefined {
-        return compose.envs.get("id", selectedId)
+    function getEnv(): Env | null {
+        const env = compose.envs.get("id", selectedId)
+        if (env) {
+            return env
+        }
+        return null;
     }
+
+    const env = getEnv();
+    if (!env) return null;
 
     return (
         <form className="flex flex-col gap-6 p-6 glass border-white/40 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-right-4 duration-500">
@@ -22,13 +29,10 @@ export default function EnvEditor() {
             <div className="flex flex-col gap-5 w-full">
                 <div className="flex flex-col gap-2">
                     <label htmlFor="target">key</label>
-                    <Input name="target" value={getEnv()?.key}
+                    <Input name="target" value={env.key}
                         onChange={(e) => {
                             setCompose(() => {
-                                const env = getEnv()
-                                if (env) {
-                                    env.key = e.target.value
-                                }
+                                env.key = e.target.value
                             })
                         }}
                     />
@@ -37,13 +41,10 @@ export default function EnvEditor() {
             <div className="flex flex-col gap-5 w-full">
                 <div className="flex flex-col gap-2">
                     <label htmlFor="target">Value</label>
-                    <Input name="target" value={getEnv()?.value}
+                    <Input name="target" value={env.value}
                         onChange={(e) => {
                             setCompose(() => {
-                                const env = getEnv()
-                                if (env) {
-                                    env.value = e.target.value
-                                }
+                                env.value = e.target.value
                             })
                         }}
                     />

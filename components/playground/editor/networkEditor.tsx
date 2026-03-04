@@ -17,15 +17,16 @@ export default function NetowrkEditor() {
     const { compose, setCompose } = useComposeStore();
     const { networkNodeMeta, setNetworkNodeMeta } = usePositionMap();
 
-    function getNetwork(): Network {
+    function getNetwork(): Network | null {
         const net = compose.networks.get("id", selectedId)
         if (net) {
             return net
         }
-        throw Error(`${selectedId} network is not found`)
+        return null;
     }
 
     const network = getNetwork();
+    if (!network) return null;
     const meta = networkNodeMeta.get(network.id) || { type: 'switch' as NetworkNodeType };
 
     return (

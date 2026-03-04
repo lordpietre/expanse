@@ -24,9 +24,16 @@ export default function VolumeEditor() {
     const { selectedId } = useSelectionStore();
     const { compose, setCompose } = useComposeStore();
 
-    function getVolume(): Volume | undefined {
-        return compose.volumes.get("id", selectedId)
+    function getVolume(): Volume | null {
+        const vol = compose.volumes.get("id", selectedId)
+        if (vol) {
+            return vol
+        }
+        return null;
     }
+
+    const volume = getVolume();
+    if (!volume) return null;
 
     return (
         <form className="flex flex-col gap-4 p-4 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-yellow-500/10 backdrop-blur-2xl border border-amber-500/10 rounded-2xl shadow-xl animate-in fade-in slide-in-from-right-4 duration-500 text-slate-300 w-[280px]">
@@ -38,29 +45,23 @@ export default function VolumeEditor() {
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-bold text-slate-400" htmlFor="target">Volume Name</label>
                     <Input name="target" placeholder="my-volume"
-                        value={getVolume()?.name}
+                        value={volume.name}
                         className="bg-white/5 border-white/10 text-white"
                         onChange={(e) => {
                             setCompose(() => {
-                                const vol = getVolume()
-                                if (vol) {
-                                    vol.name = e.target.value
-                                }
+                                volume.name = e.target.value
                             })
                         }}
                     />
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-bold text-slate-400">Mount Type</label>
-                    <Select 
-                        value={getVolume()?.driver || "local"}
+                    <Select
+                        value={(volume.driver as string) || "local"}
                         onValueChange={(value) => {
                             setCompose(() => {
-                                const vol = getVolume()
-                                if (vol) {
-                                    vol.driver = value
-                                }
+                                volume.driver = value as any
                             })
                         }}
                     >
@@ -80,17 +81,14 @@ export default function VolumeEditor() {
                     </Select>
                 </div>
 
-                {getVolume()?.driver !== "tmpfs" && (
+                {((volume.driver as string) !== "tmpfs") && (
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-bold text-slate-400">Driver</label>
-                        <Select 
-                            value={getVolume()?.driver || "local"}
+                        <Select
+                            value={(volume.driver as string) || "local"}
                             onValueChange={(value) => {
                                 setCompose(() => {
-                                    const vol = getVolume()
-                                    if (vol) {
-                                        vol.driver = value
-                                    }
+                                    volume.driver = value as any
                                 })
                             }}
                         >
@@ -111,26 +109,23 @@ export default function VolumeEditor() {
                     </div>
                 )}
 
-                {getVolume()?.driver === "nfs" && (
+                {((volume.driver as string) === "nfs") && (
                     <div className="flex flex-col gap-2">
                         <label className="text-sm font-bold text-slate-400">NFS Options</label>
-                        <Input 
+                        <Input
                             placeholder="o: addr=192.168.1.1,rw"
-                            value={getVolume()?.driver_opts?.find((opt: any) => opt.key === "type")?.value || ""}
+                            value={volume.driver_opts?.find((opt: any) => opt.key === "type")?.value || ""}
                             className="bg-white/5 border-white/10 text-white"
                             onChange={(e) => {
                                 setCompose(() => {
-                                    const vol = getVolume()
-                                    if (vol) {
-                                        if (!vol.driver_opts) {
-                                            vol.driver_opts = []
-                                        }
-                                        const typeOpt = vol.driver_opts.find((opt: any) => opt.key === "type")
-                                        if (typeOpt) {
-                                            typeOpt.value = e.target.value
-                                        } else {
-                                            vol.driver_opts.push({ id: Math.random().toString(), key: "type", value: e.target.value })
-                                        }
+                                    if (!volume.driver_opts) {
+                                        volume.driver_opts = []
+                                    }
+                                    const typeOpt = volume.driver_opts.find((opt: any) => opt.key === "type")
+                                    if (typeOpt) {
+                                        typeOpt.value = e.target.value
+                                    } else {
+                                        volume.driver_opts.push({ id: Math.random().toString(), key: "type", value: e.target.value })
                                     }
                                 })
                             }}

@@ -1,13 +1,13 @@
 import useSelectionStore from "@/store/selection";
-import {useComposeStore} from "@/store/compose";
-import {KeyValue} from "expanse-docker-lib";
-import {Input} from "@/components/ui/input";
+import { useComposeStore } from "@/store/compose";
+import { KeyValue } from "expanse-docker-lib";
+import { Input } from "@/components/ui/input";
 
 export default function LabelEditor() {
-    const {selectedId} = useSelectionStore();
-    const {compose, setCompose} = useComposeStore();
+    const { selectedId } = useSelectionStore();
+    const { compose, setCompose } = useComposeStore();
 
-    function getLabel(): KeyValue | undefined {
+    function getLabel(): KeyValue | null {
         // Search through all services to find the label with matching ID
         for (const service of compose.services) {
             if (service.labels) {
@@ -17,8 +17,11 @@ export default function LabelEditor() {
                 }
             }
         }
-        return undefined;
+        return null;
     }
+
+    const label = getLabel();
+    if (!label) return null;
 
     return (
         <form className="flex flex-col gap-5">
@@ -28,13 +31,10 @@ export default function LabelEditor() {
                     <label htmlFor="key">Key</label>
                     <Input
                         id="key"
-                        value={getLabel()?.key || ""}
+                        value={label.key || ""}
                         onChange={(e) => {
                             setCompose(() => {
-                                const label = getLabel();
-                                if (label) {
-                                    label.key = e.target.value;
-                                }
+                                label.key = e.target.value;
                             });
                         }}
                     />
@@ -45,13 +45,10 @@ export default function LabelEditor() {
                     <label htmlFor="value">Value</label>
                     <Input
                         id="value"
-                        value={getLabel()?.value || ""}
+                        value={label.value || ""}
                         onChange={(e) => {
                             setCompose(() => {
-                                const label = getLabel();
-                                if (label) {
-                                    label.value = e.target.value;
-                                }
+                                label.value = e.target.value;
                             });
                         }}
                     />

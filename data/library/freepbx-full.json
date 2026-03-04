@@ -1,0 +1,47 @@
+{
+    "name": "FreePBX (Full Stack)",
+    "description": "Complete FreePBX deployment with integrated MariaDB database and persistence.",
+    "category": "Network",
+    "isStack": true,
+    "image": "tiredofit/freepbx:latest",
+    "logo": "https://img.icons8.com/color/512/asterisk.png",
+    "default_ports": [
+        "80:80",
+        "443:443",
+        "5060:5060/udp",
+        "5160:5160/udp",
+        "18000-20000:18000-20000/udp"
+    ],
+    "env_vars": {
+        "DB_EMBEDDED": "FALSE",
+        "DB_HOST": "db",
+        "DB_NAME": "asterisk",
+        "DB_USER": "asterisk",
+        "DB_PASS": "password",
+        "ADMIN_USER": "admin",
+        "ADMIN_PASSWORD": "password",
+        "ADMIN_PASS": "password"
+    },
+    "volumes": [
+        "freepbx_data:/data",
+        "freepbx_www:/var/www/html"
+    ],
+    "related_services": [
+        {
+            "name": "db",
+            "description": "MariaDB database for FreePBX",
+            "category": "Database",
+            "image": "mariadb:10.6",
+            "logo": "https://img.icons8.com/color/512/mariadb.png",
+            "env_vars": {
+                "MYSQL_ROOT_PASSWORD": "password",
+                "MYSQL_DATABASE": "asterisk",
+                "MYSQL_USER": "asterisk",
+                "MYSQL_PASSWORD": "password"
+            },
+            "volumes": [
+                "freepbx_db_data:/var/lib/mysql"
+            ]
+        }
+    ]
+}
