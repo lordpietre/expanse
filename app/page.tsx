@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Settings, Share, Rocket, Activity, LogOut, House as HouseIcon, Box } from "lucide-react";
+import { Settings, Rocket, Activity, LogOut, House as HouseIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { getAllMyComposeOrderByEditDate } from "@/actions/userActions";
@@ -16,7 +16,6 @@ export default function HomePage() {
     const router = useRouter();
 
     const [composes, setComposes] = useState<any[]>([]);
-    const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -48,9 +47,16 @@ export default function HomePage() {
                     const projectName = `expanse-project_${c.id}`;
                     const status = projectStatuses[projectName] || null;
 
+                    const services = c.data?.services || [];
+                    const serviceNames = Object.keys(services).map(s => {
+                        const name = services[s].name || s;
+                        // Avoid repeating the project name if it's identical
+                        return name.toUpperCase();
+                    }).join(", ");
+
                     return {
                         id: c.id.toString(),
-                        name: c.data?.name,
+                        name: serviceNames || c.data?.name || "Untitled Project",
                         createdAt: c.createdAt,
                         updatedAt: c.updatedAt,
                         status,
@@ -59,7 +65,6 @@ export default function HomePage() {
                 });
 
                 setComposes(data);
-                setStats(globalStats);
                 setLoading(false);
             } catch (err) {
                 console.error(err);

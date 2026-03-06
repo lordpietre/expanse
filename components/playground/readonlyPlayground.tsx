@@ -9,7 +9,7 @@ import VolumeNode from "@/components/playground/node/volumeNode";
 import BindingNode from "@/components/playground/node/bindingNode";
 import EnvNode from "@/components/playground/node/envNode";
 import { Background, BackgroundVariant, Edge, Node, ReactFlow, XYPosition } from "@xyflow/react";
-import { dependencyEdgeStyle, envEdgeStyle, networkEdgeStyle, volumeEdgeStyle } from "@/components/playground/node/utils";
+import { dependencyEdgeStyle, networkEdgeStyle, volumeEdgeStyle } from "@/components/playground/node/utils";
 import '@xyflow/react/dist/style.css'
 import { composeMetadata, recreatePositionMap, reHydrateComposeIds } from "@/lib/metadata";
 import CustomBackground from "@/components/playground/customBackground";

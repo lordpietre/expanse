@@ -1,0 +1,35 @@
+{
+    "name": "Vaultwarden (Full Stack)",
+    "description": "Lightweight Bitwarden-compatible server written in Rust, paired with PostgreSQL for a robust and secure password management solution.",
+    "category": "Utilities",
+    "isStack": true,
+    "image": "vaultwarden/server:latest",
+    "logo": "https://img.icons8.com/color/512/shield.png",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "DATABASE_URL": "postgresql://vaultwarden:password@db:5432/vaultwarden",
+        "SIGNUPS_ALLOWED": "true"
+    },
+    "volumes": [
+        "vw_data:/data"
+    ],
+    "related_services": [
+        {
+            "name": "db",
+            "description": "PostgreSQL database for Vaultwarden",
+            "category": "Database",
+            "image": "postgres:18-alpine",
+            "logo": "https://img.icons8.com/color/512/postgreesql.png",
+            "env_vars": {
+                "POSTGRES_DB": "vaultwarden",
+                "POSTGRES_USER": "vaultwarden",
+                "POSTGRES_PASSWORD": "password"
+            },
+            "volumes": [
+                "vw_db_data:/var/lib/postgresql/data"
+            ]
+        }
+    ]
+}

@@ -3,7 +3,7 @@
     "description": "Complete Joomla CMS deployment with integrated PostgreSQL and persistence.",
     "category": "CMS",
     "isStack": true,
-    "image": "joomla:latest",
+    "image": "joomla:5-php8.1-apache",
     "logo": "https://img.icons8.com/color/512/joomla.png",
     "default_ports": [
         "8082:80"
@@ -13,7 +13,9 @@
         "JOOMLA_DB_USER": "joomla",
         "JOOMLA_DB_PASSWORD": "password",
         "JOOMLA_DB_NAME": "joomla",
-        "JOOMLA_DB_DRIVER": "pgsql"
+        "JOOMLA_DB_TYPE": "pgsql",
+        "PHP_UPLOAD_MAX_FILESIZE": "64M",
+        "PHP_POST_MAX_SIZE": "64M"
     },
     "volumes": [
         "joomla_data:/var/www/html"
@@ -23,7 +25,7 @@
             "name": "db",
             "description": "PostgreSQL database for Joomla",
             "category": "Database",
-            "image": "postgres:18-alpine",
+            "image": "postgres:17-alpine",
             "logo": "postgresql",
             "env_vars": {
                 "POSTGRES_USER": "joomla",

@@ -72,6 +72,9 @@ export const getComposeByShareId = async (shareId: string) => {
 };
 
 export const getAllMyShares = async () => {
+    if (process.env.npm_lifecycle_event === 'build') {
+        return [];
+    }
     const payload = await ensureAuth();
     const db = await getDb();
     const collection = db.collection("shares");

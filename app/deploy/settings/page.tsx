@@ -10,12 +10,10 @@ import {
 } from "@/actions/dockerActions";
 import {
     Layers, Database, Activity, RefreshCw, HardDrive, Cpu,
-    Container, ArrowLeft, ChevronRight, Square, Trash2, X,
-    Lock, AlertTriangle, Box, Boxes, MemoryStick, Network,
-    Info
+    Container, ChevronRight, Square, Trash2, X,
+    Lock, AlertTriangle, Boxes, MemoryStick, Network
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
@@ -368,13 +366,10 @@ function ProjectDetail({
 export default function DashboardPage() {
     const [stats, setStats] = useState<any>(null);
     const [sysInfo, setSysInfo] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
     const [selectedProject, setSelectedProject] = useState<any>(null);
 
     // Global action state
     const [modalAction, setModalAction] = useState<null | { label: string; desc: string; fn: () => Promise<any> }>(null);
-    const [actionLoading, setActionLoading] = useState(false);
 
     const fetchData = useCallback(async () => {
         try {
@@ -384,11 +379,8 @@ export default function DashboardPage() {
             ]);
             if (!('error' in dockerStats)) setStats(dockerStats);
             if (!('error' in systemStats)) setSysInfo(systemStats);
-            setLastUpdated(new Date());
         } catch (err) {
             console.error('fetchData error:', err);
-        } finally {
-            setLoading(false);
         }
     }, []);
 
@@ -450,10 +442,8 @@ export default function DashboardPage() {
 
     const handlePasswordConfirm = async () => {
         if (!modalAction) return;
-        setActionLoading(true);
         setModalAction(null);
         const res = await modalAction.fn();
-        setActionLoading(false);
         if (res?.success) {
             toast.success("Operation completed");
             fetchData();

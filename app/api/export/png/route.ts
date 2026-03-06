@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import path from 'path';
-import client from '@/lib/mongodb';
+import { getMongoClient } from '@/lib/mongodb';
 import { ObjectId } from 'bson';
 
 
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Get compose data and metadata from database via share
-        const mongodb = await client;
+        const mongodb = await getMongoClient();
         const db = mongodb.db('compose_craft');
         const sharesCollection = db.collection('shares');
 

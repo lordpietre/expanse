@@ -111,7 +111,7 @@ export class IconDownloader {
             try {
                 const content = JSON.parse(fs.readFileSync(path.join(this.libraryDir, file), 'utf-8'));
                 visit(content);
-            } catch (e) { }
+            } catch { /* ignore error */ }
         }
 
         return Array.from(needed.entries()).map(([slug, source]) => ({ slug, source }));
@@ -123,7 +123,7 @@ export class IconDownloader {
             if (PROTECTED_LOGOS.includes(file)) continue;
             const slug = file.replace(/\.[^/.]+$/, "");
             if (!neededSlugs.includes(slug)) {
-                try { fs.unlinkSync(path.join(this.logosDir, file)); } catch (e) { }
+                try { fs.unlinkSync(path.join(this.logosDir, file)); } catch { /* ignore error */ }
             }
         }
     }
@@ -181,7 +181,7 @@ export class IconDownloader {
                         file.close();
                         resolve(true);
                     });
-                    file.on('error', (err: any) => {
+                    file.on('error', () => {
                         fs.unlink(dest, () => { });
                         resolve(false);
                     });
@@ -194,7 +194,7 @@ export class IconDownloader {
                 } else {
                     resolve(false);
                 }
-            }).on('error', (err: any) => {
+            }).on('error', () => {
                 fs.unlink(dest, () => { });
                 resolve(false);
             });
@@ -207,8 +207,8 @@ export class IconDownloader {
     private normalizeName(name: string): string {
         return name
             .toLowerCase()
-            .replace(/[\s\-_]+/g, '-')
-            .replace(/[^a-z0-9\-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')
             .replace(/^-|-$/g, '');
     }
 }

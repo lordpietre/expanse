@@ -1,10 +1,10 @@
 {
     "name": "Friendica",
-    "image": "friendica/node:stable",
+    "image": "friendica:stable-fpm",
     "category": "Social",
     "logo": "friendica",
-    "description": "Full-featured social network (Facebook-like). Connects with Mastodon, Diaspora, and older protocols.",
+    "description": "Full-featured social network (Facebook-like). This is the FPM version, requires an Nginx sidecar and MariaDB.",
     "default_ports": [
-        "8080:8080"
+        "9000:9000"
     ]
 }

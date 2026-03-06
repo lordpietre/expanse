@@ -39,7 +39,7 @@ export async function exportAllProjects() {
 /**
  * Placeholder for Google Drive export logic
  */
-export async function exportToGoogleDrive(data: any) {
+export async function exportToGoogleDrive() {
     // This would require Google OAuth implementation
     // For now, we'll return a "not implemented" result
     return { success: false, error: "Google Drive integration is not yet configured. Please use local backup for now." };

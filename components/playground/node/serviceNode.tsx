@@ -6,7 +6,7 @@ import { Container, Database, Globe, Network, HardDrive, Key, Tag, ChevronDown, 
 import { useExecutionStore } from "@/store/execution";
 import Selectable from "@/components/playground/node/Selectable";
 import { useState } from "react";
-import { useComposeStore } from "@/store/compose";
+
 import { cn, resolveLogoPath } from "@/lib/utils";
 
 const getCategoryTheme = (imageName: string = "") => {
@@ -17,7 +17,7 @@ const getCategoryTheme = (imageName: string = "") => {
     if (name.includes('nginx') || name.includes('apache') || name.includes('proxy') || name.includes('http')) {
         return { icon: Globe, gradient: "from-sky-500 to-emerald-600", color: "text-sky-400", glow: "shadow-sky-500/20" };
     }
-    if (name.includes('chat') || name.includes('matrix') || name.includes('slack') || name.includes('mattermost') || name.includes('zulip') || name.includes('revolt') || name.includes('synapse') || name.includes('rocketchat')) {
+    if (name.includes('chat') || name.includes('matrix') || name.includes('slack') || name.includes('mattermost') || name.includes('zulip') || name.includes('revolt') || name.includes('synapse') || name.includes('rocketchat') || name.includes('mastodon') || name.includes('social')) {
         return { icon: Globe, gradient: "from-indigo-500 to-purple-600", color: "text-indigo-400", glow: "shadow-indigo-500/20" };
     }
     if (name.includes('vpn') || name.includes('wireguard') || name.includes('proxy') || name.includes('dns') || name.includes('traefik') || name.includes('uptime') || name.includes('netdata')) {
@@ -30,7 +30,6 @@ const getCategoryTheme = (imageName: string = "") => {
 };
 
 export default function ServiceNode({ data, selected }: { data: { service: Service }, selected?: boolean }) {
-    const { tick } = useComposeStore();
     const service = data.service;
     const { serviceStatuses } = useExecutionStore();
     const status = serviceStatuses[service.name]?.status || 'stopped';
@@ -48,9 +47,20 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
         return "p-[1px] rounded-xl border-[4px] border-slate-800 z-50";
     };
 
-    const displayPort = isRunning && serviceStatuses[service.name] && serviceStatuses[service.name].ports
-        ? serviceStatuses[service.name].ports?.split(',')[0].replace('0.0.0.0:', '').replace(':::', '').replace('::', '')
-        : null;
+    const displayPort = (() => {
+        if (serviceStatuses[service.name]?.ports) {
+            const ports = serviceStatuses[service.name].ports;
+            const mappedPort = ports?.split(',').find(p => p.includes('->'))?.split('->')[0]?.split(':').pop();
+            const directPort = ports?.split(',')[0]?.split('/')[0];
+            return mappedPort || directPort;
+        }
+        const portMaps = Array.from(service.ports || []);
+        if (portMaps.length > 0) {
+            const first = portMaps[0] as any;
+            return first.hostPort || first.containerPort;
+        }
+        return null;
+    })();
 
     return (
         <Selectable id={service.id}>
@@ -62,7 +72,7 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                 isRunning && "float"
             )}>
                 {/* Compact Glass Card */}
-                <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-2xl rounded-[0.9rem] flex flex-col overflow-visible border border-white/5" style={{ minWidth: 195 }}>
+                <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 backdrop-blur-2xl rounded-[0.9rem] flex flex-col overflow-visible border border-white/5" style={{ minWidth: 230 }}>
 
                     {/* Gradient Header — always visible, click to toggle */}
                     <div
@@ -76,19 +86,27 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                         title={expanded ? "Collapse node" : "Expand node"}
                     >
                         <div className="absolute inset-0 shimmer opacity-30" />
-                        <div className="flex flex-col z-10 min-w-0">
-                            <div className="flex items-center gap-2">
-                                <h3 className="text-white font-black text-lg tracking-tight uppercase truncate max-w-[120px] leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                                    {service.image?.name || 'no-image'}
+                        <div className="flex flex-col z-10 min-w-0 flex-1">
+                            <div className="flex items-center gap-2 min-w-0">
+                                <h3 className="text-white font-black text-lg tracking-tight uppercase truncate flex-1 leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                                    {service.name || 'no-name'}
                                 </h3>
                                 {displayPort && (
-                                    <span className="text-[10px] font-mono font-bold text-cyan-400 bg-black/40 px-1.5 py-0.5 rounded border border-cyan-500/30 whitespace-nowrap shadow-[0_0_10px_rgba(34,211,238,0.2)]">
+                                    <a
+                                        href={`http://localhost:${displayPort}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="text-xs font-mono font-black text-cyan-400 bg-black/60 px-2 py-1 rounded-lg border-2 border-cyan-500/50 whitespace-nowrap shadow-[0_0_15px_rgba(34,211,238,0.3)] shrink-0 hover:bg-cyan-500/30 hover:scale-110 transition-all cursor-pointer z-50 flex items-center gap-1.5"
+                                        title="Click to open service"
+                                    >
+                                        <Globe className="w-3 h-3" />
                                         {displayPort}
-                                    </span>
+                                    </a>
                                 )}
                             </div>
-                            <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest truncate max-w-[150px] mt-1" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                                {service.name}
+                            <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest truncate mt-1" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                                {service.image?.name || 'no-image'}
                             </span>
                         </div>
                         <div className="flex items-center gap-2 z-10 ml-3 shrink-0">
@@ -98,7 +116,10 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                                     const rawLogo = labels.find(l => l.key === "com.expanse.logo")?.value;
                                     const logo = resolveLogoPath(rawLogo);
                                     return logo ? (
-                                        <img src={logo} className="w-8 h-8 object-contain drop-shadow-lg" alt="logo" />
+                                        <>
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={logo} className="w-8 h-8 object-contain drop-shadow-lg" alt="logo" />
+                                        </>
                                     ) : (
                                         <Icon className="w-8 h-8 text-white drop-shadow-lg" />
                                     );

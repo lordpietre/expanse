@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useComposeStore } from "@/store/compose";
 
 export default function VolumeNode({ data }: { data: { volume: Volume } }) {
-    const { compose, tick } = useComposeStore();
+    const { compose } = useComposeStore();
     const { selectedId } = useSelectionStore();
     const isSelected = selectedId === data.volume.id;
 

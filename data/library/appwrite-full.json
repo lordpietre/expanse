@@ -1,0 +1,77 @@
+{
+    "name": "Appwrite (Full Stack)",
+    "description": "Open-source Backend-as-a-Service (BaaS) that provides developers with all the core APIs required to build any application.",
+    "category": "Development",
+    "isStack": true,
+    "image": "appwrite/appwrite:latest",
+    "logo": "https://img.icons8.com/color/512/appwrite.png",
+    "default_ports": [
+        "80:80",
+        "443:443"
+    ],
+    "env_vars": {
+        "_APP_ENV": "production",
+        "_APP_DB_SCHEMA": "appwrite",
+        "_APP_DB_USER": "root",
+        "_APP_DB_PASS": "password",
+        "_APP_DB_HOST": "mariadb",
+        "_APP_REDIS_HOST": "redis",
+        "_APP_INFLUXDB_HOST": "influxdb",
+        "_APP_DOMAIN": "localhost",
+        "_APP_DOMAIN_TARGET": "localhost",
+        "_APP_OPTIONS_FORCE_HTTPS": "disabled"
+    },
+    "volumes": [
+        "appwrite_data:/storage/app"
+    ],
+    "related_services": [
+        {
+            "name": "mariadb",
+            "description": "MariaDB database for Appwrite",
+            "category": "Database",
+            "image": "mariadb:10.7",
+            "logo": "https://img.icons8.com/color/512/mariadb.png",
+            "env_vars": {
+                "MYSQL_ROOT_PASSWORD": "password",
+                "MYSQL_DATABASE": "appwrite"
+            },
+            "volumes": [
+                "appwrite_db_data:/var/lib/mysql"
+            ],
+            "healthcheck": {
+                "test": [
+                    "CMD-SHELL",
+                    "mysqladmin ping -h localhost -u root -p\"$${MYSQL_ROOT_PASSWORD:-$${MARIADB_ROOT_PASSWORD:-}}\""
+                ],
+                "interval": "10s",
+                "timeout": "5s",
+                "retries": 5,
+                "start_period": "30s"
+            }
+        },
+        {
+            "name": "redis",
+            "description": "Redis for Appwrite real-time and cache",
+            "category": "Cache",
+            "image": "redis:alpine",
+            "logo": "https://img.icons8.com/color/512/redis.png"
+        },
+        {
+            "name": "influxdb",
+            "description": "InfluxDB for Appwrite analytics",
+            "category": "Database",
+            "image": "influxdb:2.0-alpine",
+            "logo": "https://img.icons8.com/color/512/influxdb.png",
+            "env_vars": {
+                "DOCKER_INFLUXDB_INIT_MODE": "setup",
+                "DOCKER_INFLUXDB_INIT_USERNAME": "appwrite",
+                "DOCKER_INFLUXDB_INIT_PASSWORD": "password",
+                "DOCKER_INFLUXDB_INIT_ORG": "appwrite",
+                "DOCKER_INFLUXDB_INIT_BUCKET": "appwrite"
+            },
+            "volumes": [
+                "appwrite_influx_data:/var/lib/influxdb2"
+            ]
+        }
+    ]
+}

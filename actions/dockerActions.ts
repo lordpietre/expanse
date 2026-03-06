@@ -13,9 +13,9 @@ const execAsync = promisify(exec);
 
 /** DB healthcheck templates keyed by image substring */
 const DB_HEALTHCHECKS: Record<string, object> = {
-    mariadb: { test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    mariadb: { test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$${MYSQL_ROOT_PASSWORD:-$${MARIADB_ROOT_PASSWORD:-}}\""], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
     mysql: { test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
-    postgres: { test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
+    postgres: { test: ["CMD-SHELL", "pg_isready -h localhost -U $${POSTGRES_USER:-postgres}"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
     mongo: { test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
     redis: { test: ["CMD", "redis-cli", "ping"], interval: "5s", timeout: "3s", retries: 5 },
 }
@@ -380,7 +380,7 @@ export async function getAvailablePort(preferred: number): Promise<number> {
         return await checkPort(p);
     };
 
-    let isAvailable = await isPortFree(preferred);
+    const isAvailable = await isPortFree(preferred);
     if (isAvailable) return preferred;
 
     // Search for a free port starting from a random ephemeral range if possible, 
@@ -407,11 +407,38 @@ export async function stopProjectByName(projectName: string) {
 export async function removeProjectByName(projectName: string) {
     await ensureAuth();
     try {
+        // 1. Try standard compose down first which is the cleanest way
         const { stdout, stderr } = await execAsync(`docker compose -p ${projectName} down --volumes --remove-orphans`);
-        console.log('Remove project:', stdout);
-        if (stderr) console.error('Remove project stderr:', stderr);
-        return { success: true };
+        console.log('Remove project standard:', stdout);
+
+        // 2. Robust fallback: Identify any remaining containers or volumes with this project label
+        // This handles cases where 'down' might have missed things or if the project name 
+        // in Docker doesn't perfectly match what Compose expect for 'down'
+        const { stdout: containerIds } = await execAsync(`docker ps -a --filter "label=com.docker.compose.project=${projectName}" -q`);
+        if (containerIds.trim()) {
+            const ids = containerIds.trim().split(/\s+/).join(' ');
+            await execAsync(`docker rm -f ${ids}`);
+        }
+
+        const { stdout: volumeNames } = await execAsync(`docker volume ls --filter "label=com.docker.compose.project=${projectName}" -q`);
+        if (volumeNames.trim()) {
+            const names = volumeNames.trim().split(/\s+/).join(' ');
+            await execAsync(`docker volume rm -f ${names}`);
+        }
+
+        const { stdout: networkNames } = await execAsync(`docker network ls --filter "label=com.docker.compose.project=${projectName}" -q`);
+        if (networkNames.trim()) {
+            const names = networkNames.trim().split(/\s+/).join(' ');
+            await execAsync(`docker network rm ${names}`);
+        }
+
+        if (stderr && !stderr.includes('Network') && !stderr.includes('Volume')) {
+            console.error('Remove project stderr:', stderr);
+        }
+
+        return { success: true, message: `Project "${projectName}" and all associated volumes and networks deleted.` };
     } catch (error: any) {
+        console.error('Remove project error:', error);
         return { success: false, error: error.message };
     }
 }
@@ -560,31 +587,39 @@ export async function validateComposePorts(yamlContent: string) {
     await ensureAuth();
     const doc = YAML.parse(yamlContent);
     const reassignments: Record<string, { old: number, new: number }[]> = {};
+    const usedInConfig = new Set<number>();
     let hasChanges = false;
 
     if (doc.services) {
         for (const [serviceName, service] of Object.entries<any>(doc.services)) {
             if (service.ports) {
-                const updatedPorts: string[] = [];
                 const serviceReassignments: { old: number, new: number }[] = [];
 
-                for (const p of service.ports) {
-                    const portStr = String(p);
+                for (let i = 0; i < service.ports.length; i++) {
+                    const portStr = String(service.ports[i]);
                     const match = portStr.match(/^(\d+):(\d+)$/);
                     if (match) {
                         const hostPort = parseInt(match[1]);
                         const containerPort = parseInt(match[2]);
-                        const availablePort = await getAvailablePort(hostPort);
 
-                        if (availablePort !== hostPort) {
-                            updatedPorts.push(`${availablePort}:${containerPort}`);
-                            serviceReassignments.push({ old: hostPort, new: availablePort });
-                            hasChanges = true;
+                        // Check if this port is already used by another service in this config
+                        // OR if it's actually busy in the system
+                        let targetPort = hostPort;
+                        if (usedInConfig.has(targetPort)) {
+                            targetPort = await getAvailablePort(targetPort + 1);
                         } else {
-                            updatedPorts.push(portStr);
+                            const availablePort = await getAvailablePort(targetPort);
+                            if (availablePort !== targetPort) {
+                                targetPort = availablePort;
+                            }
                         }
-                    } else {
-                        updatedPorts.push(portStr);
+
+                        if (targetPort !== hostPort) {
+                            service.ports[i] = `${targetPort}:${containerPort}`;
+                            serviceReassignments.push({ old: hostPort, new: targetPort });
+                            hasChanges = true;
+                        }
+                        usedInConfig.add(targetPort);
                     }
                 }
 

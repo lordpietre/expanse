@@ -144,6 +144,8 @@ export const useComposeStore = create<ComposeState>((set, get) => {
         addServiceFromTemplate: async (template: TemplateService) => {
             const { setCompose } = useComposeStore.getState();
 
+            const stackSuffix = generateRandomName().substring(0, 4);
+
             const createService = (tmp: TemplateService, isRelated = false): Service => {
                 const [imageName, imageTag] = tmp.image.split(':');
                 const newEnvironment = new SuperSet<Readonly<Env>>();
@@ -183,9 +185,8 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                 }
 
                 const baseName = tmp.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-                // For related services (like "db") we try to keep the exact name if it's short, 
-                // but for main ones we add a random suffix to avoid collisions.
-                const finalName = isRelated && baseName.length < 8 ? baseName : baseName + "_" + generateRandomName().substring(0, 4);
+                // Use the consistent stack suffix
+                const finalName = isRelated && baseName.length < 8 ? baseName : baseName + "_" + stackSuffix;
 
                 return new Service({
                     name: finalName,
@@ -193,7 +194,8 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                     environment: newEnvironment.size > 0 ? newEnvironment : undefined,
                     ports: newPorts.length > 0 ? newPorts : undefined,
                     bindings: newBindings.size > 0 ? newBindings : undefined,
-                    labels: tmp.logo ? [new KeyValue("com.expanse.logo", tmp.logo)] : undefined
+                    labels: tmp.logo ? [new KeyValue("com.expanse.logo", tmp.logo)] : undefined,
+                    command: typeof tmp.command === 'string' ? [tmp.command] : tmp.command
                 });
             };
 
@@ -212,9 +214,14 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                 }
                 compose.addService(mainService);
 
-                if (template.related_services) {
-                    const nameMap = new Map<string, string>();
+                const allServices: Service[] = [mainService];
+                const nameMap = new Map<string, string>();
 
+                // Add main service to name map
+                const mainBaseName = template.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                nameMap.set(mainBaseName, mainService.name);
+
+                if (template.related_services) {
                     template.related_services.forEach(rel => {
                         const relService = createService(rel, true);
                         if (stackNetwork) {
@@ -224,32 +231,68 @@ export const useComposeStore = create<ComposeState>((set, get) => {
                         const baseName = rel.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
                         nameMap.set(baseName, relService.name);
 
+                        allServices.push(relService);
                         compose.addService(relService);
                         // Automatically make the main service depend on the related one
                         mainService.depends_on.add(relService);
                     });
+                }
 
-                    // Update main service environment with the dynamically generated names
-                    if (mainService.environment) {
+                // Update all services (main + related) environment and commands with dynamically generated names
+                allServices.forEach(srv => {
+                    // Update Environment
+                    if (srv.environment) {
                         const updatedEnv = new SuperSet<Readonly<Env>>();
-                        mainService.environment.forEach(env => {
+                        srv.environment.forEach(env => {
                             let newValue = env.value;
                             if (newValue && nameMap.has(newValue)) {
                                 newValue = nameMap.get(newValue) as string;
                             } else if (newValue) {
                                 nameMap.forEach((finalName, originalName) => {
-                                    const regex = new RegExp(`(?<=[@\\/:]|^)${originalName}(?=[@\\/:]|$)`, 'g');
-                                    newValue = newValue!.replace(regex, finalName);
+                                    // 1. Replace bracketed placeholders like ${service} -> service_xyz
+                                    const placeholderRegex = new RegExp(`\\$\\{${originalName}\\}`, 'g');
+                                    newValue = newValue!.replace(placeholderRegex, finalName);
+
+                                    // 2. Replace bare names with boundaries (avoiding protocol schemes)
+                                    const bareRegex = new RegExp(`(?<=[@\\/:]|\\s|^)${originalName}(?=[@\\/:]|\\s|$)(?!:\\/\\/)`, 'g');
+                                    newValue = newValue!.replace(bareRegex, finalName);
                                 });
                             }
                             updatedEnv.add(new Env(env.key, newValue));
                         });
-                        mainService.environment = updatedEnv;
+                        srv.environment = updatedEnv;
                     }
-                }
 
-                toast.success(`${template.name} added to compose`);
+                    // Update Command
+                    if (srv.command) {
+                        if (Array.isArray(srv.command)) {
+                            srv.command = (srv.command as string[]).map(cmdPart => {
+                                let newPart = cmdPart;
+                                nameMap.forEach((finalName, originalName) => {
+                                    const placeholderRegex = new RegExp(`\\$\\{${originalName}\\}`, 'g');
+                                    newPart = newPart.replace(placeholderRegex, finalName);
+
+                                    const bareRegex = new RegExp(`(?<=[@\\/:]|\\s|^)${originalName}(?=[@\\/:]|\\s|$)(?!:\\/\\/)`, 'g');
+                                    newPart = newPart.replace(bareRegex, finalName);
+                                });
+                                return newPart;
+                            });
+                        } else {
+                            let newCommand = srv.command as unknown as string;
+                            nameMap.forEach((finalName, originalName) => {
+                                const placeholderRegex = new RegExp(`\\$\\{${originalName}\\}`, 'g');
+                                newCommand = newCommand.replace(placeholderRegex, finalName);
+
+                                const bareRegex = new RegExp(`(?<=[@\\/:]|\\s|^)${originalName}(?=[@\\/:]|\\s|$)(?!:\\/\\/)`, 'g');
+                                newCommand = newCommand.replace(bareRegex, finalName);
+                            });
+                            srv.command = newCommand as any;
+                        }
+                    }
+                });
             });
-        }
+
+            toast.success(`${template.name} added to compose`);
+        },
     };
 });

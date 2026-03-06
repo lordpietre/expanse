@@ -22,7 +22,23 @@ export type ComposeLine = {
 export const columns: ColumnDef<ComposeLine>[] = [
     {
         accessorKey: "name",
-        header: "Name",
+        header: "Deployment / Services",
+        cell: ({ row }) => {
+            const name = row.original.name || "Untitled";
+            const services = name.split(", ");
+            return (
+                <div className="flex flex-col gap-1.5 py-1">
+                    {services.map((s, i) => (
+                        <div key={i} className="flex items-center gap-2 group">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40 group-hover:bg-emerald-500 transition-colors shrink-0" />
+                            <span className="text-[11px] font-black text-white/90 uppercase tracking-tighter leading-none truncate max-w-[200px]">
+                                {s}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            )
+        }
     },
     {
         accessorKey: "status",

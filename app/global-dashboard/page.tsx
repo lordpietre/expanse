@@ -9,10 +9,10 @@ import {
     removeVolume, removeVolumes
 } from "@/actions/dockerActions";
 import {
-    Layers, Database, Activity, RefreshCw, HardDrive, Cpu,
+    Layers, Activity, RefreshCw, HardDrive, Cpu,
     Container, ArrowLeft, ChevronRight, Square, Trash2, X,
-    Lock, AlertTriangle, Box, Boxes, MemoryStick, Network,
-    Info, CheckSquare, Square as SquareIcon
+    Lock, AlertTriangle, Boxes, MemoryStick,
+    CheckSquare, Square as SquareIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -47,19 +47,6 @@ function parsePorts(portsStr: string | undefined): { host: string; container: st
     return result;
 }
 
-function PortChips({ ports }: { ports: { host: string; container: string }[] }) {
-    if (!ports.length) return null;
-    return (
-        <div className="flex flex-wrap gap-1 mt-1">
-            {ports.map((p, i) => (
-                <span key={i} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[9px] font-mono font-bold text-cyan-400">
-                    <Network className="w-2.5 h-2.5 shrink-0" />
-                    {p.host === '-' ? p.container : `${p.host}:${p.container}`}
-                </span>
-            ))}
-        </div>
-    );
-}
 
 // ─── Password Modal ───────────────────────────────────────────────────────────
 interface PasswordModalProps {
@@ -241,7 +228,7 @@ function ProjectDetail({
                             <Button
                                 onClick={() => runWithPassword(
                                     "Delete project",
-                                    `All containers and volumes of "${project.Name}" will be deleted`,
+                                    `URGENT: All containers and VOLUMES (persistent data) of "${project.Name}" will be permanently deleted. This action cannot be undone.`,
                                     () => removeProjectByName(project.Name).then(r => {
                                         if (r.success) {
                                             const { compose, resetCompose } = useComposeStore.getState();
@@ -434,7 +421,6 @@ export default function DashboardPage() {
 
     // Global action state
     const [modalAction, setModalAction] = useState<null | { label: string; desc: string; fn: () => Promise<any> }>(null);
-    const [actionLoading, setActionLoading] = useState(false);
 
     const fetchData = useCallback(async () => {
         try {
@@ -510,10 +496,8 @@ export default function DashboardPage() {
 
     const handlePasswordConfirm = async () => {
         if (!modalAction) return;
-        setActionLoading(true);
         setModalAction(null);
         const res = await modalAction.fn();
-        setActionLoading(false);
         if (res?.success) {
             if (res.warning) {
                 toast.error(res.warning, { duration: 5000 });
@@ -692,7 +676,7 @@ export default function DashboardPage() {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (!confirm(`Completely delete "${proj.Name}"? This will erase all containers and volumes.`)) return;
+                                                        if (!confirm(`WARNING: Completely delete "${proj.Name}"? This will permanently erase ALL associated containers and VOLUMES (database/files).`)) return;
                                                         toast.promise(
                                                             removeProjectByName(proj.Name).then(r => {
                                                                 if (r.success) {

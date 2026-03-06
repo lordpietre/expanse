@@ -42,11 +42,16 @@ export default async function RootLayout({
 
 
   let version
-  try {
-    version = await getCachedLastVersion() || undefined
-  } catch (error) {
-    console.error("Failed to fetch latest version:", error)
-    // Continue with current version if fetch fails
+  if (process.env.npm_lifecycle_event !== 'build') {
+    try {
+      // Use a 2s timeout for version check to prevent hanging the layout
+      const timeoutPromise = new Promise<undefined>((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 2000)
+      );
+      version = await Promise.race([getCachedLastVersion(), timeoutPromise]).catch(() => undefined);
+    } catch (error) {
+      console.error("Failed to fetch latest version:", error)
+    }
   }
 
   let showUpdateBanner = version != packageJson.version
@@ -70,7 +75,9 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${dm_sans.className} antialiased h-screen`}
       >
-        {!process.env.DISABLE_TELEMETRY && <Instrumentation posthogKey={process.env.NEXT_PUBLIC_POSTHOG_KEY!} />}
+        {!process.env.DISABLE_TELEMETRY && process.env.NEXT_PUBLIC_POSTHOG_KEY && (
+          <Instrumentation posthogKey={process.env.NEXT_PUBLIC_POSTHOG_KEY} />
+        )}
         <Toaster
           position="top-right"
           reverseOrder={false}

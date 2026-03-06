@@ -27,9 +27,15 @@ export default async function Page() {
         const projectName = `expanse-project_${c.id}`;
         const status = projectStatuses[projectName] || null;
 
+        const services = c.data?.services || [];
+        const serviceNames = Object.keys(services).map(s => {
+            const name = services[s].name || s;
+            return name.toUpperCase();
+        }).join(", ");
+
         return {
             id: c.id.toString(),
-            name: c.data?.name,
+            name: serviceNames || c.data?.name || "Untitled Project",
             createdAt: c.createdAt,
             updatedAt: c.updatedAt,
             status,

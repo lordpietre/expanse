@@ -34,12 +34,13 @@ const categoryOrder: Record<string, number> = {
     'Automation': 7,
     'Cloud': 8,
     'AI': 9,
-    'Development': 10,
-    'Messaging': 11,
-    'Queue': 12,
-    'Applications': 13,
-    'OS': 14,
-    'Other': 15,
+    'Utilities': 10,
+    'Development': 11,
+    'Messaging': 12,
+    'Queue': 13,
+    'Applications': 14,
+    'OS': 15,
+    'Other': 16,
 };
 
 const dbPopularity: Record<string, number> = {
@@ -61,16 +62,18 @@ const dbPopularity: Record<string, number> = {
 };
 
 const cmsPopularity: Record<string, number> = {
-    'WordPress': 1,
-    'Drupal': 2,
-    'Joomla': 3,
-    'Ghost': 4,
-    'Strapi': 5,
-    'Directus': 6,
-    'Payload CMS': 7,
-    'October CMS': 8,
-    'TYPO3': 9,
-    'Plone': 10,
+    'Ghost (Full Stack)': 1,
+    'WordPress (Full Stack)': 2,
+    'WordPress': 3,
+    'Drupal': 4,
+    'Joomla': 5,
+    'Ghost': 6,
+    'Strapi': 7,
+    'Directus': 8,
+    'Payload CMS': 9,
+    'October CMS': 10,
+    'TYPO3': 11,
+    'Plone': 12,
 };
 
 const networkPopularity: Record<string, number> = {
@@ -89,14 +92,16 @@ const networkPopularity: Record<string, number> = {
 };
 
 const cloudPopularity: Record<string, number> = {
-    'Nextcloud': 1,
-    'FileBrowser': 2,
-    'Seafile': 3,
-    'Cloudreve': 4,
-    'OpenCloud': 5,
-    'Ocis': 6,
-    'Cozy': 7,
-    'Syncthing': 8,
+    'Nextcloud Enterprise (Optimized)': 1,
+    'Elasticsearch': 2,
+    'Nextcloud': 3,
+    'FileBrowser': 4,
+    'Seafile': 5,
+    'Cloudreve': 6,
+    'OpenCloud': 7,
+    'Ocis': 8,
+    'Cozy': 9,
+    'Syncthing': 10,
 };
 
 const socialPopularity: Record<string, number> = {
@@ -119,16 +124,17 @@ const aiPopularity: Record<string, number> = {
 };
 
 const automationPopularity: Record<string, number> = {
-    'n8n': 1,
-    'Activepieces': 2,
-    'Node-RED': 3,
-    'Windmill': 4,
-    'Automatisch': 5,
-    'Kestra': 6,
-    'Huginn': 7,
-    'Flowise': 8,
-    'Apache Airflow': 9,
-    'Budibase': 10,
+    'n8n (Full Stack)': 1,
+    'n8n': 2,
+    'Activepieces': 3,
+    'Node-RED': 4,
+    'Windmill': 5,
+    'Automatisch': 6,
+    'Kestra': 7,
+    'Huginn': 8,
+    'Flowise': 9,
+    'Apache Airflow': 10,
+    'Budibase': 11,
 };
 
 const webServerPopularity: Record<string, number> = {
@@ -159,23 +165,38 @@ const messagingPopularity: Record<string, number> = {
 };
 
 const monitoringPopularity: Record<string, number> = {
-    'Grafana': 1,
-    'Prometheus': 2,
-    'Uptime Kuma': 3,
-    'Netdata': 4,
-    'Zabbix': 5,
+    'Monitoring Stack (Prometheus + Grafana)': 1,
+    'ELK Stack (Observability)': 2,
+    'PLG Stack (Modern Logging)': 3,
+    'Grafana + PostgreSQL (Full Stack)': 4,
+    'Grafana': 5,
+    'Prometheus': 6,
+    'Uptime Kuma': 7,
+    'Netdata': 8,
+    'Zabbix': 9,
 };
 
 const developmentPopularity: Record<string, number> = {
-    'GitLab': 1,
-    'Jenkins': 2,
-    'SonarQube': 3,
+    'Appwrite (Full Stack)': 1,
+    'Gitea (Full Stack)': 2,
+    'Gitea': 3,
+    'VS Code Server': 4,
+    'Postman': 5,
+    'Jenkins': 6,
+};
+
+const utilitiesPopularity: Record<string, number> = {
+    'Vaultwarden (Full Stack)': 1,
+    'Vaultwarden': 2,
+    'CyberChef': 3,
+    'IT-Tools': 4,
 };
 
 const applicationsPopularity: Record<string, number> = {
-    'Portainer': 1,
-    'Watchtower': 2,
-    'Duplicati': 3,
+    'Media Center (Jellyfin + Arrs)': 1,
+    'Portainer': 2,
+    'Watchtower': 3,
+    'Duplicati': 4,
 };
 
 const osPopularity: Record<string, number> = {
@@ -284,6 +305,12 @@ function readFromDir(dir: string): TemplateService[] {
         if (a.category === 'Monitoring' && b.category === 'Monitoring') {
             const popA = monitoringPopularity[a.name] ?? 99;
             const popB = monitoringPopularity[b.name] ?? 99;
+            return popA - popB;
+        }
+
+        if (a.category === 'Utilities' && b.category === 'Utilities') {
+            const popA = utilitiesPopularity[a.name] ?? 99;
+            const popB = utilitiesPopularity[b.name] ?? 99;
             return popA - popB;
         }
 

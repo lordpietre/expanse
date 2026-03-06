@@ -173,6 +173,9 @@ export const registerComposeWithoutMetadata = async (compose: object, userId: Ob
 };
 
 export const getAllMyComposeOrderByEditDate = async () => {
+    if (process.env.npm_lifecycle_event === 'build') {
+        return [];
+    }
     const payload = await ensureAuth();
     const db = await getDb();
     const collection = db.collection("composes");
@@ -322,6 +325,9 @@ export const getComposeByIdPublic = async (composeId: string) => {
 };
 
 export const getMyInfos = async () => {
+    if (process.env.npm_lifecycle_event === 'build') {
+        return undefined;
+    }
     const payload = await ensureAuth();
     const db = await getDb();
     const collection = db.collection("users");

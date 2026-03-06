@@ -12,8 +12,8 @@ import {
 import { useComposeStore } from "@/store/compose";
 import ServiceNode from "@/components/playground/node/serviceNode";
 import NetworkNode from "@/components/playground/node/networkNode";
-import { Binding, Compose, Env, KeyValue, Network, SuperSet, Volume, Service } from "expanse-docker-lib";
-import { dependencyEdgeStyle, envEdgeStyle, networkEdgeStyle, volumeEdgeStyle, labelEdgeStyle } from "@/components/playground/node/utils";
+import { Binding, Compose, Env, KeyValue, SuperSet, Volume, Service } from "expanse-docker-lib";
+import { dependencyEdgeStyle, networkEdgeStyle, volumeEdgeStyle, labelEdgeStyle } from "@/components/playground/node/utils";
 import ELK from 'elkjs/lib/elk.bundled.js';
 
 import '@xyflow/react/dist/style.css'

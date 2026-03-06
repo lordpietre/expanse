@@ -1,27 +1,93 @@
 {
-    "name": "Mastodon",
+    "name": "Mastodon Web",
     "image": "tootsuite/mastodon:latest",
     "category": "Social",
     "isStack": true,
     "logo": "mastodon",
     "description": "Classic federated microblogging platform. Mature with thousands of instances, excellent mobile apps, and powerful moderation tools. Heavy on resources (Ruby + Node + Postgres + Redis).",
     "default_ports": [
-        "3000:3000",
-        "4000:4000"
+        "3000:3000"
+    ],
+    "command": [
+        "/bin/bash",
+        "-c",
+        "rm -f /mastodon/tmp/pids/server.pid; ruby -e 'require \"socket\"; loop { begin; TCPSocket.new(\"postgres\", 5432); break; rescue; puts \"Waiting for postgres...\"; sleep 3; end }'; bundle exec rails db:migrate 2>/dev/null || bundle exec rails db:setup; bundle exec rails s -p 3000 -b 0.0.0.0"
     ],
     "env_vars": {
+        "RAILS_SERVE_STATIC_FILES": "true",
         "DB_HOST": "postgres",
         "DB_PORT": "5432",
-        "DB_USER": "mastodon",
+        "DB_USER": "postgres",
         "DB_NAME": "mastodon",
         "DB_PASS": "password",
         "REDIS_HOST": "redis",
-        "SECRET_KEY_BASE": "replace-with-random-value",
-        "OTP_SECRET": "replace-with-random-value",
-        "VAPID_PRIVATE_KEY": "replace-with-random-value",
-        "VAPID_PUBLIC_KEY": "replace-with-random-value"
+        "LOCAL_DOMAIN": "localhost",
+        "WEB_DOMAIN": "localhost",
+        "RAILS_ENV": "production",
+        "SECRET_KEY_BASE": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+        "OTP_SECRET": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+        "VAPID_PRIVATE_KEY": "n0_vApId_PrIvAtE_kEy_HeRe_uSe_gEnErAtEd_oNe_In_pRoD",
+        "VAPID_PUBLIC_KEY": "BDRnE_OmsXoUpu5y7X-K6vY3Z5d4T-M4f5E6g7h8i9j0k1l2m3n4o5p6q7r8s9t0U1V2W3X4Y5Z6a7b8c9d0E1F2G3H4I5J6K7L8",
+        "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+        "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+        "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d"
     },
+    "volumes": [
+        "mastodon_public_system_v4:/mastodon/public/system"
+    ],
     "related_services": [
+        {
+            "name": "Mastodon Sidekiq",
+            "description": "Background worker for Mastodon",
+            "category": "Worker",
+            "image": "tootsuite/mastodon:latest",
+            "logo": "mastodon",
+            "command": [
+                "bundle",
+                "exec",
+                "sidekiq"
+            ],
+            "env_vars": {
+                "DB_HOST": "postgres",
+                "DB_PORT": "5432",
+                "DB_USER": "postgres",
+                "DB_NAME": "mastodon",
+                "DB_PASS": "password",
+                "REDIS_HOST": "redis",
+                "RAILS_ENV": "production",
+                "SECRET_KEY_BASE": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+                "OTP_SECRET": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+                "ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+                "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d",
+                "ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY": "5e8d8d8d8d8d8d8d8d8d8d8d8d8d8d8d"
+            },
+            "volumes": [
+                "mastodon_public_system_v4:/mastodon/public/system"
+            ]
+        },
+        {
+            "name": "Mastodon Streaming",
+            "description": "Streaming API for Mastodon",
+            "category": "Messaging",
+            "image": "tootsuite/mastodon:latest",
+            "logo": "mastodon",
+            "command": [
+                "node",
+                "./streaming"
+            ],
+            "default_ports": [
+                "4000:4000"
+            ],
+            "env_vars": {
+                "DB_HOST": "postgres",
+                "DB_PORT": "5432",
+                "DB_USER": "postgres",
+                "DB_NAME": "mastodon",
+                "DB_PASS": "password",
+                "REDIS_HOST": "redis",
+                "NODE_ENV": "production"
+            }
+        },
         {
             "name": "postgres",
             "description": "PostgreSQL database for Mastodon",
@@ -30,11 +96,11 @@
             "logo": "postgresql",
             "env_vars": {
                 "POSTGRES_DB": "mastodon",
-                "POSTGRES_USER": "mastodon",
+                "POSTGRES_USER": "postgres",
                 "POSTGRES_PASSWORD": "password"
             },
             "volumes": [
-                "mastodon_db:/var/lib/postgresql/data"
+                "mastodon_db_v4:/var/lib/postgresql/data"
             ]
         },
         {
@@ -44,7 +110,7 @@
             "image": "redis:7-alpine",
             "logo": "redis",
             "volumes": [
-                "mastodon_redis:/data"
+                "mastodon_redis_v4:/data"
             ]
         }
     ]

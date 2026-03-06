@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify, SignJWT } from "jose";
-import { getDb, DB_NAME } from "@/lib/mongodb";
+import { getDb } from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 
 const SESSION_DURATION_STR = '30d';

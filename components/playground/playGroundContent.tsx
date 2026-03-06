@@ -2,10 +2,10 @@
 
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Code, FileUp, Zap, Image, Square, Play, FileDown, Library, Box, Activity, CheckCircle2, Loader2, ChevronLeft, ChevronRight, PanelLeftClose, PanelLeftCloseIcon, Terminal, Globe, Search, Plus, FolderOpen, Save, Share2, LayoutGrid, ListPlus } from "lucide-react";
+import { Code, FileUp, Zap, Image, Square, Play, FileDown, CheckCircle2, Loader2, ChevronLeft, Plus } from "lucide-react";
 import Playground, { PlaygroundHandle } from "@/components/playground/playground";
 import { useComposeStore, save } from "@/store/compose";
-import useSelectionStore from "@/store/selection";
+
 import { useExecutionStore } from "@/store/execution";
 import useComposeIdStore from "@/store/composeId";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,7 +20,7 @@ import { runCompose as executeCompose, stopCompose, getComposeStatus, getCompose
 import ExecutionPanel from "./executionPanel";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+
 
 // ── Deploy Phase Types ──────────────────────────────────────────────────────
 type DeployPhase = null | 'validating' | 'writing' | 'starting' | 'done';
@@ -87,10 +87,9 @@ import { useSearchParams } from "next/navigation";
 import { getComposeById } from "@/actions/userActions";
 import { reHydrateComposeIds, recreatePositionMap, recreateConnectionMap } from "@/lib/metadata";
 
-export default function PlaygroundContent({ inviteMode = false }: { inviteMode?: boolean }) {
+export default function PlaygroundContent() {
     const { compose, setCompose, replaceCompose, isDirty, resetCompose } = useComposeStore();
     const { id: composeId } = useComposeIdStore();
-    const { setSelectedString } = useSelectionStore();
     const { isExecuting, setExecuting, clearStatuses, updateStatuses, setLogs } = useExecutionStore();
     const { isLibraryOpen, setIsLibraryOpen } = useUIStore();
     const playgroundRef = useRef<PlaygroundHandle>(null);
@@ -288,7 +287,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     setDeployPhase('done');
                     setTimeout(() => setDeployPhase(null), 2500);
                     toast.success(
-                        (_t: any) => (
+                        () => (
                             <div className="flex flex-col gap-1 w-full min-w-[200px]">
                                 <span className="font-bold">Compose execution started</span>
                                 <ExposedPortsSummary />
@@ -300,16 +299,21 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 } else if (res.collisionPort) {
                     toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
-                    const newPort = await getAvailablePort(res.collisionPort + 1);
-                    await setCompose((currentCompose) => {
-                        currentCompose.services.forEach(service => {
-                            service.ports?.forEach(portMapping => {
-                                if (portMapping.hostPort === res.collisionPort) {
-                                    portMapping.hostPort = newPort;
-                                }
-                            });
+                    const servicesToFix = Array.from(compose.services).filter(s =>
+                        s.ports?.some(p => p.hostPort === res.collisionPort)
+                    );
+
+                    let lastKnownPort = res.collisionPort;
+                    for (const s of servicesToFix) {
+                        const newPort = await getAvailablePort(lastKnownPort + 1);
+                        await setCompose((curr) => {
+                            const svc = Array.from(curr.services).find(cs => cs.name === s.name);
+                            const mapping = svc?.ports?.find(p => p.hostPort === res.collisionPort);
+                            if (mapping) mapping.hostPort = newPort;
                         });
-                    });
+                        lastKnownPort = newPort;
+                    }
+
                     currentYaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
                     retries++;
                 } else {
@@ -325,7 +329,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 setDeployPhase(null);
                 setExecuting(false);
             }
-        } catch (error) {
+        } catch {
             toast.error("An unexpected error occurred");
             setDeployPhase(null);
             setExecuting(false);
@@ -339,7 +343,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
         setDeployPhase('writing');
         await new Promise(r => setTimeout(r, 80));
 
-        let yaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
+        const yaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
 
         try {
             let retries = 0;
@@ -353,7 +357,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                     setDeployPhase('done');
                     setTimeout(() => setDeployPhase(null), 2500);
                     toast.success(
-                        (_t: any) => (
+                        () => (
                             <div className="flex flex-col gap-1 w-full min-w-[200px]">
                                 <span className="font-bold">Compose restarted</span>
                                 <ExposedPortsSummary />
@@ -365,16 +369,21 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 } else if (res.collisionPort) {
                     toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
-                    const newPort = await getAvailablePort(res.collisionPort + 1);
-                    await setCompose((currentCompose) => {
-                        currentCompose.services.forEach(service => {
-                            service.ports?.forEach(portMapping => {
-                                if (portMapping.hostPort === res.collisionPort) {
-                                    portMapping.hostPort = newPort;
-                                }
-                            });
+                    const servicesToFix = Array.from(compose.services).filter(s =>
+                        s.ports?.some(p => p.hostPort === res.collisionPort)
+                    );
+
+                    let lastKnownPort = res.collisionPort;
+                    for (const s of servicesToFix) {
+                        const newPort = await getAvailablePort(lastKnownPort + 1);
+                        await setCompose((curr) => {
+                            const svc = Array.from(curr.services).find(cs => cs.name === s.name);
+                            const mapping = svc?.ports?.find(p => p.hostPort === res.collisionPort);
+                            if (mapping) mapping.hostPort = newPort;
                         });
-                    });
+                        lastKnownPort = newPort;
+                    }
+
                     currentYaml = YAML.stringify(new Translator(useComposeStore.getState().compose).toDict());
                     retries++;
                 } else {
@@ -389,7 +398,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
                 setDeployPhase(null);
                 setExecuting(false);
             }
-        } catch (error) {
+        } catch {
             toast.error("An unexpected error occurred");
             setDeployPhase(null);
             setExecuting(false);
@@ -407,7 +416,7 @@ export default function PlaygroundContent({ inviteMode = false }: { inviteMode?:
             } else {
                 toast.error(res.error || "Failed to stop compose");
             }
-        } catch (error) {
+        } catch {
             toast.error("An unexpected error occurred");
         }
     };

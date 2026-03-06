@@ -107,8 +107,8 @@ export const resolveLogoPath = (path: string | undefined | null): string | null 
 
   const normalized = baseName
     .toLowerCase()
-    .replace(/[\s\-_]+/g, '-')
-    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
     .replace(/^-|-$/g, '');
 
   return `/api/logos/library/${normalized}`;

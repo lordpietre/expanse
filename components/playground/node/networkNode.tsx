@@ -1,7 +1,7 @@
 import { Network as NetworkType } from "expanse-docker-lib";
 import { Handle, Position, useEdges } from "@xyflow/react";
 import { CardContent } from "@/components/ui/card";
-import { Globe, Activity, Signal, Link, Router, Zap, GitBranch, Shield } from "lucide-react";
+import { Globe, Activity, Signal, Link, Router, Zap, GitBranch } from "lucide-react";
 import { useComposeStore } from "@/store/compose";
 import { useExecutionStore } from "@/store/execution";
 import { cn } from "@/lib/utils";
@@ -55,7 +55,7 @@ function getNodeTypeMeta(type: NetworkNodeType, gatewayImpl?: GatewayImpl): Node
 }
 
 export default function NetworkNode({ data, selected }: { data: { network: NetworkType }, selected?: boolean }) {
-    const { compose, tick } = useComposeStore();
+    const { compose } = useComposeStore();
     const { serviceStatuses } = useExecutionStore();
     const { networkNodeMeta } = usePositionMap();
     const edges = useEdges();
@@ -107,7 +107,7 @@ export default function NetworkNode({ data, selected }: { data: { network: Netwo
                                     {typeMeta.label}{typeMeta.subLabel ? ` · ${typeMeta.subLabel}` : ''}
                                 </span>
                             </div>
-                            <h3 className="text-white font-black text-lg tracking-tight uppercase truncate max-w-[140px] drop-shadow-lg leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
+                            <h3 className="text-white font-black text-lg tracking-tight uppercase truncate max-w-[200px] drop-shadow-lg leading-none" style={{ fontFamily: 'Outfit, sans-serif' }}>
                                 {data.network.name}
                             </h3>
                             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">

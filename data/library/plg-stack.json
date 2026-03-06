@@ -1,0 +1,28 @@
+{
+    "name": "PLG Stack (Modern Logging)",
+    "description": "Modern and lightweight observability stack: Promtail (log collection), Loki (log aggregation), and Grafana (visualization).",
+    "category": "Monitoring",
+    "isStack": true,
+    "image": "grafana/grafana:latest",
+    "logo": "https://img.icons8.com/color/512/grafana.png",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "related_services": [
+        {
+            "name": "loki",
+            "description": "Like Prometheus, but for logs",
+            "category": "Monitoring",
+            "image": "grafana/loki:latest",
+            "logo": "https://img.icons8.com/color/512/logstash.png",
+            "command": "-config.file=/etc/loki/local-config.yaml"
+        },
+        {
+            "name": "promtail",
+            "description": "Shipper that fetches local logs and sends them to Loki",
+            "category": "Monitoring",
+            "image": "grafana/promtail:latest",
+            "command": "-config.file=/etc/promtail/config.yml"
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "name": "Nextcloud Enterprise (Optimized)",
+    "description": "Full-featured productivity suite with Nextcloud, MariaDB for data, and Redis for high-performance file locking and caching.",
+    "category": "Cloud",
+    "isStack": true,
+    "image": "nextcloud:latest",
+    "logo": "https://img.icons8.com/color/512/nextcloud.png",
+    "default_ports": [
+        "8080:80"
+    ],
+    "env_vars": {
+        "MYSQL_HOST": "db",
+        "MYSQL_DATABASE": "nextcloud",
+        "MYSQL_USER": "nextcloud",
+        "MYSQL_PASSWORD": "password",
+        "REDIS_HOST": "redis"
+    },
+    "volumes": [
+        "nc_data:/var/www/html"
+    ],
+    "related_services": [
+        {
+            "name": "db",
+            "description": "MariaDB database for Nextcloud",
+            "category": "Database",
+            "image": "mariadb:10.6",
+            "logo": "https://img.icons8.com/color/512/mariadb.png",
+            "env_vars": {
+                "MYSQL_ROOT_PASSWORD": "password",
+                "MYSQL_DATABASE": "nextcloud",
+                "MYSQL_USER": "nextcloud",
+                "MYSQL_PASSWORD": "password"
+            },
+            "volumes": [
+                "nc_db_data:/var/lib/mysql"
+            ]
+        },
+        {
+            "name": "redis",
+            "description": "Redis cache for Nextcloud",
+            "category": "Cache",
+            "image": "redis:alpine",
+            "logo": "https://img.icons8.com/color/512/redis.png"
+        }
+    ]
+}

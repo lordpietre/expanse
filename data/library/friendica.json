@@ -1,22 +1,42 @@
 {
     "name": "Friendica",
-    "image": "friendica/node:stable",
+    "image": "friendica:stable-fpm",
     "category": "Social",
     "isStack": true,
     "logo": "friendica",
-    "description": "Full-featured social network (Facebook-like). Contacts, groups, events, and connection with other protocols. Connects with Mastodon, Diaspora, and older protocols.",
-    "default_ports": [
-        "8080:8080"
-    ],
+    "description": "Full-featured social network (Facebook-like). PHP-FPM version for better performance, requires Nginx.",
+    "default_ports": [],
     "env_vars": {
-        "MYSQL_HOST": "mariadb",
-        "MYSQL_DATABASE": "friendica",
-        "MYSQL_USER": "friendica",
-        "MYSQL_PASSWORD": "password",
-        "SITE_NAME": "Friendica",
-        "ADMIN_MAIL": "admin@example.com"
+        "FRIENDICA_URL": "http://localhost:8080",
+        "DB_TYPE": "mysql",
+        "DB_HOST": "mariadb",
+        "DB_PORT": "3306",
+        "DB_USER": "friendica",
+        "DB_PASS": "password",
+        "DB_NAME": "friendica"
     },
+    "volumes": [
+        "friendica_html_fpm:/var/www/html"
+    ],
     "related_services": [
+        {
+            "name": "web",
+            "description": "Nginx web server for Friendica FPM",
+            "category": "Web Server",
+            "image": "nginx:alpine",
+            "logo": "nginx",
+            "default_ports": [
+                "8080:80"
+            ],
+            "command": [
+                "sh",
+                "-c",
+                "sleep 5 && echo 'server { listen 80; root /var/www/html; index index.php; location / { try_files $$uri $$uri/ /index.php?$$args; } location ~ \\.php$ { fastcgi_pass ${friendica}:9000; include fastcgi_params; fastcgi_param SCRIPT_FILENAME $$document_root$$fastcgi_script_name; fastcgi_param HTTP_HOST $$http_host; fastcgi_param HTTP_X_FORWARDED_HOST $$http_host; fastcgi_param SERVER_NAME $$host; fastcgi_param SERVER_PORT $$server_port; fastcgi_param REMOTE_ADDR $$remote_addr; } }' > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+            ],
+            "volumes": [
+                "friendica_html_fpm:/var/www/html"
+            ]
+        },
         {
             "name": "mariadb",
             "description": "MariaDB database for Friendica",
@@ -30,7 +50,7 @@
                 "MYSQL_PASSWORD": "password"
             },
             "volumes": [
-                "friendica_db:/var/lib/mysql"
+                "friendica_db_fpm:/var/lib/mysql"
             ]
         }
     ]

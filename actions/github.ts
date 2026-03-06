@@ -2,7 +2,7 @@
 
 import * as crypto from "node:crypto";
 
-import client from "@/lib/mongodb";
+import { getMongoClient } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 import axios from "axios";
@@ -26,7 +26,8 @@ export async function getGithubAccesToken(code: string) {
 }
 
 export async function AuthWithGithub(cli: boolean) {
-    const db = (await client).db("expanse")
+    const mongodb = await getMongoClient();
+    const db = mongodb.db("expanse")
     const CSRF_collection = db.collection('csrf_token')
     const randomString = crypto.randomBytes(32).toString('hex');
     CSRF_collection.insertOne({

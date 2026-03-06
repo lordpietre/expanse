@@ -1,0 +1,40 @@
+{
+    "name": "Ghost (Full Stack)",
+    "description": "Professional publishing platform for blogs and newsletters, pre-configured with MySQL 8.0 for production-ready performance.",
+    "category": "CMS",
+    "isStack": true,
+    "image": "ghost:5-alpine",
+    "logo": "https://img.icons8.com/ios-filled/512/ghost.png",
+    "default_ports": [
+        "2368:2368"
+    ],
+    "env_vars": {
+        "database__client": "mysql",
+        "database__connection__host": "db",
+        "database__connection__user": "ghost",
+        "database__connection__password": "password",
+        "database__connection__database": "ghost_db",
+        "url": "http://localhost:2368"
+    },
+    "volumes": [
+        "ghost_content:/var/lib/ghost/content"
+    ],
+    "related_services": [
+        {
+            "name": "db",
+            "description": "MySQL 8.0 database for Ghost",
+            "category": "Database",
+            "image": "mysql:8.0",
+            "logo": "https://img.icons8.com/color/512/mysql-logo.png",
+            "env_vars": {
+                "MYSQL_RANDOM_ROOT_PASSWORD": "yes",
+                "MYSQL_DATABASE": "ghost_db",
+                "MYSQL_USER": "ghost",
+                "MYSQL_PASSWORD": "password"
+            },
+            "volumes": [
+                "ghost_db_data:/var/lib/mysql"
+            ]
+        }
+    ]
+}

@@ -1,7 +1,8 @@
-diff -ru original/lib/cjs/compose/volume/volume.js modified/lib/cjs/compose/volume/volume.js
---- a/lib/cjs/compose/volume/volume.js	2026-03-06 00:27:14.317651595 +0100
-+++ b/lib/cjs/compose/volume/volume.js	2026-03-06 01:33:01.628359325 +0100
-@@ -21,7 +21,7 @@
+diff --git a/lib/cjs/compose/volume/volume.js b/lib/cjs/compose/volume/volume.js
+index 6ac5b125cd72e18f3ee8c8ba215ef1c3fa2d4fb4..56ff3d5f656b6ee3da678581dbea83a9a7ea94a6 100644
+--- a/lib/cjs/compose/volume/volume.js
++++ b/lib/cjs/compose/volume/volume.js
+@@ -21,7 +21,7 @@ class Volume extends serializable_1.Serializable {
          var _a, _b;
          return {
              driver: this.driver.toString(),
@@ -10,10 +11,11 @@ diff -ru original/lib/cjs/compose/volume/volume.js modified/lib/cjs/compose/volu
              labels: (_b = this.labels) === null || _b === void 0 ? void 0 : _b.map((lab) => lab.toString()),
              external: this.external,
          };
-diff -ru original/lib/cjs/translator/translator.js modified/lib/cjs/translator/translator.js
---- a/lib/cjs/translator/translator.js	2026-03-06 00:27:14.321651455 +0100
-+++ b/lib/cjs/translator/translator.js	2026-03-06 01:32:10.053964938 +0100
-@@ -58,7 +58,23 @@
+diff --git a/lib/cjs/translator/translator.js b/lib/cjs/translator/translator.js
+index 50f33abb575a3619631e303c917840c3e3456950..f31c55d9fc38f39f1667c77ca896cdb70dfe7e47 100644
+--- a/lib/cjs/translator/translator.js
++++ b/lib/cjs/translator/translator.js
+@@ -58,7 +58,23 @@ class Translator {
              //ones linked to other params
              serviceDict.secrets = Array.from(service.secrets).map((sec) => sec.name);
              serviceDict.depends_on = Array.from(service.depends_on).map((dep) => dep.name);
@@ -38,7 +40,7 @@ diff -ru original/lib/cjs/translator/translator.js modified/lib/cjs/translator/t
              if (service.bindings.size > 0) {
                  serviceDict.volumes = [];
              }
-@@ -72,7 +88,7 @@
+@@ -72,7 +88,7 @@ class Translator {
              if (serviceDict.secrets.length === 0) {
                  serviceDict.secrets = undefined;
              }
@@ -47,7 +49,7 @@ diff -ru original/lib/cjs/translator/translator.js modified/lib/cjs/translator/t
                  serviceDict.networks = undefined;
              }
              //finally append to result
-@@ -198,10 +214,10 @@
+@@ -198,10 +214,10 @@ class Translator {
                      }
                      else {
                          ser.ports = [new service_1.PortMapping({
@@ -62,7 +64,7 @@ diff -ru original/lib/cjs/translator/translator.js modified/lib/cjs/translator/t
                      }
                  });
              }
-@@ -228,10 +244,12 @@
+@@ -228,10 +244,12 @@ class Translator {
              }
              //labels
              if (service === null || service === void 0 ? void 0 : service.labels) {
@@ -78,7 +80,7 @@ diff -ru original/lib/cjs/translator/translator.js modified/lib/cjs/translator/t
                      }) || [];
                  }
                  else {
-@@ -250,9 +268,11 @@
+@@ -250,9 +268,11 @@ class Translator {
                      service.environment = Object.keys(service.environment).map((key) => `${key}=${service.environment[key]}`);
                  }
                  service.environment.forEach((env) => {
@@ -93,7 +95,7 @@ diff -ru original/lib/cjs/translator/translator.js modified/lib/cjs/translator/t
                      }
                  });
              }
-@@ -315,8 +335,9 @@
+@@ -315,8 +335,9 @@ class Translator {
                      rawSer.environment = Object.keys(rawSer.environment).map((key) => `${key}=${rawSer.environment[key]}`);
                  }
                  rawSer.environment.forEach((rawEnv) => {
@@ -105,10 +107,11 @@ diff -ru original/lib/cjs/translator/translator.js modified/lib/cjs/translator/t
                      if (env && service) {
                          if (service.environment) {
                              service.environment.add(env);
-diff -ru original/lib/esm/compose/volume/volume.js modified/lib/esm/compose/volume/volume.js
---- a/lib/esm/compose/volume/volume.js	2026-03-06 00:27:14.322651420 +0100
-+++ b/lib/esm/compose/volume/volume.js	2026-03-06 01:33:07.449398653 +0100
-@@ -18,7 +18,7 @@
+diff --git a/lib/esm/compose/volume/volume.js b/lib/esm/compose/volume/volume.js
+index bb077dd7a36c708d69b072d774e30e86f9471ebc..8fd4307fcff9bea55944f582e42582b12ab820c7 100644
+--- a/lib/esm/compose/volume/volume.js
++++ b/lib/esm/compose/volume/volume.js
+@@ -18,7 +18,7 @@ class Volume extends Serializable {
          var _a, _b;
          return {
              driver: this.driver.toString(),
@@ -117,10 +120,11 @@ diff -ru original/lib/esm/compose/volume/volume.js modified/lib/esm/compose/volu
              labels: (_b = this.labels) === null || _b === void 0 ? void 0 : _b.map((lab) => lab.toString()),
              external: this.external,
          };
-diff -ru original/lib/esm/translator/translator.js modified/lib/esm/translator/translator.js
---- a/lib/esm/translator/translator.js	2026-03-06 00:27:14.324651350 +0100
-+++ b/lib/esm/translator/translator.js	2026-03-06 01:33:17.949467054 +0100
-@@ -195,10 +195,10 @@
+diff --git a/lib/esm/translator/translator.js b/lib/esm/translator/translator.js
+index b7b489050ea87dc27133f1b4fbdec9694c55950f..b5cadce40708a74d98eff4a65fd6980870972472 100644
+--- a/lib/esm/translator/translator.js
++++ b/lib/esm/translator/translator.js
+@@ -195,10 +195,10 @@ export class Translator {
                      }
                      else {
                          ser.ports = [new PortMapping({
@@ -135,7 +139,7 @@ diff -ru original/lib/esm/translator/translator.js modified/lib/esm/translator/t
                      }
                  });
              }
-@@ -225,10 +225,12 @@
+@@ -225,10 +225,12 @@ export class Translator {
              }
              //labels
              if (service === null || service === void 0 ? void 0 : service.labels) {
@@ -151,7 +155,7 @@ diff -ru original/lib/esm/translator/translator.js modified/lib/esm/translator/t
                      }) || [];
                  }
                  else {
-@@ -247,9 +249,11 @@
+@@ -247,9 +249,11 @@ export class Translator {
                      service.environment = Object.keys(service.environment).map((key) => `${key}=${service.environment[key]}`);
                  }
                  service.environment.forEach((env) => {
@@ -166,7 +170,7 @@ diff -ru original/lib/esm/translator/translator.js modified/lib/esm/translator/t
                      }
                  });
              }
-@@ -312,8 +316,9 @@
+@@ -312,8 +316,9 @@ export class Translator {
                      rawSer.environment = Object.keys(rawSer.environment).map((key) => `${key}=${rawSer.environment[key]}`);
                  }
                  rawSer.environment.forEach((rawEnv) => {

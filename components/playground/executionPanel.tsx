@@ -3,7 +3,7 @@
 import React from "react";
 import { useExecutionStore } from "@/store/execution";
 import { cn } from "@/lib/utils";
-import { Activity, Terminal, CheckCircle2, AlertCircle, Loader2, PlayCircle, StopCircle, Command } from "lucide-react";
+import { Terminal, CheckCircle2, Loader2, PlayCircle, StopCircle, Command } from "lucide-react";
 import dynamic from "next/dynamic";
 const TerminalDialog = dynamic(() => import("./terminalDialog"), { ssr: false });
 

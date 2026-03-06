@@ -2,7 +2,6 @@
 
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { deleteUser } from "@/actions/userActions";
@@ -10,7 +9,7 @@ import { exportAllProjects, exportToGoogleDrive } from "@/actions/backupActions"
 import { getLocalSystemInfo, saveRemoteNodeConfig } from "@/actions/systemActions";
 import toast from "react-hot-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cloud, Download, HardDrive, ShieldAlert, Archive, FileJson, Server, Network, ShieldCheck, Plus, ExternalLink, Activity } from "lucide-react";
+import { Cloud, Download, HardDrive, ShieldAlert, Archive, Server, Network, Plus, ExternalLink } from "lucide-react";
 import { useEffect } from "react";
 
 
@@ -35,7 +34,6 @@ export default function Settings({ init }: { init?: settingsInitData }) {
     // Remote Node Form State
     const [remoteHost, setRemoteHost] = useState("")
     const [remotePort, setRemotePort] = useState("2375")
-    const [remoteProtocol, setRemoteProtocol] = useState("tcp")
 
     useEffect(() => {
         async function fetchSystem() {
@@ -90,7 +88,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
 
     async function handleDriveBackup() {
         toast.loading("Connecting to Google Drive...", { duration: 2000 });
-        const res = await exportToGoogleDrive({});
+        const res = await exportToGoogleDrive();
         if (!res.success) {
             toast.error(res.error || "Google Drive connection failed");
         }

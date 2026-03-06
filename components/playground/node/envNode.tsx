@@ -3,15 +3,12 @@ import { Key, Fingerprint } from "lucide-react";
 import Selectable from "@/components/playground/node/Selectable";
 import { Handle, Position } from "@xyflow/react";
 import { cn } from "@/lib/utils";
-import { useComposeStore } from "@/store/compose";
-import useSelectionStore from "@/store/selection";
+
 
 export default function EnvNode({ data, selected }: { data: { env: Env }, selected?: boolean }) {
     const env = data.env;
 
-    const { compose, tick } = useComposeStore();
-    const { selectedId } = useSelectionStore();
-    const isSelected = selectedId === data.env.id;
+
 
     return (
         <Selectable id={env.id}>

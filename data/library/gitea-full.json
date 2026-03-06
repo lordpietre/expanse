@@ -1,0 +1,51 @@
+{
+    "name": "Gitea (Full Stack)",
+    "description": "Fast and lightweight self-hosted Git service, pre-configured with PostgreSQL for data storage and Redis for high-performance caching.",
+    "category": "Development",
+    "isStack": true,
+    "image": "gitea/gitea:latest",
+    "logo": "https://img.icons8.com/color/512/gitea.png",
+    "default_ports": [
+        "3000:3000",
+        "2222:22"
+    ],
+    "env_vars": {
+        "GITEA__database__DB_TYPE": "postgres",
+        "GITEA__database__HOST": "${gitea_db}:5432",
+        "GITEA__database__NAME": "gitea",
+        "GITEA__database__USER": "gitea",
+        "GITEA__database__PASSWD": "password",
+        "GITEA__cache__ADAPTER": "redis",
+        "GITEA__cache__HOST": "redis://${gitea_cache}:6379/0",
+        "GITEA__server__DOMAIN": "localhost",
+        "GITEA__server__ROOT_URL": "http://localhost:3000",
+        "GITEA__security__INSTALL_LOCK": "true"
+    },
+    "volumes": [
+        "gitea_data:/data"
+    ],
+    "related_services": [
+        {
+            "name": "gitea_db",
+            "description": "PostgreSQL database for Gitea",
+            "category": "Database",
+            "image": "postgres:16-alpine",
+            "logo": "https://img.icons8.com/color/512/postgreesql.png",
+            "env_vars": {
+                "POSTGRES_DB": "gitea",
+                "POSTGRES_USER": "gitea",
+                "POSTGRES_PASSWORD": "password"
+            },
+            "volumes": [
+                "gitea_db_data:/var/lib/postgresql/data"
+            ]
+        },
+        {
+            "name": "gitea_cache",
+            "description": "Redis cache for Gitea",
+            "category": "Cache",
+            "image": "redis:alpine",
+            "logo": "https://img.icons8.com/color/512/redis.png"
+        }
+    ]
+}

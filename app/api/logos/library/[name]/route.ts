@@ -4,9 +4,9 @@ import path from 'path';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { name: string } }
+    { params }: { params: Promise<{ name: string }> }
 ) {
-    const { name } = params;
+    const { name } = await params;
 
     // We expect 'name' to be the normalized slug (e.g. 'mariadb')
     const logosDir = path.resolve(process.cwd(), 'public/logos/library');

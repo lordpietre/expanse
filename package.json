@@ -91,7 +91,7 @@
       "sharp"
     ],
     "patchedDependencies": {
-      "expanse-docker-lib": "patches/@expanse__expanse-docker-lib.patch"
+      "expanse-docker-lib": "patches/expanse-docker-lib.patch"
     }
   }
 }

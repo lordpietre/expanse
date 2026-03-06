@@ -1,0 +1,39 @@
+{
+    "name": "Grafana + PostgreSQL (Full Stack)",
+    "description": "Ready-to-use Grafana stack with PostgreSQL as the backend database, pre-configured for persistent storage and high-performance monitoring.",
+    "category": "Monitoring",
+    "isStack": true,
+    "image": "grafana/grafana:latest",
+    "logo": "https://img.icons8.com/color/512/grafana.png",
+    "default_ports": [
+        "3000:3000"
+    ],
+    "env_vars": {
+        "GF_DATABASE_TYPE": "postgres",
+        "GF_DATABASE_HOST": "db:5432",
+        "GF_DATABASE_NAME": "grafana",
+        "GF_DATABASE_USER": "grafana",
+        "GF_DATABASE_PASSWORD": "password",
+        "GF_SECURITY_ADMIN_PASSWORD": "admin"
+    },
+    "volumes": [
+        "grafana_data:/var/lib/grafana"
+    ],
+    "related_services": [
+        {
+            "name": "db",
+            "description": "PostgreSQL database for Grafana",
+            "category": "Database",
+            "image": "postgres:18-alpine",
+            "logo": "https://img.icons8.com/color/512/postgreesql.png",
+            "env_vars": {
+                "POSTGRES_DB": "grafana",
+                "POSTGRES_USER": "grafana",
+                "POSTGRES_PASSWORD": "password"
+            },
+            "volumes": [
+                "postgres_data:/var/lib/postgresql/data"
+            ]
+        }
+    ]
+}

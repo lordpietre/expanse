@@ -1,0 +1,59 @@
+{
+    "name": "Media Center (Jellyfin + Arrs)",
+    "description": "Complete media management and consumption stack with Jellyfin for streaming, plus Sonarr, Radarr, and qBittorrent for automation.",
+    "category": "Applications",
+    "isStack": true,
+    "image": "jellyfin/jellyfin:latest",
+    "logo": "https://img.icons8.com/color/512/jellyfin.png",
+    "default_ports": [
+        "8096:8096"
+    ],
+    "volumes": [
+        "media_config:/config",
+        "media_data:/data"
+    ],
+    "related_services": [
+        {
+            "name": "sonarr",
+            "description": "TV series management",
+            "category": "Applications",
+            "image": "linuxserver/sonarr:latest",
+            "logo": "https://img.icons8.com/color/512/sonarr.png",
+            "default_ports": [
+                "8989:8989"
+            ],
+            "volumes": [
+                "sonarr_config:/config",
+                "media_data:/data"
+            ]
+        },
+        {
+            "name": "radarr",
+            "description": "Movie management",
+            "category": "Applications",
+            "image": "linuxserver/radarr:latest",
+            "logo": "https://img.icons8.com/color/512/radarr.png",
+            "default_ports": [
+                "7878:7878"
+            ],
+            "volumes": [
+                "radarr_config:/config",
+                "media_data:/data"
+            ]
+        },
+        {
+            "name": "qbittorrent",
+            "description": "BitTorrent client",
+            "category": "Applications",
+            "image": "linuxserver/qbittorrent:latest",
+            "logo": "https://img.icons8.com/color/512/qbittorrent.png",
+            "default_ports": [
+                "8081:8080"
+            ],
+            "volumes": [
+                "qbittorrent_config:/config",
+                "media_data:/data"
+            ]
+        }
+    ]
+}

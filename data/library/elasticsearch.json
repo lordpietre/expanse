@@ -1,0 +1,19 @@
+{
+    "name": "Elasticsearch",
+    "image": "elasticsearch:9.3.1",
+    "category": "Cloud",
+    "description": "Distributed, RESTful search and analytics engine capable of addressing a growing number of use cases.",
+    "logo": "https://img.icons8.com/color/512/elasticsearch.png",
+    "default_ports": [
+        "9200:9200",
+        "9300:9300"
+    ],
+    "env_vars": {
+        "discovery.type": "single-node",
+        "xpack.security.enabled": "false",
+        "ES_JAVA_OPTS": "-Xms512m -Xmx512m"
+    },
+    "volumes": [
+        "es_data:/usr/share/elasticsearch/data"
+    ]
+}

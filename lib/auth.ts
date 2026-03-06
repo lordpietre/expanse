@@ -2,6 +2,11 @@ import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
 export async function ensureAuth() {
+    // Skip real auth check during Next.js build
+    if (process.env.npm_lifecycle_event === 'build') {
+        return { userId: "build-mode" };
+    }
+
     if (!process.env.SECRET_KEY) {
         throw new Error("SECRET_KEY environment variable is not configured.");
     }

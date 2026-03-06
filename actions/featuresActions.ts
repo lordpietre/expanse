@@ -1,6 +1,6 @@
 "use server"
 
-import { cookies } from "next/headers";
+
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "bson";
 import { revalidatePath } from "next/cache";

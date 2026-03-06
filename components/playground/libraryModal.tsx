@@ -8,14 +8,14 @@ import {
     DialogTitle,
     DialogDescription
 } from "@/components/ui/dialog";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TemplateService } from "@/types/library";
 import { useComposeStore } from "@/store/compose";
 import useUIStore from "@/store/ui";
 import useLibraryStore from "@/store/library";
-import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor, Share2, Cloud, Library, Brain, Workflow, Activity, FileText, Users, Network, Shield } from "lucide-react";
+import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor, Cloud, Brain, Workflow, Activity, FileText, Users, Network } from "lucide-react";
 import { cn, resolveLogoPath } from "@/lib/utils";
 
 interface LibraryModalProps {
@@ -64,7 +64,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
         if (open && services.length === 0) {
             fetchServices();
         }
-    }, [open, services.length]);
+    }, [open, services.length, fetchServices]);
 
     // Reset selection when mode changes
     React.useEffect(() => {
@@ -77,6 +77,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             setActiveCategory("");
             setSelectedService(null);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [libraryMode, services]);
 
     // Handle initial selection when services are loaded or libraryCategory changes
@@ -93,6 +94,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                 setSelectedService(firstService || null);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [services, libraryCategory]);
 
     const handleOpenChange = (newOpen: boolean) => {
@@ -109,10 +111,15 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
     };
 
     const filteredServices = modeFilteredServices.filter(s => {
-        const matchesCategory = s.category === activeCategory;
         const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             s.description?.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
+
+        if (searchQuery) {
+            return matchesSearch;
+        }
+
+        const matchesCategory = s.category === activeCategory;
+        return matchesCategory;
     });
 
     const categoriesList = categories.map(cat => (
@@ -159,7 +166,10 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             <div className="flex items-center gap-3 overflow-hidden">
                 <div className="flex-shrink-0 w-6 h-6 rounded bg-slate-800 flex items-center justify-center overflow-hidden">
                     {service.logo ? (
-                        <img src={resolveLogoPath(service.logo) || ''} alt={service.name} className="w-4 h-4 object-contain" />
+                        <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={resolveLogoPath(service.logo) || ''} alt={service.name} className="w-4 h-4 object-contain" />
+                        </>
                     ) : (
                         <span className="text-[10px] text-slate-500 font-bold">
                             {service.name.substring(0, 2).toUpperCase()}
@@ -281,7 +291,10 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                     <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-3xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/10 flex items-center justify-center p-12 shadow-2xl overflow-hidden relative group">
                                         <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
                                         {selectedService.logo ? (
-                                            <img src={resolveLogoPath(selectedService.logo) || ''} alt={selectedService.name} className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
+                                            <>
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img src={resolveLogoPath(selectedService.logo) || ''} alt={selectedService.name} className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
+                                            </>
                                         ) : (
                                             <div className="text-7xl relative z-10">
                                                 {categoryIcons[selectedService.category as keyof typeof categoryIcons] || <Box className="w-32 h-32" />}

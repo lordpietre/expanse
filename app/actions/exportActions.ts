@@ -105,17 +105,16 @@ export async function processAndSaveClientExport(
 /**
  * Export playground and save to file with checksum-based naming
  * @param composeId - The ID of the compose to export
- * @param baseUrl - The base URL of the application
+ * @param composeId - The ID of the compose to export
  * @returns File path where the PNG was saved
  */
 export async function exportPlaygroundAsPNGToFile(
-    composeId: string,
-    baseUrl?: string
+    composeId: string
 ): Promise<string> {
     const fs = await import('fs').then(m => m.promises);
     const path = await import('path');
     const mongodb = await import('@/lib/mongodb');
-    const client = await mongodb.default;
+    const client = await mongodb.getMongoClient();
 
     try {
         const db = client.db('compose_craft');

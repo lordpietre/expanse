@@ -11,7 +11,7 @@ WORKDIR /app
 # Install dependencies based on the preferred package manager
 COPY package.json pnpm-lock.yaml .npmrc* ./
 COPY patches ./patches
-RUN npm install -g corepack@latest && corepack enable pnpm && pnpm i
+RUN npm install -g pnpm@latest && pnpm i
 
 
 # Rebuild the source code only when needed
@@ -26,7 +26,7 @@ COPY . .
 # ENV NEXT_TELEMETRY_DISABLED=1
 ENV MONGODB_URI="mongodb://localhost:27017"
 ENV SECRET_KEY="dummy_secret_for_build"
-RUN npm install -g corepack@latest && corepack enable pnpm && pnpm sync-icons && pnpm run build;
+RUN npm install -g pnpm@latest && pnpm sync-icons && pnpm run build;
 
 # Production image, copy all the files and run next
 FROM base AS runner

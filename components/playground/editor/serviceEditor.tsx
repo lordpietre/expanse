@@ -44,7 +44,7 @@ export default function ServiceEditor() {
         if (services.length === 0) {
             fetchServices();
         }
-    }, [services.length]);
+    }, [services.length, fetchServices]);
 
     function getService(): Service | null {
         const src = compose.services.get("id", selectedId)

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { execDockerCommand } from "@/actions/dockerActions";
-import { Terminal as TerminalIcon, Loader2, X } from "lucide-react";
+import { Terminal as TerminalIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
