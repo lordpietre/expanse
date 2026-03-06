@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/logo_mark.jpg" alt="Expanse" width="160" />
+  <img src="./assets/expanse.png" alt="Expanse" width="160" />
 
   <h1>Expanse</h1>
   <p><strong>Visual IDE and Orchestration Engine for Docker Compose</strong></p>
