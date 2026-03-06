@@ -1,0 +1,22 @@
+{
+    "name": "HashiCorp Vault",
+    "description": "Manage Secrets and Protect Sensitive Data. Centralized secret management.",
+    "category": "Cloud",
+    "image": "hashicorp/vault:latest",
+    "logo": "https://www.vectorlogo.zone/logos/vaultproject/vaultproject-icon.svg",
+    "default_ports": [
+        "8200:8200"
+    ],
+    "env_vars": {
+        "VAULT_DEV_ROOT_TOKEN_ID": "root",
+        "VAULT_ADDR": "http://0.0.0.0:8200"
+    },
+    "volumes": [
+        "vault_data:/vault/file"
+    ],
+    "command": [
+        "server",
+        "-dev"
+    ],
+    "isStack": false
+}

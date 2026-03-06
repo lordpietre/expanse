@@ -1,101 +1,135 @@
 <div align="center">
-  <img src="./assets/logo_mark.jpg" alt="Expanse Logo" width="200" />
+  <img src="./assets/logo_mark.jpg" alt="Expanse" width="160" />
+
   <h1>Expanse</h1>
-  <p><strong>Visual IDE & Orchestration Engine for Docker Compose</strong></p>
+  <p><strong>Visual IDE and Orchestration Engine for Docker Compose</strong></p>
 
   <p>
-    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
-    <a href="https://discord.gg/Wdz7Dht9YQ"><img src="https://img.shields.io/discord/123456789012345678.svg?label=Discord&logo=discord" alt="Discord" /></a>
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
+    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+    <img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js" alt="Next.js 15" />
+    <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker Compose" />
+    <img src="https://img.shields.io/badge/PRs-welcome-4caf50.svg" alt="PRs Welcome" />
   </p>
 </div>
 
 ---
 
-## 🌟 What is Expanse?
+## Overview
 
-**Expanse** is a modern, open-source orchestration tool that transforms Docker Compose management from a manual YAML-writing task into a fluid, visual experience. By providing a professional-grade node-based interface, Expanse allows developers to design, deploy, and monitor complex container architectures without touching a single line of YAML.
+**Expanse** is a professional-grade, open-source orchestration platform that transforms Docker Compose management into a fluid visual experience. Through a node-based canvas, developers design, deploy, and monitor multi-container architectures without writing YAML by hand.
 
-It is not just a diagramming tool; it is a **live execution wrapper** that talks directly to your Docker daemon.
+Expanse is not a diagramming tool. It is a **live execution wrapper** that communicates directly with the Docker daemon, turning every action on the canvas into a real deployment operation.
 
-## 🚀 Key Features
+---
 
-### 🎨 Visual Orchestration (vIaC)
-- **Drag-and-Drop Canvas**: Build architectures using nodes for Services, Networks, Volumes, and ENV variables.
-- **Intelligent Auto-Injection**: Connecting a service to a database (like Postgres or MySQL) automatically injects the required environment variables.
-- **Dagre Auto-Layout**: Keep your graphs clean and organized with advanced layout algorithms.
+## Features
 
-### ⚡ Smart Execution Engine
-- **One-Click Deploy**: Run, Stop, and Restart entire projects directly from the UI.
-- **Auto-Port Reassignment**: Never face a "Port already in use" error again. Expanse detects collisions and reassigns host ports dynamically.
-- **Resilient Monitoring**: Status polling and log streaming that persist even if temporary configuration files are lost.
+### Visual Infrastructure as Code
 
-### 📊 Global Management
-- **Centralized Dashboard**: Monitor all global Docker projects, containers, and system resources (CPU, RAM, Disk) in real-time.
-- **Dynamic Service Library**: Extensible JSON-based library with categorized templates (Databases, OS, Development, Web Servers).
-- **Official Logos & Visuals**: Services automatically display their official logos (Nginx, Ubuntu, Redis, etc.) for better identification.
-- **One-Click Import**: Instantly load existing `docker-compose.yaml` files into the visual canvas.
-- **Pro Service Editor**: Redesigned for focus, with real-time container status detection and integrated technical documentation/tooltips.
-- **High-Accessibility Controls**: Refined playground controls with 3x larger buttons for easier interaction.
-- **Live Logs**: Integrated terminal for real-time log streaming from any running container.
+- **Node-Based Canvas** — Build architectures by composing nodes for Services, Networks, Volumes, and Environment Variables.
+- **Intelligent Auto-Injection** — Connecting a service to a database automatically propagates the required environment variables and network links.
+- **Auto-Layout** — Uses the Dagre algorithm to keep complex graphs clean and readable without manual positioning.
+- **One-Click Import** — Load any existing `docker-compose.yaml` directly onto the canvas for visualization and editing.
 
-## 🛠️ Technology Stack
+### Execution Engine
 
-Expanse is built with cutting-edge web technologies:
+- **Deploy, Stop, and Restart** — Execute entire projects with a single action from the UI.
+- **Auto-Port Reassignment** — Detects host port collisions at deploy time and reassigns them dynamically.
+- **Live Log Streaming** — Integrated terminal for real-time log output from any running container.
+- **Resilient Monitoring** — Status polling persists across network interruptions and temporary file loss.
 
-- **Frontend**: Next.js 15 (App Router) + React 19
-- **Diagrams**: [React Flow](https://reactflow.dev/) (@xyflow/react)
-- **Styling**: Tailwind CSS + Framer Motion (Glassmorphism UI)
-- **State**: Zustand (Atomic & Debounced persistence)
-- **Database**: MongoDB + Mongoose
-- **Backend**: Next.js Server Actions (Direct Docker CLI Integration)
+### Service Library
 
-## 📋 Project Structure
+- **Extensible Templates** — JSON-based service catalog with templates for databases, web servers, networking tools, cloud utilities, and more.
+- **Official Branding** — Services display their official logos for immediate visual identification.
+- **Stacks** — Multi-container compositions (Gitea, Appwrite, ELK, etc.) deployable as a single unit.
 
-```bash
-├── actions/             # Server-side bridge to Docker CLI and MongoDB
-├── app/                 # Next.js Pages (Playground, Dashboard, Auth)
-├── components/          # React Components (Nodes, Editors, Glass UI)
-├── lib/                 # Core logic (YAML mapping, Metadata rehydration)
-├── store/               # Zustand state definitions for the engine
-├── types/               # TypeScript interfaces for Docker entities
-└── assets/              # Logos and branding assets
+### Global Dashboard
+
+- **System Overview** — Real-time CPU, memory, and disk metrics for the host machine.
+- **Project and Container Management** — Inspect, stop, and remove projects, containers, and volumes from a centralized interface.
+- **Volume Management** — Bulk selection, individual deletion, and pruning of unused volumes.
+
+---
+
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router) + React 19 |
+| Canvas Engine | React Flow (`@xyflow/react`) |
+| Styling | Tailwind CSS + Framer Motion |
+| State Management | Zustand (debounced persistence) |
+| Database | MongoDB |
+| Backend | Next.js Server Actions (Docker CLI bridge) |
+| Authentication | JWT via `jose` + HTTP-only cookies |
+
+---
+
+## Project Structure
+
+```
+expanse/
+├── actions/          Server-side bridge to Docker CLI and MongoDB
+├── app/              Next.js pages (Playground, Dashboard, Auth, Deploy)
+├── components/       React components (Nodes, Editors, Panels, UI primitives)
+├── data/library/     JSON service templates for the extensible library
+├── lib/              Core logic (YAML mapping, metadata, auth)
+├── store/            Zustand state definitions
+├── types/            TypeScript interfaces for all entities
+└── assets/           Branding and logo assets
 ```
 
-## ⚙️ Getting Started
+---
+
+## Getting Started
 
 ### Prerequisites
-- Node.js 20+
-- Docker Engine & Docker Compose
-- pnpm (recommended)
+
+- Node.js 20 or later
+- Docker Engine with Docker Compose
+- pnpm (recommended) or npm
 
 ### Installation
 
-1. **Clone and Install**
-   ```bash
-   git clone https://github.com/lordpietre/expanse.git
-   cd expanse
-   pnpm install
-   ```
+**1. Clone and install dependencies**
+```bash
+git clone https://github.com/lordpietre/expanse.git
+cd expanse
+pnpm install
+```
 
-2. **Configuration**
-   Create a `.env.local` file:
-   ```env
-   MONGODB_URI=mongodb://localhost:27017/expanse
-   SECRET_KEY=your_secret_key
-   URL=http://localhost:3000
-   ```
+**2. Configure environment variables**
 
-3. **Development**
-   ```bash
-   pnpm run dev
-   ```
+Create a `.env.local` file in the project root:
+```env
+MONGODB_URI=mongodb://localhost:27017/expanse
+SECRET_KEY=your-secret-key-here
+URL=http://localhost:3000
+```
 
-Navigate to `http://localhost:3000` to start orchestrating.
+**3. Start the development server**
+```bash
+pnpm run dev
+```
 
-## 🤝 Contributing
+Navigate to `http://localhost:3000` to begin.
 
-We love community contributions! Check our `CONTRIBUTING.md` for guidelines on how to submit PRs or report bugs.
+### Docker Deployment
+
+A `docker-compose.yml` is included for production-ready deployment:
+```bash
+docker compose up -d
+```
 
 ---
-**Crafted with precision by the Expanse Community.**
+
+## Contributing
+
+Contributions are welcome. Please review the `CONTRIBUTING.md` file for guidelines on submitting pull requests, reporting issues, and the code style requirements expected across the codebase.
+
+---
+
+<div align="center">
+  <sub>Built with precision by the Expanse community.</sub>
+</div>

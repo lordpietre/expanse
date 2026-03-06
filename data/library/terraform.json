@@ -1,0 +1,16 @@
+{
+    "name": "Terraform",
+    "description": "Infrastructure as Code tool for building, changing, and versioning infrastructure safely and efficiently.",
+    "category": "Cloud",
+    "image": "hashicorp/terraform:latest",
+    "logo": "https://cdn.worldvectorlogo.com/logos/terraform-enterprise.svg",
+    "volumes": [
+        "terraform_data:/terraform"
+    ],
+    "command": [
+        "tail",
+        "-f",
+        "/dev/null"
+    ],
+    "isStack": false
+}

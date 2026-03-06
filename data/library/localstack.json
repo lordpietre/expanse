@@ -1,0 +1,20 @@
+{
+    "name": "LocalStack",
+    "description": "A fully functional local AWS cloud stack. Develop and test your cloud & serverless apps offline!",
+    "category": "Cloud",
+    "image": "localstack/localstack:latest",
+    "logo": "https://avatars.githubusercontent.com/u/28732123?s=200&v=4",
+    "default_ports": [
+        "4566:4566"
+    ],
+    "env_vars": {
+        "SERVICES": "s3,lambda,dynamodb,apigateway",
+        "DEBUG": "1",
+        "DOCKER_HOST": "unix:///var/run/docker.sock"
+    },
+    "volumes": [
+        "/var/run/docker.sock:/var/run/docker.sock",
+        "localstack_data:/var/lib/localstack"
+    ],
+    "isStack": false
+}

@@ -105,7 +105,6 @@ export async function processAndSaveClientExport(
 /**
  * Export playground and save to file with checksum-based naming
  * @param composeId - The ID of the compose to export
- * @param composeId - The ID of the compose to export
  * @returns File path where the PNG was saved
  */
 export async function exportPlaygroundAsPNGToFile(

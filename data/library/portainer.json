@@ -1,0 +1,16 @@
+{
+    "name": "Portainer",
+    "description": "Making Docker and Kubernetes management easy. GUI for your containers.",
+    "category": "Utilities",
+    "image": "portainer/portainer-ce:latest",
+    "logo": "https://www.portainer.io/hubfs/logos/portainer-logo-icon.svg",
+    "default_ports": [
+        "9000:9000",
+        "9443:9443"
+    ],
+    "volumes": [
+        "/var/run/docker.sock:/var/run/docker.sock",
+        "portainer_data:/data"
+    ],
+    "isStack": false
+}
