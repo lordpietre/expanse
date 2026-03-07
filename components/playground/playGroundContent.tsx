@@ -209,28 +209,52 @@ export default function PlaygroundContent() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [idParam, searchParams]);
 
+    // Poll status whenever a composeId is available — even after page reload.
+    // This ensures port badges and running states are always accurate without
+    // needing to redeploy. Polling is faster (2 s) when actively deploying.
     React.useEffect(() => {
-        let interval: NodeJS.Timeout;
+        if (!composeId) return;
 
-        if (isExecuting && composeId) {
-            const fetchData = async () => {
-                const [statuses, logsRes] = await Promise.all([
-                    getComposeStatus(composeId),
-                    getComposeLogs(composeId)
-                ]);
+        let cancelled = false;
 
-                if (statuses) updateStatuses(statuses);
-                if (logsRes.success) setLogs(logsRes.logs || "");
-            };
+        const fetchStatuses = async () => {
+            const statuses = await getComposeStatus(composeId);
+            if (cancelled) return;
+            if (statuses && statuses.length > 0) {
+                updateStatuses(statuses);
+                // If any service is running and we weren't marked as executing, auto-set it
+                const anyRunning = statuses.some((s: any) => s.State?.toLowerCase() === 'running');
+                if (anyRunning && !isExecuting) setExecuting(true);
+            }
+        };
 
-            fetchData();
-            interval = setInterval(fetchData, 3000);
-        }
+        const fetchAll = async () => {
+            const [statuses, logsRes] = await Promise.all([
+                getComposeStatus(composeId),
+                isExecuting ? getComposeLogs(composeId) : Promise.resolve({ success: false, logs: '' })
+            ]);
+            if (cancelled) return;
+            if (statuses && statuses.length > 0) {
+                updateStatuses(statuses);
+                const anyRunning = statuses.some((s: any) => s.State?.toLowerCase() === 'running');
+                if (anyRunning && !isExecuting) setExecuting(true);
+            }
+            if (logsRes.success) setLogs((logsRes as any).logs || "");
+        };
+
+        // Immediate first fetch
+        fetchStatuses();
+
+        // Poll every 3s when executing (full fetch with logs), every 8s otherwise (status only)
+        const intervalMs = isExecuting ? 3000 : 8000;
+        const interval = setInterval(isExecuting ? fetchAll : fetchStatuses, intervalMs);
 
         return () => {
-            if (interval) clearInterval(interval);
+            cancelled = true;
+            clearInterval(interval);
         };
-    }, [isExecuting, composeId, updateStatuses, setLogs]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [composeId, isExecuting]);
 
     const handleExecute = async () => {
         if (!composeId) {

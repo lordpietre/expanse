@@ -389,6 +389,21 @@ export const deleteCompose = async (composeId: string) => {
     return true;
 }
 
+/**
+ * Verifies if the provided password matches the current user's password.
+ * Used as a security gate for sensitive operations.
+ */
+export async function verifyUserPassword(password: string): Promise<boolean> {
+    const payload = await ensureAuth();
+    const db = await getDb();
+    const collection = db.collection("users");
+    const user = await collection.findOne({ _id: new ObjectId(payload.userId as string) });
+
+    if (!user || !user.password) return false;
+
+    return await bcrypt.compare(password, user.password);
+}
+
 export async function askPasswordReset(prevState: any, formData: FormData) {
     const passwordAskSchema = zfd.formData({
         email: z.string().email(),

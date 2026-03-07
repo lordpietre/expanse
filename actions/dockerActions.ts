@@ -8,6 +8,9 @@ import os from 'os';
 import net from 'net';
 import YAML from 'yaml';
 import { ensureAuth } from "@/lib/auth";
+import { getDb } from "@/lib/mongodb";
+import { ObjectId } from "bson";
+import { composeMetadata } from "@/lib/metadata";
 
 const execAsync = promisify(exec);
 
@@ -30,10 +33,9 @@ function isDbImage(image: string): string | null {
 
 /**
  * Patch the generated YAML:
- * 1. Add healthchecks to known DB services that don't have one
- * 2. Upgrade `depends_on` referencing a DB service to condition: service_healthy
+ * 3. Inject resource limits from metadata
  */
-function patchComposeYaml(yamlText: string): string {
+function patchComposeYaml(yamlText: string, metadata?: composeMetadata): string {
     const doc = YAML.parse(yamlText)
     if (!doc?.services) return yamlText
 
@@ -72,6 +74,21 @@ function patchComposeYaml(yamlText: string): string {
         }
     }
 
+    // Inject resource limits
+    if (metadata?.resources) {
+        for (const [serviceName, limits] of Object.entries(metadata.resources)) {
+            if (doc.services[serviceName]) {
+                const svc = doc.services[serviceName];
+                if (!svc.deploy) svc.deploy = {};
+                if (!svc.deploy.resources) svc.deploy.resources = {};
+                svc.deploy.resources.limits = {
+                    cpus: limits.cpus,
+                    memory: limits.memory
+                };
+            }
+        }
+    }
+
     return YAML.stringify(doc)
 }
 
@@ -91,8 +108,15 @@ export async function runCompose(composeId: string, yamlContent: string) {
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     await fs.mkdir(tempDir, { recursive: true });
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
-    // Patch YAML: inject DB healthchecks + depends_on service_healthy
-    const patchedYaml = patchComposeYaml(yamlContent);
+
+    // Fetch metadata for resource limits
+    const db = await getDb();
+    const collection = db.collection("composes");
+    const doc = await collection.findOne({ _id: new ObjectId(composeId) });
+    const metadata = doc?.metadata as composeMetadata | undefined;
+
+    // Patch YAML: inject DB healthchecks + depends_on service_healthy + resource limits
+    const patchedYaml = patchComposeYaml(yamlContent, metadata);
     await fs.writeFile(yamlPath, patchedYaml);
 
     try {
@@ -139,8 +163,15 @@ export async function restartCompose(composeId: string, yamlContent: string) {
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     await fs.mkdir(tempDir, { recursive: true });
     const yamlPath = path.join(tempDir, 'docker-compose.yaml');
-    // Patch YAML: inject DB healthchecks + depends_on service_healthy
-    const patchedYaml = patchComposeYaml(yamlContent);
+
+    // Fetch metadata for resource limits
+    const db = await getDb();
+    const collection = db.collection("composes");
+    const doc = await collection.findOne({ _id: new ObjectId(composeId) });
+    const metadata = doc?.metadata as composeMetadata | undefined;
+
+    // Patch YAML: inject DB healthchecks + depends_on service_healthy + resource limits
+    const patchedYaml = patchComposeYaml(yamlContent, metadata);
     await fs.writeFile(yamlPath, patchedYaml);
 
     try {
@@ -212,6 +243,39 @@ export async function getComposeLogs(composeId: string) {
     } catch (error: any) {
         console.error('Docker Compose Logs Error:', error);
         return { success: false, error: error.message };
+    }
+}
+
+export async function getComposeStats(composeId: string) {
+    await ensureAuth();
+    try {
+        // Run docker stats with no-stream to get a single snapshot.
+        // We filter by project label if possible, or just parse all and filter.
+        // The most robust way is to use docker compose ps to get IDs first.
+        const containers = await getComposeStatus(composeId);
+        if (!containers || containers.length === 0) return [];
+
+        const ids = containers.map((c: any) => c.ID).join(' ');
+        const { stdout } = await execAsync(`docker stats ${ids} --no-stream --format json`);
+
+        if (!stdout.trim()) return [];
+
+        try {
+            // Line-delimited JSON
+            return stdout.trim().split('\n').map(line => {
+                try {
+                    return JSON.parse(line);
+                } catch {
+                    return null;
+                }
+            }).filter(Boolean);
+        } catch (e) {
+            console.error("Stats parse error:", e);
+            return [];
+        }
+    } catch (error: any) {
+        console.error('Docker Stats Error:', error);
+        return [];
     }
 }
 
@@ -404,26 +468,28 @@ export async function stopProjectByName(projectName: string) {
     }
 }
 
-export async function removeProjectByName(projectName: string) {
+export async function removeProjectByName(projectName: string, deleteVolumes: boolean = true) {
     await ensureAuth();
     try {
-        // 1. Try standard compose down first which is the cleanest way
-        const { stdout, stderr } = await execAsync(`docker compose -p ${projectName} down --volumes --remove-orphans`);
+        // 1. Try standard compose down first
+        const downFlags = deleteVolumes ? "--volumes --remove-orphans" : "--remove-orphans";
+        const { stdout, stderr } = await execAsync(`docker compose -p ${projectName} down ${downFlags}`);
         console.log('Remove project standard:', stdout);
 
-        // 2. Robust fallback: Identify any remaining containers or volumes with this project label
-        // This handles cases where 'down' might have missed things or if the project name 
-        // in Docker doesn't perfectly match what Compose expect for 'down'
+        // 2. Robust fallback: Identify any remaining containers with this project label
         const { stdout: containerIds } = await execAsync(`docker ps -a --filter "label=com.docker.compose.project=${projectName}" -q`);
         if (containerIds.trim()) {
             const ids = containerIds.trim().split(/\s+/).join(' ');
             await execAsync(`docker rm -f ${ids}`);
         }
 
-        const { stdout: volumeNames } = await execAsync(`docker volume ls --filter "label=com.docker.compose.project=${projectName}" -q`);
-        if (volumeNames.trim()) {
-            const names = volumeNames.trim().split(/\s+/).join(' ');
-            await execAsync(`docker volume rm -f ${names}`);
+        // Only remove volumes manually if requested
+        if (deleteVolumes) {
+            const { stdout: volumeNames } = await execAsync(`docker volume ls --filter "label=com.docker.compose.project=${projectName}" -q`);
+            if (volumeNames.trim()) {
+                const names = volumeNames.trim().split(/\s+/).join(' ');
+                await execAsync(`docker volume rm -f ${names}`);
+            }
         }
 
         const { stdout: networkNames } = await execAsync(`docker network ls --filter "label=com.docker.compose.project=${projectName}" -q`);
@@ -436,7 +502,10 @@ export async function removeProjectByName(projectName: string) {
             console.error('Remove project stderr:', stderr);
         }
 
-        return { success: true, message: `Project "${projectName}" and all associated volumes and networks deleted.` };
+        return {
+            success: true,
+            message: `Project "${projectName}" deleted${deleteVolumes ? " along with all persistent volumes" : " (volumes preserved)"}.`
+        };
     } catch (error: any) {
         console.error('Remove project error:', error);
         return { success: false, error: error.message };

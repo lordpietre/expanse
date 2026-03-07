@@ -1,47 +1,64 @@
+"use client"
+
+import React, { useEffect, useState, useCallback } from "react";
 import { getAllMyComposeOrderByEditDate } from "@/actions/userActions";
 import { getGlobalDockerStats } from "@/actions/dockerActions";
 import { DataTable } from "@/components/display/dataTable";
 import { columns } from "@/components/display/composeTable/colums";
 import { Separator } from "@/components/ui/separator";
-import { Activity, Box, Container, HardDrive, Network, Plus } from "lucide-react";
+import { Activity, Plus } from "lucide-react";
 import Link from "next/link";
+import ProjectMonitor from "@/components/display/projectMonitor";
 
-export default async function Page() {
-    const [composes, globalStats] = await Promise.all([
-        getAllMyComposeOrderByEditDate(),
-        getGlobalDockerStats()
-    ]);
+export default function Page() {
+    const [composes, setComposes] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedProject, setSelectedProject] = useState<any>(null);
 
-    // Create a mapping of project names to status from Docker
-    const projectStatuses: Record<string, string> = {};
-    if (globalStats && !globalStats.error && globalStats.projects) {
-        globalStats.projects.forEach((proj: any) => {
-            if (proj.Name && proj.Status) {
-                projectStatuses[proj.Name] = proj.Status;
-            }
+    const fetchData = useCallback(async () => {
+        const [composesData, globalStats] = await Promise.all([
+            getAllMyComposeOrderByEditDate(),
+            getGlobalDockerStats()
+        ]);
+
+        // Create a mapping of project names to status from Docker
+        const projectStatuses: Record<string, string> = {};
+        if (globalStats && !globalStats.error && globalStats.projects) {
+            globalStats.projects.forEach((proj: any) => {
+                if (proj.Name && proj.Status) {
+                    projectStatuses[proj.Name] = proj.Status;
+                }
+            });
+        }
+
+        // Map the database composes with real-time docker statuses
+        const data = composesData.map((c) => {
+            const projectName = `expanse-project_${c.id}`;
+            const status = projectStatuses[projectName] || null;
+
+            const services = c.data?.services || [];
+            const serviceNames = Object.keys(services).map(s => {
+                const name = services[s].name || s;
+                return name.toUpperCase();
+            }).join(", ");
+
+            return {
+                id: c.id.toString(),
+                name: serviceNames || c.data?.name || "Untitled Project",
+                createdAt: c.createdAt,
+                updatedAt: c.updatedAt,
+                status,
+                projectName
+            };
         });
-    }
 
-    // Map the database composes with real-time docker statuses
-    const data = composes.map((c) => {
-        const projectName = `expanse-project_${c.id}`;
-        const status = projectStatuses[projectName] || null;
+        setComposes(data);
+        setLoading(false);
+    }, []);
 
-        const services = c.data?.services || [];
-        const serviceNames = Object.keys(services).map(s => {
-            const name = services[s].name || s;
-            return name.toUpperCase();
-        }).join(", ");
-
-        return {
-            id: c.id.toString(),
-            name: serviceNames || c.data?.name || "Untitled Project",
-            createdAt: c.createdAt,
-            updatedAt: c.updatedAt,
-            status,
-            projectName
-        };
-    });
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     return (
         <div className="w-full text-white">
@@ -65,56 +82,25 @@ export default async function Page() {
                 </div>
             </div>
 
-
-
             <div className="bg-slate-950/40 backdrop-blur-xl border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl mb-12">
-                <DataTable columns={columns} data={data} />
+                <DataTable
+                    columns={columns}
+                    data={composes}
+                    onRowClick={(row) => setSelectedProject(row)}
+                    selectedRowId={selectedProject?.id}
+                />
             </div>
 
-            <Separator className="bg-white/10 mb-8" />
-
-            <div className="grid grid-cols-4 gap-4 mb-8">
-                <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 backdrop-blur-md border border-emerald-500/10 rounded-2xl p-5 shadow-xl">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-emerald-500/20 rounded-lg">
-                            <Box className="w-5 h-5 text-emerald-400" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Projects</span>
-                    </div>
-                    <p className="text-3xl font-black text-white">{globalStats?.projects?.length || 0}</p>
+            {selectedProject && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <Separator className="bg-white/10 mb-8" />
+                    <ProjectMonitor
+                        project={selectedProject}
+                        onClose={() => setSelectedProject(null)}
+                        onRefresh={fetchData}
+                    />
                 </div>
-
-                <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 backdrop-blur-md border border-emerald-500/10 rounded-2xl p-5 shadow-xl">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-emerald-500/20 rounded-lg">
-                            <Container className="w-5 h-5 text-emerald-400" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Containers</span>
-                    </div>
-                    <p className="text-3xl font-black text-white">{globalStats?.containers?.length || 0}</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-yellow-500/10 backdrop-blur-md border border-amber-500/10 rounded-2xl p-5 shadow-xl">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-amber-500/20 rounded-lg">
-                            <HardDrive className="w-5 h-5 text-amber-400" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Volumes</span>
-                    </div>
-                    <p className="text-3xl font-black text-white">{globalStats?.volumes?.length || 0}</p>
-                </div>
-
-                <div className="bg-gradient-to-br from-violet-500/10 via-purple-500/10 to-fuchsia-500/10 backdrop-blur-md border border-violet-500/10 rounded-2xl p-5 shadow-xl">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-violet-500/20 rounded-lg">
-                            <Network className="w-5 h-5 text-violet-400" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Networks</span>
-                    </div>
-                    <p className="text-3xl font-black text-white">{globalStats?.networks?.length || 0}</p>
-                </div>
-            </div>
-
+            )}
         </div>
     );
 }

@@ -4,12 +4,13 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Settings, Rocket, Activity, LogOut, House as HouseIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getAllMyComposeOrderByEditDate } from "@/actions/userActions";
 import { getGlobalDockerStats } from "@/actions/dockerActions";
 import { DataTable } from "@/components/display/dataTable";
 import { columns } from "@/components/display/composeTable/colums";
 import { Plus } from "lucide-react";
+import ProjectMonitor from "@/components/display/projectMonitor";
 
 export default function HomePage() {
     const pathname = usePathname();
@@ -17,62 +18,64 @@ export default function HomePage() {
 
     const [composes, setComposes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedProject, setSelectedProject] = useState<any>(null);
+
+    const checkAndFetch = useCallback(async () => {
+        try {
+            const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+            if (!token) {
+                router.push('/login');
+                return;
+            }
+
+            const [composesData, globalStats] = await Promise.all([
+                getAllMyComposeOrderByEditDate(),
+                getGlobalDockerStats()
+            ]);
+
+            // Create a mapping of project names to status from Docker
+            const projectStatuses: Record<string, string> = {};
+            if (globalStats && !globalStats.error && globalStats.projects) {
+                globalStats.projects.forEach((proj: any) => {
+                    if (proj.Name && proj.Status) {
+                        projectStatuses[proj.Name] = proj.Status;
+                    }
+                });
+            }
+
+            // Map the database composes with real-time docker statuses
+            const data = composesData.map((c) => {
+                const projectName = `expanse-project_${c.id}`;
+                const status = projectStatuses[projectName] || null;
+
+                const services = c.data?.services || [];
+                const serviceNames = Object.keys(services).map(s => {
+                    const name = services[s].name || s;
+                    // Avoid repeating the project name if it's identical
+                    return name.toUpperCase();
+                }).join(", ");
+
+                return {
+                    id: c.id.toString(),
+                    name: serviceNames || c.data?.name || "Untitled Project",
+                    createdAt: c.createdAt,
+                    updatedAt: c.updatedAt,
+                    status,
+                    projectName
+                };
+            });
+
+            setComposes(data);
+            setLoading(false);
+        } catch (err) {
+            console.error(err);
+            router.push('/login');
+        }
+    }, [router]);
 
     useEffect(() => {
-        const checkAndFetch = async () => {
-            try {
-                const token = document.cookie.split('; ').find(row => row.startsWith('token='));
-                if (!token) {
-                    router.push('/login');
-                    return;
-                }
-
-                const [composesData, globalStats] = await Promise.all([
-                    getAllMyComposeOrderByEditDate(),
-                    getGlobalDockerStats()
-                ]);
-
-                // Create a mapping of project names to status from Docker
-                const projectStatuses: Record<string, string> = {};
-                if (globalStats && !globalStats.error && globalStats.projects) {
-                    globalStats.projects.forEach((proj: any) => {
-                        if (proj.Name && proj.Status) {
-                            projectStatuses[proj.Name] = proj.Status;
-                        }
-                    });
-                }
-
-                // Map the database composes with real-time docker statuses
-                const data = composesData.map((c) => {
-                    const projectName = `expanse-project_${c.id}`;
-                    const status = projectStatuses[projectName] || null;
-
-                    const services = c.data?.services || [];
-                    const serviceNames = Object.keys(services).map(s => {
-                        const name = services[s].name || s;
-                        // Avoid repeating the project name if it's identical
-                        return name.toUpperCase();
-                    }).join(", ");
-
-                    return {
-                        id: c.id.toString(),
-                        name: serviceNames || c.data?.name || "Untitled Project",
-                        createdAt: c.createdAt,
-                        updatedAt: c.updatedAt,
-                        status,
-                        projectName
-                    };
-                });
-
-                setComposes(data);
-                setLoading(false);
-            } catch (err) {
-                console.error(err);
-                router.push('/login');
-            }
-        };
         checkAndFetch();
-    }, [router]);
+    }, [checkAndFetch]);
 
     const navItems = [
         { href: "/", label: "Home", icon: HouseIcon },
@@ -159,8 +162,21 @@ export default function HomePage() {
                 </div>
 
                 <div className="bg-slate-950/40 backdrop-blur-xl border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
-                    <DataTable columns={columns} data={composes} />
+                    <DataTable
+                        columns={columns}
+                        data={composes}
+                        onRowClick={(row) => setSelectedProject(row)}
+                        selectedRowId={selectedProject?.id}
+                    />
                 </div>
+
+                {selectedProject && (
+                    <ProjectMonitor
+                        project={selectedProject}
+                        onClose={() => setSelectedProject(null)}
+                        onRefresh={checkAndFetch}
+                    />
+                )}
             </div>
         </div>
     );

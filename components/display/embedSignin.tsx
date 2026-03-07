@@ -2,8 +2,8 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import QuickToolType from "@/components/ui/quickToolType";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
     const router = useRouter()
 
     const [mode, setMode] = useState<"register" | "login">("register")
-    const [companyType, setCompanyType] = useState("")
+
     const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
 
@@ -41,7 +41,7 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
     async function handleRegister(e: React.FormEvent) {
         e.preventDefault()
         const data = getPlaygroundData()
-        const registerPromise = registerUser(email, password, companyType, true, data)
+        const registerPromise = registerUser(email, password, "", true, data)
             .then(result => (result === true ? "" : result));
         toast.promise(registerPromise, {
             success: (data: string) => {
@@ -107,36 +107,15 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
                     <Input id="password" required name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 {mode === "register" && (
-                    <>
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="company" className="flex justify-between">
-                                Company type
-                                <QuickToolType className="" message={"This won't affect pricing"} />
-                            </Label>
-                            <Select onValueChange={(value) => {
-                                setCompanyType(value)
-                            }}>
-                                <SelectTrigger className='w-full'>
-                                    <SelectValue placeholder="select a company type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={"individual"}>Individual</SelectItem>
-                                    <SelectItem value={"startup"}>Start Up</SelectItem>
-                                    <SelectItem value={"serviceCompany"}>IT service company</SelectItem>
-                                    <SelectItem value={"other"}>Other</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex flex-row items-center gap-3">
-                            <Checkbox required id="terms" name="terms" />
-                            <label
-                                htmlFor="terms"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                                Accept <Link className="underline" href="/cgu.pdf">terms and conditions</Link>
-                            </label>
-                        </div>
-                    </>
+                    <div className="flex flex-row items-center gap-3">
+                        <Checkbox required id="terms" name="terms" />
+                        <label
+                            htmlFor="terms"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                            I accept the <Link className="underline" href="/terms">Terms and Conditions</Link>
+                        </label>
+                    </div>
                 )}
                 <Button className="bg-gradient-to-r from-[#1A96F8] via-[#3AA8FF] to-[#62BEFF]" type="submit">
                     {mode === "register" ? "Create an account" : "Login"}

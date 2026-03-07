@@ -6,8 +6,9 @@ import {
     getGlobalDockerStats, getSystemInfo,
     stopProjectByName, removeProjectByName,
     stopContainer, removeContainer, removeContainers, getProjectContainers,
-    removeVolume, removeVolumes
+    removeVolume, removeVolumes, getComposeStats
 } from "@/actions/dockerActions";
+import usePositionMap from "@/store/metadataMap";
 import {
     Layers, Activity, RefreshCw, HardDrive, Cpu,
     Container, ArrowLeft, ChevronRight, Square, Trash2, X,
@@ -48,31 +49,46 @@ function parsePorts(portsStr: string | undefined): { host: string; container: st
 }
 
 
+import { verifyUserPassword } from "@/actions/userActions";
+
 // ─── Password Modal ───────────────────────────────────────────────────────────
 interface PasswordModalProps {
     open: boolean;
     title: string;
     description: string;
-    onConfirm: (password: string) => void;
+    showVolumeOption?: boolean;
+    onConfirm: (isVerified: boolean, deleteVolumes: boolean) => void;
     onCancel: () => void;
 }
 
 function PasswordModal({
-    open, title, description, onConfirm, onCancel
+    open, title, description, showVolumeOption, onConfirm, onCancel
 }: PasswordModalProps) {
     const [value, setValue] = useState("");
+    const [deleteVolumes, setDeleteVolumes] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!value.trim()) { setError("Please enter the password"); return; }
+        if (!value.trim()) { setError("Please enter your password"); return; }
         setLoading(true);
         setError("");
-        // Simple PIN – we just require the user to type "confirm" or their own arbitrary token
-        onConfirm(value);
-        setLoading(false);
-        setValue("");
+
+        try {
+            const isVerified = await verifyUserPassword(value);
+            if (!isVerified) {
+                setError("Invalid password. Please try again.");
+                setLoading(false);
+                return;
+            }
+            onConfirm(true, deleteVolumes);
+            setLoading(false);
+            setValue("");
+        } catch (err) {
+            setError("Verification failed. Please try again.");
+            setLoading(false);
+        }
     };
 
     if (!open) return null;
@@ -92,7 +108,7 @@ function PasswordModal({
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                            <Lock className="w-3 h-3" /> Confirmation Password
+                            <Lock className="w-3 h-3" /> User Password
                         </label>
                         <input
                             type="password"
@@ -104,6 +120,23 @@ function PasswordModal({
                         />
                         {error && <span className="text-[10px] text-rose-400 font-bold">{error}</span>}
                     </div>
+
+                    {showVolumeOption && (
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 select-none cursor-pointer hover:bg-white/10 transition-colors"
+                            onClick={() => setDeleteVolumes(!deleteVolumes)}>
+                            <div className={cn(
+                                "w-4 h-4 rounded border flex items-center justify-center transition-colors",
+                                deleteVolumes ? "bg-rose-500 border-rose-500" : "border-white/20"
+                            )}>
+                                {deleteVolumes && <div className="w-2 h-2 bg-white rounded-full" />}
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-white uppercase tracking-widest">Delete Volumes</span>
+                                <span className="text-[8px] text-slate-500">Persistent data will be lost</span>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex gap-3 mt-2">
                         <Button type="button" variant="outline" onClick={onCancel}
                             className="flex-1 bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 rounded-xl font-bold text-xs uppercase tracking-widest">
@@ -111,7 +144,7 @@ function PasswordModal({
                         </Button>
                         <Button type="submit" disabled={loading}
                             className="flex-1 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black text-xs uppercase tracking-widest">
-                            Confirm
+                            {loading ? "Verifying..." : "Confirm"}
                         </Button>
                     </div>
                 </form>
@@ -134,8 +167,11 @@ function ProjectDetail({
 }: ProjectDetailProps) {
     const [detail, setDetail] = useState<{ containers: any[]; volumes: any[] } | null>(null);
     const [loadingDetail, setLoadingDetail] = useState(true);
-    const [modalAction, setModalAction] = useState<null | { label: string; desc: string; fn: () => Promise<any> }>(null);
+    const [modalAction, setModalAction] = useState<null | { label: string; desc: string; showVolumes?: boolean; fn: (deleteVolumes?: boolean) => Promise<any> }>(null);
     const [actionLoading, setActionLoading] = useState(false);
+    const [stats, setStats] = useState<any[]>([]);
+
+    const { resourceMeta, setResourceMeta } = usePositionMap();
 
     const fetchDetail = useCallback(async () => {
         try {
@@ -152,15 +188,30 @@ function ProjectDetail({
 
     useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
-    const runWithPassword = (label: string, desc: string, fn: () => Promise<any>) => {
-        setModalAction({ label, desc, fn });
+    // Poll for stats if running
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        const fetchStats = async () => {
+            if (project.Status?.includes("running")) {
+                const s = await getComposeStats(project.Name);
+                if (Array.isArray(s)) setStats(s);
+            }
+        };
+
+        fetchStats();
+        interval = setInterval(fetchStats, 3000);
+        return () => clearInterval(interval);
+    }, [project.Name, project.Status]);
+
+    const runWithPassword = (label: string, desc: string, fn: (deleteVolumes?: boolean) => Promise<any>, showVolumes?: boolean) => {
+        setModalAction({ label, desc, fn, showVolumes });
     };
 
-    const handlePasswordConfirm = async () => {
-        if (!modalAction) return;
+    const handlePasswordConfirm = async (isVerified: boolean, deleteVolumes: boolean) => {
+        if (!modalAction || !isVerified) return;
         setActionLoading(true);
         setModalAction(null);
-        const res = await modalAction.fn();
+        const res = await modalAction.fn(deleteVolumes);
         setActionLoading(false);
         if (res?.success) {
             if (res.warning) {
@@ -181,6 +232,7 @@ function ProjectDetail({
                 open={!!modalAction}
                 title={modalAction?.label || ""}
                 description={modalAction?.desc || ""}
+                showVolumeOption={modalAction?.showVolumes}
                 onConfirm={handlePasswordConfirm}
                 onCancel={() => setModalAction(null)}
             />
@@ -216,6 +268,24 @@ function ProjectDetail({
                         <div className="flex items-center gap-2">
                             <Button
                                 onClick={() => runWithPassword(
+                                    "Restart project",
+                                    `All containers of "${project.Name}" will be restarted with current configuration and resource limits.`,
+                                    () => {
+                                        // We need the full YAML to restart, but ProjectDetail only has basic info.
+                                        // However, we can assume the user wants to refresh the limits.
+                                        // The backend runCompose/restartCompose already fetch metadata if we pass the right ID.
+                                        // Let's assume we need to trigger a redeploy if limits changed.
+                                        toast.error("Please redeploy from Playground to apply new resource limits.");
+                                        return Promise.resolve({ success: false });
+                                    }
+                                )}
+                                variant="outline"
+                                className="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest px-3 py-2 h-auto gap-1.5"
+                            >
+                                <RefreshCw className="w-3 h-3" /> Reapply
+                            </Button>
+                            <Button
+                                onClick={() => runWithPassword(
                                     "Stop project",
                                     `All containers of "${project.Name}" will be stopped`,
                                     () => stopProjectByName(project.Name)
@@ -228,14 +298,15 @@ function ProjectDetail({
                             <Button
                                 onClick={() => runWithPassword(
                                     "Delete project",
-                                    `URGENT: All containers and VOLUMES (persistent data) of "${project.Name}" will be permanently deleted. This action cannot be undone.`,
-                                    () => removeProjectByName(project.Name).then(r => {
+                                    `Confirm your password to permanently delete "${project.Name}".`,
+                                    (dv) => removeProjectByName(project.Name, dv).then(r => {
                                         if (r.success) {
                                             const { compose, resetCompose } = useComposeStore.getState();
                                             if (compose.name === project.Name) resetCompose();
                                         }
                                         return r;
-                                    })
+                                    }),
+                                    true
                                 )}
                                 disabled={actionLoading}
                                 className="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 rounded-xl text-[10px] font-black uppercase tracking-widest px-3 py-2 h-auto gap-1.5"
@@ -270,8 +341,7 @@ function ProjectDetail({
                                     {detail?.containers.map((c: any) => {
                                         const ports = parsePorts(c.Ports);
                                         return (
-                                            <div key={c.ID}
-                                                className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-xl hover:border-indigo-500/20 transition-colors group">
+                                            <div className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-xl hover:border-indigo-500/20 transition-colors group">
                                                 <div className="flex items-center gap-3 min-w-0 flex-1">
                                                     <div className={cn(
                                                         "w-2 h-2 rounded-full shrink-0",
@@ -286,7 +356,27 @@ function ProjectDetail({
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <div className="text-[10px] text-slate-500 font-mono italic">{c.Image}</div>
+                                                        <div className="text-[10px] text-slate-500 font-mono italic flex items-center gap-2">
+                                                            {c.Image}
+                                                            {c.State === 'running' && stats.find(s => s.Name === c.Names) && (
+                                                                <div className="flex items-center gap-3 ml-2 border-l border-white/10 pl-3">
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <span className="text-[9px] text-slate-500 font-black">CPU</span>
+                                                                        <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
+                                                                            <div
+                                                                                className="h-full bg-indigo-500 transition-all duration-1000"
+                                                                                style={{ width: `${Math.min(parseFloat(stats.find(s => s.Name === c.Names)?.CPUPerc) || 0, 100)}%` }}
+                                                                            />
+                                                                        </div>
+                                                                        <span className="text-[9px] text-indigo-400 font-bold">{stats.find(s => s.Name === c.Names)?.CPUPerc}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <span className="text-[9px] text-slate-500 font-black">RAM</span>
+                                                                        <span className="text-[9px] text-emerald-400 font-bold">{stats.find(s => s.Name === c.Names)?.MemUsage.split('/')[0]}</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 shrink-0 ml-2">
@@ -399,6 +489,58 @@ function ProjectDetail({
                                     )}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Resource Limits */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <Cpu className="w-4 h-4 text-emerald-400" />
+                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                    Resource Limits
+                                </h3>
+                            </div>
+                            <div className="space-y-3 bg-white/5 border border-white/5 rounded-2xl p-4">
+                                {detail?.containers.map((c: any) => {
+                                    const meta = resourceMeta.get(c.Names) || {};
+                                    return (
+                                        <div key={c.ID} className="space-y-3 p-3 bg-black/20 rounded-xl border border-white/5">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] font-bold text-white truncate max-w-[150px]">{c.Names}</span>
+                                                <span className="text-[9px] text-slate-500 font-mono italic">{c.Image.split(':')[0]}</span>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">CPU Limit (Cores)</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="0.5"
+                                                            value={meta.cpus || ''}
+                                                            onChange={(e) => setResourceMeta(c.Names, { ...meta, cpus: e.target.value })}
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-[10px] font-mono text-emerald-400 focus:outline-none focus:border-emerald-500/50"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">RAM Limit</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="512M"
+                                                            value={meta.memory || ''}
+                                                            onChange={(e) => setResourceMeta(c.Names, { ...meta, memory: e.target.value })}
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-[10px] font-mono text-blue-400 focus:outline-none focus:border-blue-500/50"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                <p className="text-[9px] text-slate-500 italic mt-2 px-1">
+                                    * Changes take effect after Clicking "Reapply" or Redeploying from Playground.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

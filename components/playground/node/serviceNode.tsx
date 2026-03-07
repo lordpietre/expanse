@@ -48,17 +48,28 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
     };
 
     const displayPort = (() => {
+        // Infrastructure/system ports that should be skipped in favor of web ports
+        const SKIP_CONTAINER_PORTS = new Set(['22', '25', '53', '389', '636', '5353']);
+
+        // Live port data from Docker (e.g. "0.0.0.0:2222->22/tcp, :::2222->22/tcp, 0.0.0.0:3001->3000/tcp")
         if (serviceStatuses[service.name]?.ports) {
-            const ports = serviceStatuses[service.name].ports;
-            const mappedPort = ports?.split(',').find(p => p.includes('->'))?.split('->')[0]?.split(':').pop();
-            const directPort = ports?.split(',')[0]?.split('/')[0];
-            return mappedPort || directPort;
+            const raw = serviceStatuses[service.name].ports!;
+            // Collect all host->container TCP mappings
+            const all = [...raw.matchAll(/(\d+)->(\d+)\/tcp/g)];
+            if (all.length > 0) {
+                // Prefer the first entry whose container side is NOT a system port
+                const web = all.find(m => !SKIP_CONTAINER_PORTS.has(m[2]));
+                return web ? web[1] : all[0][1];
+            }
+            // Fallback: plain "3000/tcp" with no host mapping
+            const m2 = raw.match(/(\d+)\//);
+            if (m2) return m2[1];
         }
-        const portMaps = Array.from(service.ports || []);
-        if (portMaps.length > 0) {
-            const first = portMaps[0] as any;
-            return first.hostPort || first.containerPort;
-        }
+
+        // Static fallback from compose config — prefer host port, skip port 22
+        const portMaps = Array.from(service.ports || []) as any[];
+        const webPort = portMaps.find(p => String(p.containerPort) !== '22') || portMaps[0];
+        if (webPort) return webPort.hostPort || webPort.containerPort || null;
         return null;
     })();
 

@@ -29,6 +29,7 @@ export type composeMetadata = {
     }
     positionMap: PositionMap[]
     connectionMap?: ConnectionMapEntry[]
+    resources?: Record<string, { cpus?: string, memory?: string }>
 }
 
 export function extractMetadata(compose: Compose, positionMap: Map<string, NodeData>): composeMetadata {
@@ -42,7 +43,8 @@ export function extractMetadata(compose: Compose, positionMap: Map<string, NodeD
             labelsIds: []
         },
         positionMap: [],
-        connectionMap: []
+        connectionMap: [],
+        resources: Object.fromEntries(usePositionMap.getState().resourceMeta)
     }
     const connectionMapState = usePositionMap.getState().connectionMap;
     compose.services.forEach(service => {
@@ -116,6 +118,14 @@ export function reHydrateComposeIds(compose: Compose, metadata: composeMetadata)
             }
         }
     })
+
+    if (metadata.resources) {
+        const resourceMap = new Map();
+        Object.entries(metadata.resources).forEach(([name, limits]) => {
+            resourceMap.set(name, limits);
+        });
+        usePositionMap.setState({ resourceMeta: resourceMap });
+    }
 }
 
 export function recreatePositionMap(input: PositionMap[]): Map<string, NodeData> {

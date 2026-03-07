@@ -36,6 +36,8 @@ Expanse is not a diagramming tool. It is a **live execution wrapper** that commu
 - **Deploy, Stop, and Restart** — Execute entire projects with a single action from the UI.
 - **Auto-Port Reassignment** — Detects host port collisions at deploy time and reassigns them dynamically.
 - **Live Log Streaming** — Integrated terminal for real-time log output from any running container.
+- **Resource Control** — Configure CPU and RAM limits per service directly from the UI to prevent resource exhaustion.
+- **Live Performance Metrics** — Real-time CPU and Memory usage graphs for every container, refreshing every 3 seconds.
 - **Resilient Monitoring** — Status polling persists across network interruptions and temporary file loss.
 
 ### Service Library
