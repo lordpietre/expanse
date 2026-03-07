@@ -546,49 +546,6 @@ export async function removeVolume(volumeName: string) {
     }
 }
 
-export async function removeContainers(containerIds: string[]) {
-    await ensureAuth();
-    if (!containerIds.length) return { success: true };
-    try {
-        const ids = containerIds.join(' ');
-        const { stdout } = await execAsync(`docker rm -f ${ids}`);
-        console.log('Batch remove containers:', stdout);
-        return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
-}
-
-export async function removeVolumes(volumeNames: string[]) {
-    await ensureAuth();
-    if (!volumeNames.length) return { success: true };
-
-    const deleted: string[] = [];
-    const failed: { name: string, error: string }[] = [];
-
-    for (const name of volumeNames) {
-        try {
-            await execAsync(`docker volume rm -f ${name}`);
-            deleted.push(name);
-        } catch (error: any) {
-            let errMsg = error.message || String(error);
-            if (errMsg.includes("in use")) {
-                errMsg = "in use";
-            }
-            failed.push({ name, error: errMsg });
-        }
-    }
-
-    if (failed.length > 0) {
-        const failedNames = failed.map(f => f.name).join(', ');
-        return {
-            success: true,
-            warning: `Deleted ${deleted.length} volumes. Skipped ${failed.length}: ${failedNames} (in use)`
-        };
-    }
-
-    return { success: true, message: `Successfully deleted ${deleted.length} volumes.` };
-}
 
 export async function getProjectContainers(projectName: string) {
     await ensureAuth();
