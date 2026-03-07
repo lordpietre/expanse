@@ -90,6 +90,8 @@ The fastest way to run Expanse is using **Docker Compose**.
 
 ### Quick Start (Docker)
 
+**Prerequisites:** [Docker](https://docs.docker.com/get-docker/) + [Docker Compose](https://docs.docker.com/compose/install/)
+
 **1. Clone the repository**
 ```bash
 git clone https://github.com/lordpietre/expanse.git
@@ -111,9 +113,9 @@ If you prefer to run the project manually for development purposes:
 
 ### Prerequisites
 
-- Node.js 20 or later
-- Docker Engine (required for the bridge to work)
-- pnpm (recommended) or npm
+- **Node.js 20** or later
+- **pnpm** (recommended) or npm
+- **Docker Engine** (required for the bridge to work)
 
 ### Manual Installation
 
