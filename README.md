@@ -86,24 +86,45 @@ expanse/
 
 ## Getting Started
 
-### Prerequisites
+The fastest way to run Expanse is using **Docker Compose**.
 
-- Node.js 20 or later
-- Docker Engine with Docker Compose
-- pnpm (recommended) or npm
+### Quick Start (Docker)
 
-### Installation
-
-**1. Clone and install dependencies**
+**1. Clone the repository**
 ```bash
 git clone https://github.com/lordpietre/expanse.git
 cd expanse
+```
+
+**2. Start the engine**
+```bash
+docker compose up -d
+```
+
+Expanse will be available at `http://localhost:4000`.
+
+---
+
+## Development Setup
+
+If you prefer to run the project manually for development purposes:
+
+### Prerequisites
+
+- Node.js 20 or later
+- Docker Engine (required for the bridge to work)
+- pnpm (recommended) or npm
+
+### Manual Installation
+
+**1. Install dependencies**
+```bash
 pnpm install
 ```
 
 **2. Configure environment variables**
 
-Create a `.env.local` file in the project root:
+Create a `.env.local` file:
 ```env
 MONGODB_URI=mongodb://localhost:27017/expanse
 SECRET_KEY=your-secret-key-here
@@ -113,15 +134,6 @@ URL=http://localhost:3000
 **3. Start the development server**
 ```bash
 pnpm run dev
-```
-
-Navigate to `http://localhost:3000` to begin.
-
-### Docker Deployment
-
-A `docker-compose.yml` is included for production-ready deployment:
-```bash
-docker compose up -d
 ```
 
 ---
