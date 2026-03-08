@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 import { DM_Sans } from 'next/font/google'
 import VersionUpdateBanner from "@/components/ui/versionUpdateBanner";
-import Instrumentation from "@/components/instrumentation";
+import PostHogInstrumentation from "@/components/PostHogInstrumentation";
 import Script from "next/script";
 import { getCachedLastVersion } from "@/lib/utils";
 import packageJson from "@/package.json"
@@ -76,7 +76,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${dm_sans.className} antialiased h-screen`}
       >
         {!process.env.DISABLE_TELEMETRY && process.env.NEXT_PUBLIC_POSTHOG_KEY && (
-          <Instrumentation posthogKey={process.env.NEXT_PUBLIC_POSTHOG_KEY} />
+          <PostHogInstrumentation posthogKey={process.env.NEXT_PUBLIC_POSTHOG_KEY} />
         )}
         <Toaster
           position="top-right"

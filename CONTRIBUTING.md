@@ -1,100 +1,57 @@
 # Contributing to Expanse
 
-Thank you for your interest in contributing to Expanse! We welcome contributions from the community and are happy to have you on board.
+We love contributions! Whether you're fixing a bug, adding a feature, or contributing a new service stack, this guide will help you get started.
 
-## Code of Conduct
+## Quick Setup
 
-By participating in this project, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md). Please report any unacceptable behavior to the project maintainers.
+**1. Prerequisites:** Docker & Docker Compose.
+**2. Fork & Clone:** Clone your fork of the repository.
+**3. Install (Dev Only):** `pnpm install` (only if modifying code).
+**4. Run:** `docker compose up -d` to see changes.
 
 ## How to Contribute
 
-### Reporting Bugs
+### 1. Contributing Service Stacks (Recommended)
+You can contribute new services to the Expanse library by creating a JSON file in `data/library/`.
 
-Before creating bug reports, please check the issue list to avoid duplicates. When you create a bug report, include as many details as possible:
+**Template for `data/library/your-service.json`:**
+```json
+{
+    "name": "Service Name",
+    "description": "Short description of the service",
+    "category": "Database | Web | Network | etc",
+    "isStack": true,
+    "image": "image:latest",
+    "logo": "https://url-to-logo.png",
+    "default_ports": ["8080:80"],
+    "env_vars": {
+        "DB_HOST": "${related_db}:5432"
+    },
+    "volumes": ["data:/app/data"],
+    "related_services": [
+        {
+            "name": "related_db",
+            "image": "postgres:alpine",
+            "env_vars": { "POSTGRES_PASSWORD": "pass" }
+        }
+    ]
+}
+```
 
-- Use a clear and descriptive title
-- Describe the exact steps to reproduce the problem
-- Provide specific examples to demonstrate the steps
-- Describe the behavior you observed after following the steps
-- Explain which behavior you expected to see instead and why
-- Include screenshots if possible
+### 2. Code Contributions
+- **Bug Fixes:** Open an issue first to discuss the bug.
+- **Features:** Create a proposal issue before starting work.
+- **Standards:** We use **TypeScript**, **Next.js 15**, and **Tailwind CSS**.
+- **Commits:** Keep commit messages clear and concise (e.g., `feat: add redis stack`).
 
-### Suggesting Enhancements
-
-Enhancement suggestions are tracked as GitHub issues. When creating an enhancement suggestion:
-
-Use issue template if one fit to your needs.
-
-- Use a clear and descriptive title
-- Provide a detailed description of the proposed functionality
-- Include mockups or examples if possible
-- Explain why this enhancement would be useful
-
-### Pull Requests
-
-- Fork the repository and create your branch from `main`
-- Follow the coding style of the project
-- Include comments in your code where necessary
-- Update the documentation if needed
-- Ensure the test suite passes
-- Create a pull request with a clear title and description
-
-## Development Setup
-
-1. Ensure you have Node.js installed (preferably the latest LTS version)
-2. Fork and clone the repository
-3. Install dependencies:
-   ```bash
-   pnpm install
-   ```
-4. Set up your environment variables:
-   ```env
-   SECRET_KEY=your_secret_key
-   MONGODB_URI=your_mongodb_uri
-   URL=http://localhost:3000
-   CORE_ONLY=false
-   DISABLE_TELEMETRY=true
-   ```
-5. Start the development server:
-   ```bash
-   pnpm run dev
-   ```
-
-## Coding Standards
-
-- Use TypeScript for all new code
-- Follow the existing code style
-- Write meaningful commit messages
-- Add comments for complex logic
-- Ensure your code is properly formatted using the project's prettier configuration
-
-## Testing
-
-Before submitting a pull request:
-
-1. Run the test suite:
-   ```bash
-   pnpm test
-   ```
-2. Ensure your code passes linting:
-   ```bash
-   pnpm lint
-   ```
-
-## Documentation
-
-- Update documentation for any changed functionality
-- Document new features
-- Keep the README.md up to date
+## Pull Request Process
+1. Create a branch: `git checkout -b feat/my-new-feature`.
+2. Commit changes and push to your fork.
+3. Open a PR against the `main` branch.
+4. Ensure your PR description clearly explains the changes.
 
 ## Questions?
+Open a [GitHub Issue](https://github.com/lordpietre/expanse/issues) if you need help!
 
-If you have any questions or need clarification:
-
-1. Check the existing issues
-2. Open a new issue with your question
-3. Contact the maintainers
-
-## License
-
-By contributing to Expanse, you agree that your contributions will be licensed under its [licence](./LICENSE).
+---
+By contributing, you agree that your work will be licensed under the **MIT License**.

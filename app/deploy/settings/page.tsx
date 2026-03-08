@@ -527,7 +527,7 @@ export default function DashboardPage() {
         fetchData();
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
-    }, [fetchData]);
+    }, []);
 
     // Build a map of projectName -> all port mappings across its containers
     const portsByProject = useMemo(() => {

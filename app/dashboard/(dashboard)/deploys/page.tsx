@@ -1,7 +1,7 @@
 import { getAllMyShares } from "@/actions/composeActions";
 import { DataTable } from "@/components/display/dataTable";
 import { columns } from "@/components/display/shareTable/colums";
-import FirstCompose from "@/components/ui/fisrtCompose";
+import FirstCompose from "@/components/ui/firstCompose";
 import { Activity } from "lucide-react";
 
 export default async function Page() {
