@@ -20,7 +20,7 @@ export async function exportAllProjects() {
         const exportData = {
             version: "1.0",
             timestamp: new Date().toISOString(),
-            projects: composes.map(c => ({
+            projects: composes.map((c: any) => ({
                 id: c._id.toString(),
                 data: c.data,
                 metadata: c.metadata,
@@ -36,11 +36,3 @@ export async function exportAllProjects() {
     }
 }
 
-/**
- * Placeholder for Google Drive export logic
- */
-export async function exportToGoogleDrive() {
-    // This would require Google OAuth implementation
-    // For now, we'll return a "not implemented" result
-    return { success: false, error: "Google Drive integration is not yet configured. Please use local backup for now." };
-}

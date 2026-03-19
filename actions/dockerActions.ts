@@ -92,16 +92,6 @@ function patchComposeYaml(yamlText: string, metadata?: composeMetadata): string 
     return YAML.stringify(doc)
 }
 
-/** Expose the generated YAML for debugging */
-export async function getComposeYaml(composeId: string): Promise<string | null> {
-    await ensureAuth();
-    const yamlPath = path.join(os.tmpdir(), `expanse-${composeId}`, 'docker-compose.yaml')
-    try {
-        return await fs.readFile(yamlPath, 'utf-8')
-    } catch {
-        return null
-    }
-}
 
 export async function runCompose(composeId: string, yamlContent: string) {
     await ensureAuth();
