@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/expanse.png" alt="Expanse Logo" width="160" />
+  <img src="https://raw.githubusercontent.com/lordpietre/expanse/main/assets/expanse.png" alt="Expanse Logo" width="160" />
 
   <h1>Expanse</h1>
   <p><strong>Professional Orchestration Engine and Visual IDE for Docker Compose</strong></p>
