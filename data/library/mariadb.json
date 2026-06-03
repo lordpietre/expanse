@@ -10,5 +10,8 @@
     "env_vars": {
         "MARIADB_ROOT_PASSWORD": "password",
         "MARIADB_DATABASE": "expanse"
-    }
+    },
+    "volumes": [
+        "mariadb_data:/var/lib/mysql"
+    ]
 }

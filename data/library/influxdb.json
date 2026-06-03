@@ -13,5 +13,8 @@
         "DOCKER_INFLUXDB_INIT_PASSWORD": "passwordpassword",
         "DOCKER_INFLUXDB_INIT_ORG": "my-org",
         "DOCKER_INFLUXDB_INIT_BUCKET": "my-bucket"
-    }
+    },
+    "volumes": [
+        "influxdb_data:/var/lib/influxdb2"
+    ]
 }

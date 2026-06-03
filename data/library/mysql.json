@@ -10,5 +10,8 @@
     "env_vars": {
         "MYSQL_ROOT_PASSWORD": "password",
         "MYSQL_DATABASE": "expanse"
-    }
+    },
+    "volumes": [
+        "mysql_data:/var/lib/mysql"
+    ]
 }

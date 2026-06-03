@@ -11,5 +11,8 @@
         "POSTGRES_PASSWORD": "password",
         "POSTGRES_USER": "admin",
         "POSTGRES_DB": "expanse"
-    }
+    },
+    "volumes": [
+        "postgres_data:/var/lib/postgresql/data"
+    ]
 }

@@ -14,12 +14,12 @@ export async function getLibraryServices(): Promise<TemplateService[]> {
             if (fs.existsSync(fallbackDir)) {
                 return readFromDir(fallbackDir);
             }
-            return [];
+            throw new Error(`Library directory not found: ${libraryDir}`);
         }
         return readFromDir(libraryDir);
     } catch (error) {
         console.error("[Library] FATAL:", error);
-        return [];
+        throw new Error(`Failed to load library services: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
 

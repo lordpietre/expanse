@@ -11,12 +11,12 @@
     ],
     "env_vars": {
         "GITEA__database__DB_TYPE": "postgres",
-        "GITEA__database__HOST": "${gitea_db}:5432",
+        "GITEA__database__HOST": "db:5432",
         "GITEA__database__NAME": "gitea",
         "GITEA__database__USER": "gitea",
         "GITEA__database__PASSWD": "password",
         "GITEA__cache__ADAPTER": "redis",
-        "GITEA__cache__HOST": "redis://${gitea_cache}:6379/0",
+        "GITEA__cache__HOST": "redis://cache:6379/0",
         "GITEA__server__DOMAIN": "localhost",
         "GITEA__server__ROOT_URL": "http://localhost:3000",
         "GITEA__security__INSTALL_LOCK": "true"
@@ -26,7 +26,7 @@
     ],
     "related_services": [
         {
-            "name": "gitea_db",
+            "name": "db",
             "description": "PostgreSQL database for Gitea",
             "category": "Database",
             "image": "postgres:16-alpine",
@@ -41,11 +41,14 @@
             ]
         },
         {
-            "name": "gitea_cache",
+            "name": "cache",
             "description": "Redis cache for Gitea",
             "category": "Cache",
             "image": "redis:alpine",
-            "logo": "https://img.icons8.com/color/512/redis.png"
+            "logo": "https://img.icons8.com/color/512/redis.png",
+            "volumes": [
+                "gitea_redis_data:/data"
+            ]
         }
     ]
 }

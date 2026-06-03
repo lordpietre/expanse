@@ -32,7 +32,14 @@
             },
             "volumes": [
                 "db_data:/var/lib/mysql"
-            ]
+            ],
+            "healthcheck": {
+                "test": ["CMD-SHELL", "mysqladmin ping -h localhost -u root -ppassword || exit 1"],
+                "interval": "10s",
+                "timeout": "5s",
+                "retries": 5,
+                "start_period": "30s"
+            }
         }
     ]
 }

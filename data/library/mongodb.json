@@ -10,5 +10,8 @@
     "env_vars": {
         "MONGO_INITDB_ROOT_USERNAME": "admin",
         "MONGO_INITDB_ROOT_PASSWORD": "password"
-    }
+    },
+    "volumes": [
+        "mongodb_data:/data/db"
+    ]
 }

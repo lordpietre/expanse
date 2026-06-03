@@ -36,7 +36,14 @@
             },
             "volumes": [
                 "n8n_db_data:/var/lib/postgresql/data"
-            ]
+            ],
+            "healthcheck": {
+                "test": ["CMD-SHELL", "pg_isready -h localhost -U n8n"],
+                "interval": "10s",
+                "timeout": "5s",
+                "retries": 5,
+                "start_period": "10s"
+            }
         },
         {
             "name": "redis",

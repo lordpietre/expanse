@@ -323,7 +323,8 @@ export default function PlaygroundContent() {
                 } else if (res.collisionPort) {
                     toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
-                    const servicesToFix = Array.from(compose.services).filter(s =>
+                    const currentCompose = useComposeStore.getState().compose;
+                    const servicesToFix = Array.from(currentCompose.services).filter(s =>
                         s.ports?.some(p => p.hostPort === res.collisionPort)
                     );
 
@@ -393,7 +394,8 @@ export default function PlaygroundContent() {
                 } else if (res.collisionPort) {
                     toast.error(`Host port ${res.collisionPort} is currently occupied natively.Reassigning...`);
 
-                    const servicesToFix = Array.from(compose.services).filter(s =>
+                    const currentCompose = useComposeStore.getState().compose;
+                    const servicesToFix = Array.from(currentCompose.services).filter(s =>
                         s.ports?.some(p => p.hostPort === res.collisionPort)
                     );
 

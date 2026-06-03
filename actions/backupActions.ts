@@ -36,3 +36,7 @@ export async function exportAllProjects() {
     }
 }
 
+export async function exportToGoogleDrive() {
+    return { success: false, error: "Google Drive integration coming soon" };
+}
+
