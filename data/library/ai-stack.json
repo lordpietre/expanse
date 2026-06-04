@@ -1,0 +1,46 @@
+{
+    "name": "AI Stack (Ollama + WebUI + Qdrant)",
+    "description": "Stack completo de IA con Ollama para LLM local, Open WebUI como interfaz tipo ChatGPT, y Qdrant como base de datos vectorial para RAG.",
+    "category": "AI",
+    "isStack": true,
+    "image": "ollama/ollama:latest",
+    "logo": "https://img.icons8.com/color/512/ollama.png",
+    "default_ports": [
+        "11434:11434"
+    ],
+    "volumes": [
+        "ollama_data:/root/.ollama"
+    ],
+    "related_services": [
+        {
+            "name": "open-webui",
+            "description": "Interfaz web tipo ChatGPT",
+            "category": "AI",
+            "image": "ghcr.io/open-webui/open-webui:main",
+            "logo": "https://img.icons8.com/color/512/open-webui.png",
+            "default_ports": [
+                "8080:8080"
+            ],
+            "volumes": [
+                "open-webui_data:/app/backend/data"
+            ],
+            "env_vars": {
+                "OLLAMA_BASE_URL": "http://ollama:11434"
+            }
+        },
+        {
+            "name": "qdrant",
+            "description": "Vector database para RAG",
+            "category": "AI",
+            "image": "qdrant/qdrant:latest",
+            "logo": "https://img.icons8.com/color/512/qdrant.png",
+            "default_ports": [
+                "6333:6333",
+                "6334:6334"
+            ],
+            "volumes": [
+                "qdrant_storage:/qdrant/storage"
+            ]
+        }
+    ]
+}

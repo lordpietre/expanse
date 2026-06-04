@@ -1,23 +1,29 @@
 "use client"
 
-import Link from "next/link";
-import { House, LogOut, Settings, Share, Rocket, Activity, Box } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { House, LogOut, Settings, Rocket, Activity } from "lucide-react";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { logout } from "@/actions/userActions";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import LocaleSwitcher from "@/components/ui/localeSwitcher";
+
+const commonTranslations = { logout: 'logout' };
 
 export default function UnifiedLayout({ children, version }: { children: ReactNode, version: string }) {
     const pathname = usePathname();
     const router = useRouter();
+    const nav = useTranslations('nav');
+    const common = useTranslations('common');
 
     const navItems = [
-        { href: "/", label: "Home", icon: House },
-        { href: "/dashboard/playground", label: "Deploy", icon: Rocket },
-        { href: "/deploy/settings", label: "System", icon: Activity },
-        { href: "/dashboard/settings", label: "Settings", icon: Settings },
+        { href: "/", label: nav('home'), icon: House },
+        { href: "/dashboard/playground", label: nav('deploy'), icon: Rocket },
+        { href: "/deploy/settings", label: nav('system'), icon: Activity },
+        { href: "/dashboard/settings", label: nav('settings'), icon: Settings },
     ];
 
     const getActiveHref = () => {
@@ -65,20 +71,23 @@ export default function UnifiedLayout({ children, version }: { children: ReactNo
                         </div>
                     </div>
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="bg-slate-800/50 hover:bg-slate-700 text-slate-300 p-1.5 rounded-lg transition-colors border border-slate-700">
-                            <Settings className="w-4 h-4" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-2xl border-slate-100">
-                            <DropdownMenuItem onClick={async () => { await logout(); router.push("/"); }} className="flex items-center gap-2 text-rose-600 font-bold cursor-pointer hover:bg-rose-50 rounded-lg">
-                                <LogOut className="w-4 h-4" />
-                                Logout
-                            </DropdownMenuItem>
-                            <div className="px-2 py-1.5 text-[10px] text-slate-400 font-mono text-right border-t border-slate-100 mt-1">
-                                v{version}
-                            </div>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex items-center gap-2">
+                        <LocaleSwitcher />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger className="bg-slate-800/50 hover:bg-slate-700 text-slate-300 p-1.5 rounded-lg transition-colors border border-slate-700">
+                                <Settings className="w-4 h-4" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-2xl border-slate-100">
+                                <DropdownMenuItem onClick={async () => { await logout(); router.push("/"); }} className="flex items-center gap-2 text-rose-600 font-bold cursor-pointer hover:bg-rose-50 rounded-lg">
+                                    <LogOut className="w-4 h-4" />
+                                    {common('logout')}
+                                </DropdownMenuItem>
+                                <div className="px-2 py-1.5 text-[10px] text-slate-400 font-mono text-right border-t border-slate-100 mt-1">
+                                    v{version}
+                                </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
             </div>
 

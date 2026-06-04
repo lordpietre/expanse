@@ -3,11 +3,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loginUser } from "@/actions/userActions";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 import { Suspense } from "react";
 import Image from "next/image";
@@ -17,6 +18,7 @@ function LoginForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const dataFromUrl = searchParams.get("data")
+    const t = useTranslations('auth')
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -28,7 +30,7 @@ function LoginForm() {
         toast.promise(
             loginUser(null, formData),
             {
-                loading: "Logging in...",
+                loading: t('loggingIn'),
                 success: (result: any) => {
                     if (result?.error) {
                         throw new Error(result.error);
@@ -39,12 +41,12 @@ function LoginForm() {
                         } else {
                             router.push("/dashboard");
                         }
-                        return "Login successful!";
+                        return t('loginSuccessful');
                     }
-                    throw new Error("Login failed");
+                    throw new Error(t('loginFailed'));
                 },
                 error: (err: Error) => {
-                    return err.message || "Wrong password or email";
+                    return err.message || t('wrongPasswordOrEmail');
                 }
             }
         );
@@ -54,22 +56,22 @@ function LoginForm() {
         <Card className="w-full max-w-[480px]">
             <CardContent className="p-5">
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                    <h1 className="text-3xl text-primary font-bold">Welcome to Expanse</h1>
+                    <h1 className="text-3xl text-primary font-bold">{t('welcomeToExpanse')}</h1>
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t('email')}</Label>
                         <Input required name="email" placeholder="MrNobody@expanse.omg" />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="password">password</Label>
+                        <Label htmlFor="password">{t('password')}</Label>
                         <Input required name="password" type="password" />
                     </div>
-                    <Button type="submit">login</Button>
+                    <Button type="submit">{t('login')}</Button>
                     <div className="flex flex-row gap-5">
                         <Button asChild variant="default" className="w-1/2">
-                            <Link href="/signin">Create an account</Link>
+                            <Link href="/signin">{t('createAnAccount')}</Link>
                         </Button>
                         <Button variant="outline" type="button" className="w-1/2">
-                            <Link href="/forgotPassword">Password recover</Link>
+                            <Link href="/forgotPassword">{t('passwordRecover')}</Link>
                         </Button>
                     </div>
                 </form>

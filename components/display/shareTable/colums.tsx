@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import {formatDistanceToNow} from "date-fns";
 import {Button} from "@/components/ui/button";
 import {ArrowUpDown, ExternalLink} from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import toast from "react-hot-toast";
 import {deleteShareById} from "@/actions/composeActions";
 

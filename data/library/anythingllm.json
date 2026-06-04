@@ -2,14 +2,13 @@
     "name": "AnythingLLM",
     "image": "mintplexlabs/anythingllm:latest",
     "category": "AI",
-    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/anything-llm.svg",
-    "description": "RAG-focused chat with Ollama and LocalAI. Embeds local documents, multi-user workspaces. Excellent for private knowledge bases.",
+    "logo": "https://img.icons8.com/color/512/anythingllm.png",
+    "description": "Plataforma completa para chatear con tus documentos (PDF, Word, YouTube, webs, etc.). Soporta Ollama, vLLM, OpenAI, etc.",
     "default_ports": [
         "3001:3001"
     ],
-    "env_vars": {
-        "OLLAMA_BASE_URL": "http://ollama:11434",
-        "JWT_SECRET": "replace-with-random-value",
-        "STORAGE_DIR": "/app/storage"
-    }
+    "volumes": [
+        "anythingllm_storage:/app/server/storage"
+    ],
+    "isStack": false
 }

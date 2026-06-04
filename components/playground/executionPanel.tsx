@@ -5,18 +5,20 @@ import { useExecutionStore } from "@/store/execution";
 import { cn } from "@/lib/utils";
 import { Terminal, CheckCircle2, Loader2, PlayCircle, StopCircle, Command } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 const TerminalDialog = dynamic(() => import("./terminalDialog"), { ssr: false });
 
 export default function ExecutionPanel() {
     const { isExecuting, serviceStatuses, logs } = useExecutionStore();
     const [terminalOpen, setTerminalOpen] = React.useState(false);
     const [activeContainer, setActiveContainer] = React.useState<{ id: string; name: string } | null>(null);
+    const t = useTranslations('execution');
 
     if (!isExecuting && Object.keys(serviceStatuses).length === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-8 text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
                 <PlayCircle className="w-8 h-8 mb-2 opacity-20" />
-                <p className="text-sm font-medium">No services running</p>
+                <p className="text-sm font-medium">{t('noServicesRunning')}</p>
             </div>
         );
     }
@@ -57,7 +59,7 @@ export default function ExecutionPanel() {
                                 <button
                                     onClick={() => openTerminal(service.id, service.name)}
                                     className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-blue-600 transition-all opacity-0 group-hover/svc:opacity-100"
-                                    title="Open Terminal"
+                                    title={t('openTerminal')}
                                 >
                                     <Command className="w-4 h-4" />
                                 </button>
@@ -87,7 +89,7 @@ export default function ExecutionPanel() {
                 <div className="flex items-center justify-between px-4 py-2 bg-slate-800/50 border-b border-white/5">
                     <div className="flex items-center gap-2">
                         <Terminal className="w-3 h-3 text-slate-400" />
-                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Container Logs</span>
+                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t('containerLogs')}</span>
                     </div>
                     <div className="flex gap-1">
                         <div className="w-2 h-2 rounded-full bg-rose-500/20" />
@@ -98,7 +100,7 @@ export default function ExecutionPanel() {
                 <div className="p-4 h-[200px] overflow-y-auto font-mono text-[10px] text-slate-300 custom-scrollbar whitespace-pre-wrap leading-relaxed">
                     {logs ? logs : (
                         <div className="flex items-center justify-center h-full text-slate-500 italic">
-                            Waiting for logs...
+                            {t('waitingForLogs')}
                         </div>
                     )}
                 </div>

@@ -1,11 +1,10 @@
 "use client"
 
+import { useTranslations } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
-
 import { Checkbox } from "@/components/ui/checkbox";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { loginUser, registerUser } from "@/actions/userActions";
 import toast from "react-hot-toast";
@@ -23,6 +22,7 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
     const { positionMap } = usePositionMap()
     const { setState: setSaveState } = useDisableStateStore()
     const router = useRouter()
+    const t = useTranslations('auth')
 
     const [mode, setMode] = useState<"register" | "login">("register")
 
@@ -31,9 +31,9 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
 
     const getPlaygroundData = () => {
         if (!redirectToPlayGround) return JSON.stringify({})
-        const t = new Translator(compose)
+        const translator = new Translator(compose)
         return JSON.stringify({
-            compose: t.toDict(),
+            compose: translator.toDict(),
             metadata: extractMetadata(compose, positionMap),
         })
     }
@@ -51,9 +51,9 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
                 } else {
                     router.push("/dashboard")
                 }
-                return "Account created!"
+                return t('accountCreated')
             },
-            loading: "Creating account...",
+            loading: t('creatingAccount'),
             error: (e: Error) => { return e.message }
         })
     }
@@ -69,7 +69,7 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
         toast.promise(
             loginUser(null, formData),
             {
-                loading: "Logging in...",
+                loading: t('loggingIn'),
                 success: (result: any) => {
                     if (result?.error) {
                         throw new Error(result.error);
@@ -81,12 +81,12 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
                         } else {
                             router.push("/dashboard");
                         }
-                        return "Login successful!";
+                        return t('loginSuccessful');
                     }
-                    throw new Error("Login failed");
+                    throw new Error(t('loginFailed'));
                 },
                 error: (err: Error) => {
-                    return err.message || "Wrong password or email";
+                    return err.message || t('wrongPasswordOrEmail');
                 }
             }
         );
@@ -95,15 +95,15 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
     return (
         <div className="flex flex-col gap-5">
             <h1 className="text-3xl text-primary font-bold bg-gradient-to-r from-[#1A96F8] via-[#3AA8FF] to-[#62BEFF] w-fit text-transparent bg-clip-text">
-                {mode === "register" ? "Create an account" : "Welcome to Expanse"}
+                {mode === "register" ? t('createAnAccount') : t('welcomeToExpanse')}
             </h1>
             <form onSubmit={mode === "register" ? handleRegister : handleLogin} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('email')}</Label>
                     <Input id="email" required name="email" placeholder="MrNobody@expanse.omg" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <Label htmlFor="password">password</Label>
+                    <Label htmlFor="password">{t('password')}</Label>
                     <Input id="password" required name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
                 {mode === "register" && (
@@ -113,21 +113,23 @@ export default function EmbedSignin({ redirectToPlayGround = false }: { redirect
                             htmlFor="terms"
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                            I accept the <Link className="underline" href="/terms">Terms and Conditions</Link>
+                            {t.rich('acceptTerms', {
+                                terms: (chunks) => <Link className="underline" href="/terms">{chunks}</Link>
+                            })}
                         </label>
                     </div>
                 )}
                 <Button className="bg-gradient-to-r from-[#1A96F8] via-[#3AA8FF] to-[#62BEFF]" type="submit">
-                    {mode === "register" ? "Create an account" : "Login"}
+                    {mode === "register" ? t('createAnAccount') : t('login')}
                 </Button>
             </form>
 
             <div className="flex flex-row gap-5">
                 <Button variant="ghost" className="w-1/2 text-slate-500" onClick={() => setMode(mode === "register" ? "login" : "register")}>
-                    {mode === "register" ? "Already have an account? Login" : "Need an account? Register"}
+                    {mode === "register" ? t('alreadyHaveAccount') : t('needAccount')}
                 </Button>
                 <Button asChild variant="outline" className="w-1/2">
-                    <Link href="/forgotPassword">Password recover</Link>
+                    <Link href="/forgotPassword">{t('passwordRecover')}</Link>
                 </Button>
             </div>
         </div>

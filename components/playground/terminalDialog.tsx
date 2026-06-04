@@ -7,6 +7,7 @@ import { Terminal as TerminalIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
+import { useTranslations } from "next-intl";
 import "xterm/css/xterm.css";
 
 interface TerminalDialogProps {
@@ -18,6 +19,7 @@ interface TerminalDialogProps {
 
 export default function TerminalDialog({ open, onOpenChange, containerId, containerName }: TerminalDialogProps) {
     const [isExecuting, setIsExecuting] = useState(false);
+    const t = useTranslations('terminal');
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -28,13 +30,13 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
                             <TerminalIcon className="w-4 h-4 text-emerald-400" />
                         </div>
                         <DialogTitle className="text-sm font-bold text-slate-300">
-                            Expanse TTY: <span className="text-emerald-400">{containerName}</span>
+                            {t('expanseTty')} <span className="text-emerald-400">{containerName}</span>
                         </DialogTitle>
                     </div>
                     <div className="flex items-center gap-2">
                         {isExecuting && <Loader2 className="w-3 h-3 text-emerald-400 animate-spin" />}
                         <div className={cn("w-2 h-2 rounded-full animate-pulse", isExecuting ? "bg-amber-500" : "bg-emerald-500")} />
-                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{isExecuting ? 'Executing...' : 'Active Session'}</span>
+                        <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">{isExecuting ? t('executing') : t('activeSession')}</span>
                     </div>
                 </DialogHeader>
 
@@ -46,6 +48,9 @@ export default function TerminalDialog({ open, onOpenChange, containerId, contai
                             containerName={containerName}
                             isExecutingStatus={isExecuting}
                             setExecutingStatus={setIsExecuting}
+                            welcomeMessage={t('welcomeToExpanseTerminal')}
+                            connectedToMessage={t('connectedTo', { name: containerName })}
+                            typeCommandMessage={t('typeCommand')}
                         />
                     )}
 
@@ -61,19 +66,24 @@ function TerminalShell({
     containerId,
     containerName,
     isExecutingStatus,
-    setExecutingStatus
+    setExecutingStatus,
+    welcomeMessage,
+    connectedToMessage,
+    typeCommandMessage,
 }: {
     containerId: string;
     containerName: string;
     isExecutingStatus: boolean;
     setExecutingStatus: (v: boolean) => void;
+    welcomeMessage: string;
+    connectedToMessage: string;
+    typeCommandMessage: string;
 }) {
     const terminalRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
     const cmdBuf = useRef("");
     const isExecutingRef = useRef(false);
 
-    // Keep ref in sync
     useEffect(() => {
         isExecutingRef.current = isExecutingStatus;
     }, [isExecutingStatus]);
@@ -126,12 +136,11 @@ function TerminalShell({
 
         term.open(terminalRef.current);
 
-        // Initial fit with small delay to ensure container size is final
         setTimeout(() => fitAddon.fit(), 50);
 
-        term.writeln("\x1b[1;32mWelcome to Expanse Terminal\x1b[0m");
-        term.writeln(`\x1b[2mConnected to: ${containerName}\x1b[0m`);
-        term.writeln("\x1b[2mType a command below to execute...\x1b[0m\r\n");
+        term.writeln(`\x1b[1;32m${welcomeMessage}\x1b[0m`);
+        term.writeln(`\x1b[2m${connectedToMessage}\x1b[0m`);
+        term.writeln(`\x1b[2m${typeCommandMessage}\x1b[0m\r\n`);
         term.write("\x1b[1;32m➜\x1b[0m ");
 
         term.onData((data) => {
@@ -165,7 +174,6 @@ function TerminalShell({
         const handleResize = () => fitAddon.fit();
         window.addEventListener('resize', handleResize);
 
-        // Autofocus
         setTimeout(() => term.focus(), 150);
 
         return () => {
@@ -173,7 +181,7 @@ function TerminalShell({
             term.dispose();
             xtermRef.current = null;
         };
-    }, [containerName, executeCommand]);
+    }, [containerName, executeCommand, welcomeMessage, connectedToMessage, typeCommandMessage]);
 
     return (
         <div ref={terminalRef} className="flex-grow p-4 overflow-hidden h-full" />

@@ -3,7 +3,7 @@
 import {Card, CardContent} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import {Button} from "@/components/ui/button";
 import GithubAuth from "@/components/ui/githubAuth";
 import {Separator} from "@/components/ui/separator";

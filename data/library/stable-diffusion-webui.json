@@ -1,0 +1,15 @@
+{
+    "name": "Stable Diffusion WebUI (A1111)",
+    "image": "ghcr.io/automatic1111/stable-diffusion-webui:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/stable-diffusion.png",
+    "description": "La interfaz más popular para Stable Diffusion. Mucha compatibilidad con extensiones y modelos.",
+    "default_ports": [
+        "7861:7860"
+    ],
+    "volumes": [
+        "sd_models:/app/models",
+        "sd_outputs:/app/outputs"
+    ],
+    "isStack": false
+}

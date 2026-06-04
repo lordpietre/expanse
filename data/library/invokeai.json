@@ -1,0 +1,15 @@
+{
+    "name": "InvokeAI",
+    "image": "invokeai/invokeai:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/invokeai.png",
+    "description": "Alternativa a Stable Diffusion WebUI más limpia y con flujos de trabajo predefinidos. Excelente para principiantes.",
+    "default_ports": [
+        "9090:9090"
+    ],
+    "volumes": [
+        "invokeai_models:/invokeai/data/models",
+        "invokeai_outputs:/invokeai/data/outputs"
+    ],
+    "isStack": false
+}

@@ -1,96 +1,38 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
-
-import { DM_Sans } from 'next/font/google'
-import VersionUpdateBanner from "@/components/ui/versionUpdateBanner";
-import PostHogInstrumentation from "@/components/PostHogInstrumentation";
-import Script from "next/script";
-import { getCachedLastVersion } from "@/lib/utils";
-import packageJson from "@/package.json"
-
-const dm_sans = DM_Sans({ subsets: ['latin'] })
-
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+    src: "./fonts/GeistVF.woff",
+    variable: "--font-geist-sans",
+    weight: "100 900",
 });
 const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+    src: "./fonts/GeistMonoVF.woff",
+    variable: "--font-geist-mono",
+    weight: "100 900",
 });
 
-// CORE_ONLY mode: minimal metadata, no SEO indexing
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
-  title: "Expanse",
-  robots: {
-    index: false,
-    follow: false,
-  },
+    title: "Expanse",
+    robots: {
+        index: false,
+        follow: false,
+    },
 };
 
-export default async function RootLayout({
-  children,
+export default function RootLayout({
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-
-
-  let version
-  if (process.env.npm_lifecycle_event !== 'build') {
-    try {
-      // Use a 2s timeout for version check to prevent hanging the layout
-      const timeoutPromise = new Promise<undefined>((_, reject) =>
-        setTimeout(() => reject(new Error('timeout')), 2000)
-      );
-      version = await Promise.race([getCachedLastVersion(), timeoutPromise]).catch(() => undefined);
-    } catch (error) {
-      console.error("Failed to fetch latest version:", error)
-    }
-  }
-
-  let showUpdateBanner = version != packageJson.version
-  if (!version) {
-    showUpdateBanner = false
-  }
-
-  return (
-    <html lang="en">
-      <head>
-        {!process.env.DISABLE_TELEMETRY &&
-          <Script
-            src="https://opentech-ux.org/lom-captor/dist/opentech-ux-lib.js"
-            strategy="beforeInteractive"
-            async
-            data-endpoint="https://cattlemoontwelve.ux-key.com/endpoint"
-            suppressHydrationWarning
-          />
-        }
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${dm_sans.className} antialiased h-screen`}
-      >
-        {!process.env.DISABLE_TELEMETRY && process.env.NEXT_PUBLIC_POSTHOG_KEY && (
-          <PostHogInstrumentation posthogKey={process.env.NEXT_PUBLIC_POSTHOG_KEY} />
-        )}
-        <Toaster
-          position="top-right"
-          reverseOrder={false}
-        />
-        {/* CoreBanner removed - unified menu now in dashboard */}
-        {showUpdateBanner && (
-          <VersionUpdateBanner
-            currentVersion={packageJson.version}
-            latestVersion={version || ""}
-          />
-        )}
-        {children}
-      </body>
-    </html>
-  );
+    return (
+        <html suppressHydrationWarning>
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}
+            >
+                {children}
+            </body>
+        </html>
+    );
 }

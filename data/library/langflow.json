@@ -1,0 +1,14 @@
+{
+    "name": "Langflow",
+    "image": "langflowai/langflow:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/langflow.png",
+    "description": "Low-code visual para LangChain. Ideal para crear flujos de agentes y RAG visualmente.",
+    "default_ports": [
+        "7860:7860"
+    ],
+    "volumes": [
+        "langflow_data:/app/data"
+    ],
+    "isStack": false
+}

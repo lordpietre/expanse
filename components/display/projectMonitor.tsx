@@ -7,6 +7,7 @@ import usePositionMap from "@/store/metadataMap";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 interface ProjectMonitorProps {
     project: {
@@ -24,6 +25,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<any[]>([]);
     const { resourceMeta, setResourceMeta } = usePositionMap();
+    const t = useTranslations('monitor');
 
     const fetchDetail = useCallback(async () => {
         try {
@@ -57,7 +59,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
     }, [project.projectName, project.status]);
 
     const handleReapply = () => {
-        toast.error("Please redeploy from Playground to apply new resource limits.");
+        toast.error(t('pleaseRedeploy'));
     };
 
     return (
@@ -78,7 +80,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                         variant="outline"
                         className="bg-blue-500/10 hover:bg-blue-500/20 border-blue-500/20 text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest h-9"
                     >
-                        <RefreshCw className="w-3 h-3 mr-2" /> Reapply Limits
+                        <RefreshCw className="w-3 h-3 mr-2" /> {t('reapplyLimits')}
                     </Button>
                     {onClose && (
                         <Button onClick={onClose} variant="ghost" className="text-slate-500 hover:text-white">
@@ -93,7 +95,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 px-2">
                         <ContainerIcon className="w-4 h-4 text-indigo-400" />
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Live Performance</h3>
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('livePerformance')}</h3>
                     </div>
                     <div className="grid gap-3">
                         {loading ? (
@@ -122,7 +124,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                                     <div className="space-y-4">
                                         <div className="space-y-1.5">
                                             <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-500">
-                                                <span>Processor Load</span>
+                                                <span>{t('processorLoad')}</span>
                                                 <span className="text-indigo-400">{containerStats?.CPUPerc || "0.00%"}</span>
                                             </div>
                                             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
@@ -134,7 +136,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                                         </div>
                                         <div className="space-y-1.5">
                                             <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-500">
-                                                <span>Memory Usage</span>
+                                                <span>{t('memoryUsage')}</span>
                                                 <span className="text-emerald-400">{containerStats?.MemUsage.split('/')[0] || "0B"}</span>
                                             </div>
                                             <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
@@ -155,7 +157,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 px-2">
                         <Cpu className="w-4 h-4 text-emerald-400" />
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resource Allocation</h3>
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('resourceAllocation')}</h3>
                     </div>
                     <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-6 space-y-6">
                         {detail?.containers.map((c: any) => {
@@ -166,12 +168,12 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                                         <span className="text-xs font-bold text-white uppercase tracking-tight">{c.Names}</span>
                                         <div className="flex items-center gap-2">
                                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                                            <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Active</span>
+                                            <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">{t('active')}</span>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Max CPU Cores</label>
+                                            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{t('maxCpuCores')}</label>
                                             <input
                                                 type="text"
                                                 placeholder="0.5"
@@ -181,7 +183,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Max RAM (e.g. 1G)</label>
+                                            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{t('maxRam')}</label>
                                             <input
                                                 type="text"
                                                 placeholder="512M"
@@ -197,7 +199,7 @@ export default function ProjectMonitor({ project, onClose, onRefresh }: ProjectM
                         <div className="flex items-start gap-3 p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
                             <Activity className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                             <p className="text-[10px] text-blue-400/80 leading-relaxed italic">
-                                Resource limits define the maximum capacity each container can consume from the host system. Changes require a redeploy to take full effect.
+                                {t('resourceLimitsDescription')}
                             </p>
                         </div>
                     </div>

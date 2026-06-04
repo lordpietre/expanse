@@ -1,20 +1,24 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { Settings, Rocket, Activity, LogOut, House as HouseIcon } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { Settings, Rocket, Activity, LogOut, House as HouseIcon, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useCallback } from "react";
 import { getAllMyComposeOrderByEditDate } from "@/actions/userActions";
 import { getGlobalDockerStats } from "@/actions/dockerActions";
 import { DataTable } from "@/components/display/dataTable";
 import { columns } from "@/components/display/composeTable/colums";
-import { Plus } from "lucide-react";
 import ProjectMonitor from "@/components/display/projectMonitor";
+import { useTranslations } from "next-intl";
+import LocaleSwitcher from "@/components/ui/localeSwitcher";
 
 export default function HomePage() {
     const pathname = usePathname();
     const router = useRouter();
+    const t = useTranslations('home');
+    const nav = useTranslations('nav');
+    const common = useTranslations('common');
 
     const [composes, setComposes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +37,6 @@ export default function HomePage() {
                 getGlobalDockerStats()
             ]);
 
-            // Create a mapping of project names to status from Docker
             const projectStatuses: Record<string, string> = {};
             if (globalStats && !globalStats.error && globalStats.projects) {
                 globalStats.projects.forEach((proj: any) => {
@@ -43,7 +46,6 @@ export default function HomePage() {
                 });
             }
 
-            // Map the database composes with real-time docker statuses
             const data = composesData.map((c) => {
                 const projectName = `expanse-project_${c.id}`;
                 const status = projectStatuses[projectName] || null;
@@ -51,7 +53,6 @@ export default function HomePage() {
                 const services = c.data?.services || [];
                 const serviceNames = Object.keys(services).map(s => {
                     const name = services[s].name || s;
-                    // Avoid repeating the project name if it's identical
                     return name.toUpperCase();
                 }).join(", ");
 
@@ -78,10 +79,10 @@ export default function HomePage() {
     }, [checkAndFetch]);
 
     const navItems = [
-        { href: "/", label: "Home", icon: HouseIcon },
-        { href: "/dashboard/playground", label: "Deploy", icon: Rocket },
-        { href: "/deploy/settings", label: "System", icon: Activity },
-        { href: "/dashboard/settings", label: "Settings", icon: Settings },
+        { href: "/", label: nav('home'), icon: HouseIcon },
+        { href: "/dashboard/playground", label: nav('deploy'), icon: Rocket },
+        { href: "/deploy/settings", label: nav('system'), icon: Activity },
+        { href: "/dashboard/settings", label: nav('settings'), icon: Settings },
     ];
 
     if (loading) {
@@ -89,7 +90,7 @@ export default function HomePage() {
             <div className="min-h-screen bg-slate-950 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Activity className="w-8 h-8 text-emerald-500 animate-pulse" />
-                    <div className="text-slate-500 font-bold uppercase tracking-widest text-xs">Loading expanse...</div>
+                    <div className="text-slate-500 font-bold uppercase tracking-widest text-xs">{t('loadingExpanse')}</div>
                 </div>
             </div>
         );
@@ -127,15 +128,18 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => {
-                            document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-                            router.push('/login');
-                        }}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-widest text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all font-mono"
-                    >
-                        <LogOut className="w-3.5 h-3.5" /> Logout
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <LocaleSwitcher />
+                        <button
+                            onClick={() => {
+                                document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+                                router.push('/login');
+                            }}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-widest text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all font-mono"
+                        >
+                            <LogOut className="w-3.5 h-3.5" /> {common('logout')}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -145,11 +149,11 @@ export default function HomePage() {
                     <div className="flex flex-col gap-1 relative">
                         <div className="flex items-center gap-3 relative z-10">
                             <Activity className="w-4 h-4 text-emerald-500 animate-pulse" />
-                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-emerald-500 italic">compose engine</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-emerald-500 italic">{t('composeEngine')}</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <h1 className="text-white font-black text-5xl tracking-tighter uppercase relative z-10">
-                                Deploys
+                                {t('deploys')}
                             </h1>
                             <Link
                                 href="/dashboard/playground"

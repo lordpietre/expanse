@@ -273,6 +273,28 @@ Added healthchecks to database services in:
 | strapi.json | Uses SQLite (not production), missing postgres | Low |
 | pixelfed.json | Missing healthcheck on postgres | Low |
 
+### New AI Templates Added
+The following AI service templates have been added to `data/library/`:
+
+| Template | File | Description |
+|----------|------|-------------|
+| Ollama | `ollama.json` | LLM local con soporte GPU (Llama 3, Mistral, Gemma, etc.) |
+| Open WebUI | `open-webui.json` | Interfaz tipo ChatGPT para Ollama |
+| vLLM | `vllm.json` | Motor de inferencia rápido con API OpenAI-compatible |
+| ComfyUI | `comfyui.json` | Generación de imágenes/video con workflows nodos |
+| AnythingLLM | `anythingllm.json` | RAG completo para documentos |
+| Text Generation WebUI | `text-generation-webui.json` | Interfaz completa para LLMs |
+| PrivateGPT | `privategpt.json` | RAG offline privado |
+| Flowise | `flowise.json` | Low-code LangChain |
+| Qdrant | `qdrant.json` | Vector database para RAG |
+| Stable Diffusion WebUI | `stable-diffusion-webui.json` | Generación imágenes |
+| InvokeAI | `invokeai.json` | Alternativa a SD WebUI |
+| Fooocus | `fooocus.json` | SD fácil e intuitivo |
+| Langflow | `langflow.json` | Visual LangChain |
+| JupyterLab PyTorch | `jupyter-pytorch.json` | Notebook PyTorch |
+| JupyterLab TensorFlow | `jupyter-tensorflow.json` | Notebook TensorFlow GPU |
+| AI Stack (Full) | `ai-stack.json` | Ollama + Open WebUI + Qdrant |
+
 ### Port Conflicts to Consider
 
 High-risk ports when deploying multiple instances:

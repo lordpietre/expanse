@@ -1,0 +1,14 @@
+{
+    "name": "Text Generation WebUI",
+    "image": "ghcr.io/oobabooga/text-generation-webui:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/text-generation-webui.png",
+    "description": "Interfaz muy completa para LLMs. Soporta muchos backends (ExLlama, llama.cpp, etc.) y cuantizaciones.",
+    "default_ports": [
+        "7860:7860"
+    ],
+    "volumes": [
+        "textgen_models:/app/models"
+    ],
+    "isStack": false
+}

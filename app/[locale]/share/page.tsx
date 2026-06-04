@@ -1,6 +1,6 @@
 import AsyncReadOnlyPlayground from "@/components/playground/asyncReadonlyPlayground";
 import { Suspense } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type SP = Promise<{ [key: string]: string | string[] | undefined }>

@@ -1,0 +1,14 @@
+{
+    "name": "JupyterLab (TensorFlow)",
+    "image": "tensorflow/tensorflow:latest-gpu-jupyter",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/jupyter.png",
+    "description": "Entorno Jupyter con TensorFlow GPU. Ideal para deep learning y experimentación.",
+    "default_ports": [
+        "8889:8888"
+    ],
+    "volumes": [
+        "jupyter_workspace:/home/jovyan/work"
+    ],
+    "isStack": false
+}

@@ -1,0 +1,14 @@
+{
+    "name": "PrivateGPT",
+    "image": "ghcr.io/imartinez/privategpt:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/private-gpt.png",
+    "description": "RAG completamente offline para chat con documentos privados. Sin datos saliendo del servidor.",
+    "default_ports": [
+        "8001:8001"
+    ],
+    "volumes": [
+        "privategpt_storage:/app/storage"
+    ],
+    "isStack": false
+}

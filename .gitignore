@@ -24,6 +24,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# pnpm store
+.pnpm-store/
+
 #env
 .env
 /false/

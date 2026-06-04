@@ -7,7 +7,7 @@ import { DataTable } from "@/components/display/dataTable";
 import { columns } from "@/components/display/composeTable/colums";
 import { Separator } from "@/components/ui/separator";
 import { Activity, Plus } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import ProjectMonitor from "@/components/display/projectMonitor";
 
 export default function Page() {

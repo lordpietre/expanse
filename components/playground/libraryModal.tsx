@@ -17,6 +17,7 @@ import useUIStore from "@/store/ui";
 import useLibraryStore from "@/store/library";
 import { Plus, Database, Globe, Zap, MessageSquare, Box, Search, ChevronRight, LayoutGrid, Loader2, Code2, Monitor, Cloud, Brain, Workflow, Activity, FileText, Users, Network } from "lucide-react";
 import { cn, resolveLogoPath } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface LibraryModalProps {
     open: boolean;
@@ -46,6 +47,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
     const { services, loading, fetchServices } = useLibraryStore();
     const { addServiceFromTemplate } = useComposeStore();
     const { libraryCategory, setIsLibraryOpen } = useUIStore();
+    const t = useTranslations('library');
     const [libraryMode, setLibraryMode] = useState<'dockers' | 'stacks'>('dockers');
     const [activeCategory, setActiveCategory] = useState<string>("");
     const [searchQuery, setSearchQuery] = useState("");
@@ -205,7 +207,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                             : "text-slate-500 hover:text-white"
                                     )}
                                 >
-                                    DOCKERS
+                                    {t('dockers')}
                                 </button>
                                 <button
                                     onClick={() => setLibraryMode('stacks')}
@@ -216,16 +218,16 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                             : "text-slate-500 hover:text-white"
                                     )}
                                 >
-                                    STACKS
+                                    {t('stacks')}
                                 </button>
                             </div>
                         </div>
 
-                        <DialogDescription className="sr-only">Browse and add services to your compose deployment</DialogDescription>
+                        <DialogDescription className="sr-only">{t('browse')}</DialogDescription>
                         <div className="relative w-64">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <Input
-                                placeholder="Search services..."
+                                placeholder={t('searchServices')}
                                 className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-slate-500"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -238,7 +240,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                     {/* Left Column (Categories) */}
                     <aside className="w-64 border-r border-emerald-500/10 bg-gradient-to-b from-emerald-500/5 to-teal-500/5 p-4 space-y-1 overflow-y-auto">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">
-                            {libraryMode === 'dockers' ? 'Docker Categories' : 'Stack Categories'}
+                            {libraryMode === 'dockers' ? t('dockerCategories') : t('stackCategories')}
                         </p>
                         <div className="space-y-1">
                             {categoriesList}
@@ -247,11 +249,11 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
 
                     {/* Middle Column (Submenu) */}
                     <aside className="w-64 border-r border-emerald-500/10 bg-gradient-to-b from-emerald-5/10 to-teal-500/10 p-4 space-y-1 overflow-y-auto">
-                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Services</p>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">{t('services')}</p>
                         <div className="space-y-1">
                             {servicesSubmenu.length > 0 ? servicesSubmenu : (
                                 <p className="text-xs text-slate-600 px-2 italic">
-                                    {loading ? "..." : "No results found"}
+                                    {loading ? "..." : t('noResultsFound')}
                                 </p>
                             )}
                         </div>
@@ -262,7 +264,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                         {loading ? (
                             <div className="flex flex-col items-center gap-4 text-slate-500">
                                 <Loader2 className="w-12 h-12 animate-spin text-emerald-500" />
-                                <p className="animate-pulse">Loading library...</p>
+                                <p className="animate-pulse">{t('loadingLibrary')}</p>
                             </div>
                         ) : selectedService ? (
                             <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -282,7 +284,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white flex gap-3 transition-all py-8 text-xl font-bold shadow-2xl shadow-emerald-500/20 rounded-xl"
                                         >
                                             <Plus className="w-6 h-6" />
-                                            Add to Deployment
+                                            {t('addToDeployment')}
                                         </Button>
                                     </div>
                                 </div>
@@ -306,7 +308,7 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                         ) : (
                             <div className="text-slate-500 flex flex-col items-center gap-4">
                                 <Search className="w-16 h-16 opacity-20" />
-                                <p>Select a service to see details</p>
+                                <p>{t('selectServiceToSeeDetails')}</p>
                             </div>
                         )}
                     </main>

@@ -1,0 +1,14 @@
+{
+    "name": "Ollama",
+    "image": "ollama/ollama:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/ollama.png",
+    "description": "El más popular para LLMs locales. Permite ejecutar modelos como Llama 3, Mistral, Gemma, Phi, Qwen, etc. Soporta GPU (NVIDIA/AMD/Apple).",
+    "default_ports": [
+        "11434:11434"
+    ],
+    "volumes": [
+        "ollama_data:/root/.ollama"
+    ],
+    "isStack": false
+}

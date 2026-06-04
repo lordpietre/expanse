@@ -1,0 +1,14 @@
+{
+    "name": "ComfyUI",
+    "image": "ghcr.io/ai-dock/comfyui:latest-cuda",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/comfyui.png",
+    "description": "La herramienta más potente y flexible para generación de imágenes y video (workflows nodos). Mejor rendimiento que A1111 en tareas complejas.",
+    "default_ports": [
+        "8188:8188"
+    ],
+    "volumes": [
+        "comfyui_models:/app/ComfyUI/models"
+    ],
+    "isStack": false
+}

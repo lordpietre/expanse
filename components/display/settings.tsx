@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Cloud, Download, HardDrive, ShieldAlert, Archive, Server, Network, Plus, ExternalLink } from "lucide-react";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 
 interface settingsInitData {
@@ -34,6 +35,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
     // Remote Node Form State
     const [remoteHost, setRemoteHost] = useState("")
     const [remotePort, setRemotePort] = useState("2375")
+    const t = useTranslations('settings')
 
     useEffect(() => {
         async function fetchSystem() {
@@ -57,7 +59,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                 window.location.href = "https://form.expanse.com/s/cm40i9zod000hwl0z6005uvwp"
             }
         } catch (e) {
-            toast.error("Error deleting account")
+            toast.error(t('errorDeletingAccount'))
             console.error(e)
         }
     }
@@ -74,12 +76,12 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                 a.download = `expanse-backup-${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 window.URL.revokeObjectURL(url);
-                toast.success("Backup downloaded successfully");
+                toast.success(t('backupDownloadedSuccessfully'));
             } else {
-                toast.error(res.error || "Failed to generate backup");
+                toast.error(res.error || t('failedToGenerateBackup'));
             }
         } catch (error) {
-            toast.error("An unexpected error occurred during backup");
+            toast.error(t('unexpectedBackupError'));
             console.error(error);
         } finally {
             setIsExporting(false);
@@ -87,16 +89,16 @@ export default function Settings({ init }: { init?: settingsInitData }) {
     }
 
     async function handleDriveBackup() {
-        toast.loading("Connecting to Google Drive...", { duration: 2000 });
+        toast.loading(t('connectingToGoogleDrive'), { duration: 2000 });
         const res = await exportToGoogleDrive();
         if (!res.success) {
-            toast.error(res.error || "Google Drive connection failed");
+            toast.error(res.error || t('googleDriveConnectionFailed'));
         }
     }
 
     async function handleSaveRemoteNode() {
         if (!remoteHost) {
-            toast.error("Please enter a host address");
+            toast.error(t('pleaseEnterHostAddress'));
             return;
         }
         const res = await saveRemoteNodeConfig({
@@ -104,10 +106,10 @@ export default function Settings({ init }: { init?: settingsInitData }) {
             port: remotePort
         });
         if (res.success) {
-            toast.success(`Remote node ${remoteHost} added`);
+            toast.success(t('remoteNodeAdded', { host: remoteHost }));
             setRemoteHost("");
         } else {
-            toast.error(res.error || "Failed to add remote node");
+            toast.error(res.error || t('failedToAddRemoteNode'));
         }
     }
 
@@ -118,26 +120,26 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                     <ShieldAlert className="w-6 h-6 text-emerald-500" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Project Settings</h1>
-                    <p className="text-sm text-slate-400">Manage your account, backups, and security</p>
+                    <h1 className="text-2xl font-bold text-white">{t('projectSettings')}</h1>
+                    <p className="text-sm text-slate-400">{t('manageAccountBackupsSecurity')}</p>
                 </div>
             </div>
 
             <Tabs defaultValue="general" className="w-full">
                 <TabsList className="grid w-full grid-cols-4 bg-slate-900/50 border border-white/5 h-12 p-1">
-                    <TabsTrigger value="general" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white transition-all font-bold">General</TabsTrigger>
-                    <TabsTrigger value="nodes" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all font-bold">Nodes</TabsTrigger>
-                    <TabsTrigger value="backup" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all font-bold">Backup</TabsTrigger>
-                    <TabsTrigger value="security" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white transition-all font-bold">Account</TabsTrigger>
+                    <TabsTrigger value="general" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white transition-all font-bold">{t('general')}</TabsTrigger>
+                    <TabsTrigger value="nodes" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white transition-all font-bold">{t('nodes')}</TabsTrigger>
+                    <TabsTrigger value="backup" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all font-bold">{t('backup')}</TabsTrigger>
+                    <TabsTrigger value="security" className="data-[state=active]:bg-rose-600 data-[state=active]:text-white transition-all font-bold">{t('account')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="general" className="mt-6 animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border border-emerald-500/10 rounded-2xl p-6 shadow-xl">
                         <div className='flex flex-col gap-6'>
                             <div className='flex flex-col gap-2'>
-                                <label className="text-sm font-bold text-slate-400">Account Email</label>
+                                <label className="text-sm font-bold text-slate-400">{t('accountEmail')}</label>
                                 <Input className="w-full bg-white/5 border-white/10 text-white cursor-not-allowed opacity-70" type="email" value={email} disabled />
-                                <p className="text-xs text-slate-500 italic">Your email address is managed through your auth provider.</p>
+                                <p className="text-xs text-slate-500 italic">{t('emailManagedByAuth')}</p>
                             </div>
                         </div>
                     </div>
@@ -154,10 +156,10 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                            Master Node
+                                            {t('masterNode')}
                                             <span className="text-[10px] px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 rounded border border-emerald-500/20 uppercase">Active</span>
                                         </h3>
-                                        <p className="text-xs text-slate-500">Current Expanse Instance</p>
+                                        <p className="text-xs text-slate-500">{t('currentExpanseInstance')}</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -168,15 +170,15 @@ export default function Settings({ init }: { init?: settingsInitData }) {
 
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Architecture</p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">{t('architecture')}</p>
                                     <p className="text-sm text-slate-300 font-medium capitalize">{systemInfo?.os}</p>
                                 </div>
                                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Engine</p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">{t('engine')}</p>
                                     <p className="text-sm text-slate-300 font-medium">Docker Compose</p>
                                 </div>
                                 <div className="bg-white/5 p-3 rounded-xl border border-white/5">
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">Runtime</p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mb-1">{t('runtime')}</p>
                                     <p className="text-sm text-slate-300 font-medium">{systemInfo?.nodeVersion}</p>
                                 </div>
                             </div>
@@ -188,13 +190,13 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                 <div className="p-2 bg-emerald-500/10 rounded-lg">
                                     <Network className="w-5 h-5 text-emerald-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-white">Remote Docker Nodes</h3>
+                                <h3 className="text-lg font-bold text-white">{t('remoteDockerNodes')}</h3>
                             </div>
 
                             <div className="flex flex-col gap-4">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <div className="col-span-2">
-                                        <label className="text-[10px] uppercase font-bold text-slate-500 ml-1 mb-1 block">Node Address (IP/Host)</label>
+                                        <label className="text-[10px] uppercase font-bold text-slate-500 ml-1 mb-1 block">{t('nodeAddress')}</label>
                                         <Input
                                             className="bg-white/5 border-white/10 text-white placeholder:text-slate-700"
                                             placeholder="192.168.1.100"
@@ -203,7 +205,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-[10px] uppercase font-bold text-slate-500 ml-1 mb-1 block">Port</label>
+                                        <label className="text-[10px] uppercase font-bold text-slate-500 ml-1 mb-1 block">{t('port')}</label>
                                         <Input
                                             className="bg-white/5 border-white/10 text-white"
                                             value={remotePort}
@@ -223,7 +225,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                 <div className="mt-4 p-4 rounded-xl border border-dashed border-white/10 flex items-center justify-center bg-white/[0.02]">
                                     <p className="text-xs text-slate-500 italic flex items-center gap-2">
                                         <ExternalLink className="w-3 h-3" />
-                                        Advanced: Connect nodes via SSH or TLS for encrypted management.
+                                        {t('advancedNodeInfo')}
                                     </p>
                                 </div>
                             </div>
@@ -240,7 +242,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                 <div className="p-2 bg-emerald-500/10 rounded-lg">
                                     <HardDrive className="w-5 h-5 text-emerald-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-white">Local Backup</h3>
+                                <h3 className="text-lg font-bold text-white">{t('localBackup')}</h3>
                             </div>
                             <p className="text-sm text-slate-400 leading-relaxed">
                                 Download a complete snapshot of all your projects, including Docker Compose definitions and layout metadata.
@@ -251,7 +253,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                 className="mt-2 w-full bg-emerald-600 hover:bg-emerald-700 font-bold flex gap-2 transition-all shadow-lg shadow-emerald-500/20"
                             >
                                 <Download className="w-4 h-4" />
-                                {isExporting ? "Exporting..." : "Download JSON Backup"}
+                                {isExporting ? t('exporting') : t('downloadJsonBackup')}
                             </Button>
                         </div>
 
@@ -261,7 +263,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                 <div className="p-2 bg-emerald-500/10 rounded-lg">
                                     <Cloud className="w-5 h-5 text-emerald-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-white">Cloud Sync</h3>
+                                <h3 className="text-lg font-bold text-white">{t('cloudSync')}</h3>
                             </div>
                             <p className="text-sm text-slate-400 leading-relaxed">
                                 Keep your projects synchronized automatically across your devices using Google Drive.
@@ -271,7 +273,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                 className="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 font-bold flex gap-2 transition-all shadow-lg shadow-emerald-500/20"
                             >
                                 <Cloud className="w-4 h-4" />
-                                Connect Google Drive
+                                {t('connectGoogleDrive')}
                             </Button>
                         </div>
                     </div>
@@ -280,11 +282,11 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                         <div className="flex items-center gap-4">
                             <Archive className="w-10 h-10 text-slate-600" />
                             <div>
-                                <h4 className="font-bold text-slate-300">Export Raw Volumes</h4>
+                                <h4 className="font-bold text-slate-300">{t('exportRawVolumes')}</h4>
                                 <p className="text-xs text-slate-500">Coming soon: Direct export of persistent container data into TAR archives.</p>
                             </div>
                         </div>
-                        <Button variant="outline" disabled className="border-white/10 text-slate-500">Enable Beta</Button>
+                        <Button variant="outline" disabled className="border-white/10 text-slate-500">{t('enableBeta')}</Button>
                     </div>
                 </TabsContent>
 
@@ -292,7 +294,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                     <div className="bg-rose-500/5 border border-rose-500/10 rounded-2xl p-8 shadow-xl">
                         <h3 className="text-xl font-bold text-rose-500 mb-4 flex items-center gap-2">
                             <ShieldAlert className="w-5 h-5" />
-                            Danger Zone
+                            {t('dangerZone')}
                         </h3>
                         <p className="text-slate-400 text-sm mb-6 leading-relaxed">
                             Deleting your account is a permanent action. All your projects, shared links, and deployment configurations will be destroyed immediately. This cannot be undone.
@@ -300,11 +302,11 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button variant="destructive" className="bg-rose-600 hover:bg-rose-700 font-bold px-8 shadow-lg shadow-rose-500/20">
-                                    Delete My Account
+                                    {t('deleteMyAccount')}
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/10 text-white">
-                                <DialogHeader className="text-xl font-bold text-white">Permanently delete account?</DialogHeader>
+                                <DialogHeader className="text-xl font-bold text-white">{t('permanentlyDeleteAccount')}</DialogHeader>
                                 <div className="flex flex-col gap-4 py-4">
                                     <p className="text-slate-400 text-sm">
                                         This will destroy the account and all data associated with it. <br />
@@ -324,7 +326,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                 <DialogFooter className="gap-2">
                                     <DialogClose asChild>
                                         <Button variant="ghost" className="hover:bg-white/5 border border-white/5 text-slate-400">
-                                            Cancel
+                                            {t('cancel')}
                                         </Button>
                                     </DialogClose>
                                     <Button
@@ -333,7 +335,7 @@ export default function Settings({ init }: { init?: settingsInitData }) {
                                         disabled={confirm !== "delete my account and loose my data"}
                                         className="bg-rose-600 hover:bg-rose-700 transition-all font-bold px-6 shadow-lg shadow-rose-500/20"
                                     >
-                                        Yes, Delete Everything
+                                        {t('yesDeleteEverything')}
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>

@@ -1,0 +1,14 @@
+{
+    "name": "JupyterLab (PyTorch)",
+    "image": "jupyter/pytorch-notebook:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/jupyter.png",
+    "description": "Entorno perfecto para experimentar, entrenar y prototipar modelos PyTorch. Notebook interactivo en el navegador.",
+    "default_ports": [
+        "8888:8888"
+    ],
+    "volumes": [
+        "jupyter_workspace:/home/jovyan/work"
+    ],
+    "isStack": false
+}

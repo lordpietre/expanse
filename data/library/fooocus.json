@@ -1,0 +1,14 @@
+{
+    "name": "Fooocus",
+    "image": "thndrkrz/fooocus:latest",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/fooocus.png",
+    "description": "Stable Diffusion fácil e intuitivo. Enfocado en calidad de imagen más que en opciones complejas.",
+    "default_ports": [
+        "7865:7865"
+    ],
+    "volumes": [
+        "fooocus_outputs:/appoutputs"
+    ],
+    "isStack": false
+}

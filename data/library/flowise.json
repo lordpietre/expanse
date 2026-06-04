@@ -1,15 +1,14 @@
 {
     "name": "Flowise",
     "image": "flowiseai/flowise:latest",
-    "category": "Automation",
-    "logo": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/flowise.svg",
-    "description": "AI/LLM workflow builder with visual chains (LangChain). Drag-and-drop for RAG and AI agents, integrates Ollama/LocalAI. Perfect if combined with local LLMs.",
+    "category": "AI",
+    "logo": "https://img.icons8.com/color/512/flowise.png",
+    "description": "Plataforma low-code para construir flujos de LangChain. Ideal para crear pipelines de RAG y agentes.",
     "default_ports": [
         "3000:3000"
     ],
-    "env_vars": {
-        "PORT": "3000",
-        "FLOWISE_USERNAME": "admin",
-        "FLOWISE_PASSWORD": "password"
-    }
+    "volumes": [
+        "flowise_data:/root/.flowise"
+    ],
+    "isStack": false
 }
