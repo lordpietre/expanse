@@ -1,0 +1,89 @@
+{
+  "name": "PostgREST (HA)",
+  "description": "REST API layer with HAProxy load balancer, autoscaling PostgREST instances, and PgBouncer connection pooling",
+  "category": "Web Server",
+  "isStack": true,
+  "image": "postgrest/postgrest:latest",
+  "logo": "postgresql",
+  "default_ports": ["3000:80"],
+  "haEnabled": true,
+  "loadBalancer": {
+    "type": "haproxy",
+    "port": 80,
+    "targetPort": 3000,
+    "algorithm": "round-robin",
+    "healthCheckPath": "/",
+    "healthCheckInterval": "5s"
+  },
+  "replicas": {
+    "enabled": true,
+    "minReplicas": 2,
+    "maxReplicas": 10,
+    "scaleTarget": "api",
+    "targetCPUUtilization": 70,
+    "targetMemoryUtilization": 80
+  },
+  "databaseHa": {
+    "type": "pgbouncer",
+    "poolMode": "transaction",
+    "maxConnections": 100,
+    "poolSize": 20
+  },
+  "env_vars": {
+    "PGRST_DB_SCHEMAS": "public",
+    "PGRST_DB_ANON_ROLE": "anon",
+    "PGRST_DB_USE_LEGACY_GUCS": "false"
+  },
+  "related_services": [
+    {
+      "name": "db",
+      "image": "postgres:18-alpine",
+      "env_vars": {
+        "POSTGRES_PASSWORD": "postgres",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_DB": "postgres"
+      },
+      "healthcheck": {
+        "test": ["CMD-SHELL", "pg_isready -h localhost -U postgres"],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 5,
+        "start_period": "20s"
+      },
+      "volumes": ["postgres_data:/var/lib/postgresql/data"]
+    },
+    {
+      "name": "pgbouncer",
+      "image": "edoburu/pgbouncer:latest",
+      "env_vars": {
+        "DATABASE_URL": "postgres://postgres:postgres@db:5432/postgres",
+        "POOL_MODE": "transaction",
+        "MAX_CLIENT_CONN": "100",
+        "DEFAULT_POOL_SIZE": "20"
+      },
+      "ports": ["5439:5432"]
+    },
+    {
+      "name": "api",
+      "image": "postgrest/postgrest:latest",
+      "env_vars": {
+        "PGRST_DB_URI": "postgres://postgres:postgres@pgbouncer:5439/postgres"
+      },
+      "deploy": {
+        "replicas": 2
+      },
+      "resources": {
+        "limits": {
+          "cpus": "0.5",
+          "memory": "512m"
+        }
+      }
+    },
+    {
+      "name": "lb",
+      "image": "haproxy:2.9-alpine",
+      "ports": ["80:80"],
+      "volumes": ["haproxy.conf:/usr/local/etc/haproxy/haproxy.cfg:ro"]
+    }
+  ]
+}

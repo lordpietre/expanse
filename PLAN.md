@@ -331,6 +331,37 @@ High-risk ports when deploying multiple instances:
 | beforeunload save | Medium | 1h | DONE |
 | Externalize popularity | Low | 2h | DONE |
 | Extend healthchecks | Low | 1h | DONE |
+| HA Deployment System | High | 8h | DONE |
+
+---
+
+## HA Deployment Implementation
+
+### Completed Items
+| Task | Status | Date |
+|------|--------|------|
+| Add HA types to types/library.ts | Done | 2026-06-13 |
+| Create postgrest-ha.json template | Done | 2026-06-13 |
+| Add HA config generators (generateHaproxyConfig, generatePgbouncerConfig) | Done | 2026-06-13 |
+| Add HA deployment dialog (haDeploymentDialog.tsx) | Done | 2026-06-13 |
+| Modify runCompose to support HA config | Done | 2026-06-13 |
+| Add HA metrics panel (haMetricsPanel.tsx) | Done | 2026-06-13 |
+
+### HA Features
+- **Load Balancer**: HAProxy with round-robin distribution and health checks
+- **Autoscaling**: 2-10 replicas configurable via slider
+- **Connection Pooling**: PgBouncer in transaction mode
+- **User Prompt**: Dialog asks user if they want HA before deployment
+
+### HA Template Fields
+```typescript
+interface TemplateService {
+  haEnabled?: boolean;
+  loadBalancer?: LoadBalancerConfig;
+  replicas?: ReplicasConfig;
+  databaseHa?: DatabaseHaConfig;
+}
+```
 
 ---
 

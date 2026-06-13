@@ -10,7 +10,8 @@ import YAML from 'yaml';
 import { ensureAuth } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "bson";
-import { composeMetadata } from "@/lib/metadata";
+import { composeMetadata, generateHaproxyConfig, generatePgbouncerConfig, type HaConfig } from "@/lib/metadata";
+import type { HaDeploymentConfig } from "@/components/playground/haDeploymentDialog";
 
 const execAsync = promisify(exec);
 
@@ -107,7 +108,11 @@ function patchComposeYaml(yamlText: string, metadata?: composeMetadata): string 
 }
 
 
-export async function runCompose(composeId: string, yamlContent: string) {
+export async function runCompose(
+    composeId: string,
+    yamlContent: string,
+    haConfig?: HaDeploymentConfig
+) {
     await ensureAuth();
     const tempDir = path.join(os.tmpdir(), `expanse-${composeId}`);
     await fs.mkdir(tempDir, { recursive: true });
@@ -119,8 +124,95 @@ export async function runCompose(composeId: string, yamlContent: string) {
     const doc = await collection.findOne({ _id: new ObjectId(composeId) });
     const metadata = doc?.metadata as composeMetadata | undefined;
 
+    // Parse YAML to check for HA services and inject configs
+    let parsedYaml = YAML.parse(yamlContent);
+
+    // If HA is enabled, inject HA-specific configurations
+    if (haConfig?.enabled) {
+        // Inject PgBouncer configuration if connection pooling is enabled
+        if (haConfig.enableConnectionPool) {
+            const dbService = Object.entries(parsedYaml.services || {}).find(
+                ([name, svc]: [string, any]) => svc.image?.includes('postgres')
+            );
+            if (dbService) {
+                const [, dbSvc] = dbService;
+                // Add pgbouncer service if not already present
+                if (!parsedYaml.services.pgbouncer) {
+                    parsedYaml.services.pgbouncer = {
+                        image: 'edoburu/pgbouncer:latest',
+                        environment: {
+                            DATABASE_URL: `postgres://${dbSvc.environment?.POSTGRES_USER || 'postgres'}:${dbSvc.environment?.POSTGRES_PASSWORD || 'postgres'}@${dbService[0]}:5432/${dbSvc.environment?.POSTGRES_DB || 'postgres'}`,
+                            POOL_MODE: 'transaction',
+                            MAX_CLIENT_CONN: '100',
+                            DEFAULT_POOL_SIZE: '20'
+                        },
+                        ports: ['5439:5432'],
+                        depends_on: {
+                            [dbService[0]]: { condition: 'service_healthy' }
+                        }
+                    };
+                }
+            }
+        }
+
+        // Inject HAProxy configuration if load balancer is enabled
+        if (haConfig.enableLoadBalancer) {
+            const apiServices = Object.entries(parsedYaml.services || {}).filter(
+                ([name, svc]: [string, any]) => svc.image?.includes('postgrest') || name === 'api'
+            );
+
+            if (apiServices.length > 0) {
+                // Generate HAProxy config
+                const servers = apiServices.map(([name], idx) => ({
+                    name: `${name}_${idx + 1}`,
+                    host: name,
+                    port: 3000
+                }));
+
+                const haproxyConfig = generateHaproxyConfig({
+                    type: 'haproxy',
+                    port: 80,
+                    targetPort: 3000,
+                    algorithm: 'round-robin',
+                    healthCheckPath: '/'
+                }, servers);
+
+                // Write HAProxy config file
+                await fs.writeFile(path.join(tempDir, 'haproxy.conf'), haproxyConfig);
+
+                // Add/update HAProxy service
+                parsedYaml.services.lb = {
+                    image: 'haproxy:2.9-alpine',
+                    ports: ['80:80'],
+                    volumes: ['./haproxy.conf:/usr/local/etc/haproxy/haproxy.cfg:ro'],
+                    depends_on: apiServices.map(([name]) => name).reduce((acc, name) => {
+                        acc[name] = { condition: 'service_started' };
+                        return acc;
+                    }, {} as Record<string, any>)
+                };
+
+                // Update API services to use pgbouncer if available
+                if (haConfig.enableConnectionPool && parsedYaml.services.pgbouncer) {
+                    for (const [name, svc] of apiServices) {
+                        if (svc.environment) {
+                            svc.environment.PGRST_DB_URI = `postgres://${parsedYaml.services.pgbouncer.environment.DATABASE_URL.split('@')[1]?.split('/')[0] || 'postgres'}:5439/postgres`;
+                        }
+                    }
+                }
+
+                // Set replicas for API services
+                for (const [name] of apiServices) {
+                    if (!parsedYaml.services[name].deploy) {
+                        parsedYaml.services[name].deploy = {};
+                    }
+                    parsedYaml.services[name].deploy.replicas = haConfig.minReplicas;
+                }
+            }
+        }
+    }
+
     // Patch YAML: inject DB healthchecks + depends_on service_healthy + resource limits
-    const patchedYaml = patchComposeYaml(yamlContent, metadata);
+    const patchedYaml = patchComposeYaml(YAML.stringify(parsedYaml), metadata);
     await fs.writeFile(yamlPath, patchedYaml);
 
     try {

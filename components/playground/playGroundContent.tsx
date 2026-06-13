@@ -20,6 +20,8 @@ import { runCompose as executeCompose, stopCompose, getComposeStatus, getCompose
 import ExecutionPanel from "./executionPanel";
 import toast from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { HaDeploymentDialog, type HaDeploymentConfig } from "@/components/playground/haDeploymentDialog";
+import { extractHaConfig } from "@/lib/metadata";
 
 
 // ── Deploy Phase Types ──────────────────────────────────────────────────────
@@ -96,6 +98,8 @@ export default function PlaygroundContent() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [deployPhase, setDeployPhase] = useState<DeployPhase>(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [haDialogOpen, setHaDialogOpen] = useState(false);
+    const [haConfig, setHaConfig] = useState<HaDeploymentConfig | null>(null);
 
     React.useEffect(() => {
         if (isExecuting) {
@@ -261,6 +265,17 @@ export default function PlaygroundContent() {
             toast.error("Save your compose first");
             return;
         }
+        setHaDialogOpen(true);
+    };
+
+    const handleExecuteWithHa = async (config: HaDeploymentConfig) => {
+        setHaDialogOpen(false);
+        setHaConfig(config);
+
+        if (!composeId) {
+            toast.error("Save your compose first");
+            return;
+        }
         try {
             setExecuting(true);
             setDeployPhase('validating');
@@ -306,7 +321,7 @@ export default function PlaygroundContent() {
 
             while (retries < 5 && !success) {
                 setDeployPhase('starting');
-                const res = await executeCompose(composeId, currentYaml);
+                const res = await executeCompose(composeId, currentYaml, haConfig ?? undefined);
                 if (res.success) {
                     setDeployPhase('done');
                     setTimeout(() => setDeployPhase(null), 2500);
@@ -614,7 +629,11 @@ export default function PlaygroundContent() {
 
                                 {isExecuting && (
                                     <div className="mt-2 text-white">
-                                        <ExecutionPanel />
+                                        <ExecutionPanel haConfig={haConfig?.enabled ? {
+                                            enabled: true,
+                                            minReplicas: haConfig.minReplicas,
+                                            maxReplicas: haConfig.maxReplicas
+                                        } : undefined} />
                                     </div>
                                 )}
                             </div>
@@ -631,6 +650,12 @@ export default function PlaygroundContent() {
                 </div>
             </div>
             <LibraryModal open={isLibraryOpen} onOpenChange={setIsLibraryOpen} />
+            <HaDeploymentDialog
+                open={haDialogOpen}
+                onOpenChange={setHaDialogOpen}
+                onConfirm={handleExecuteWithHa}
+                isLoading={!!deployPhase}
+            />
         </section>
     );
 }

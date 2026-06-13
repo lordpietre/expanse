@@ -102,3 +102,22 @@ Create `data/library/<service-name>.json` following the schema in `CONTRIBUTING.
 ## CI/CD
 - Push to `main`: builds multi-arch (amd64+arm64) image, pushes to Docker Hub
 - Push to other branches: build-only test (no push)
+
+## HA Deployments
+When deploying, users are prompted with `HaDeploymentDialog` to choose HA options:
+- **HA Enabled**: Multiple replicas with autoscaling (min 2, max 10)
+- **Load Balancer**: HAProxy with round-robin, health checks
+- **Connection Pooling**: PgBouncer in transaction mode
+
+Template HA fields in `types/library.ts`:
+- `haEnabled`: boolean to mark template as HA-capable
+- `loadBalancer`: { type, port, targetPort, algorithm, healthCheckPath }
+- `replicas`: { enabled, minReplicas, maxReplicas, scaleTarget }
+- `databaseHa`: { type, poolMode, maxConnections, poolSize }
+
+Key files for HA:
+- `lib/metadata.ts`: `generateHaproxyConfig()`, `generatePgbouncerConfig()`
+- `actions/dockerActions.ts`: `runCompose()` accepts `haConfig` parameter
+- `components/playground/haDeploymentDialog.tsx`: User prompt for HA options
+- `components/playground/haMetricsPanel.tsx`: Shows HA metrics during execution
+- `data/library/postgrest-ha.json`: Example HA template

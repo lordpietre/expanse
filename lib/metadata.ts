@@ -145,3 +145,81 @@ export function recreateConnectionMap(input: ConnectionMapEntry[] | undefined): 
     })
     return result
 }
+
+import type { LoadBalancerConfig, ReplicasConfig, DatabaseHaConfig } from "@/types/library";
+
+export interface HaConfig {
+    loadBalancer?: LoadBalancerConfig;
+    replicas?: ReplicasConfig;
+    databaseHa?: DatabaseHaConfig;
+}
+
+export function extractHaConfig(template: { loadBalancer?: LoadBalancerConfig; replicas?: ReplicasConfig; databaseHa?: DatabaseHaConfig; haEnabled?: boolean }): HaConfig {
+    if (!template.haEnabled) {
+        return {};
+    }
+    return {
+        loadBalancer: template.loadBalancer,
+        replicas: template.replicas,
+        databaseHa: template.databaseHa,
+    };
+}
+
+export function generateHaproxyConfig(
+    lbConfig: LoadBalancerConfig,
+    servers: Array<{ name: string; host: string; port: number }>
+): string {
+    const serversLines = servers
+        .map(s => `    server ${s.name} ${s.host}:${s.port} check inter 5s fall 2 rise 1`)
+        .join('\n');
+
+    return `global
+    log stdout format raw local0
+    maxconn 4096
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+frontend postgrest_ha
+    bind :${lbConfig.port}
+    default_backend postgrest_nodes
+
+backend postgrest_nodes
+    balance ${lbConfig.algorithm}
+    option httpchk GET ${lbConfig.healthCheckPath}
+    http-check expect status 200
+${serversLines}
+`;
+}
+
+export function generatePgbouncerConfig(
+    dbConfig: DatabaseHaConfig,
+    dbHost: string,
+    dbPort: number,
+    dbName: string
+): string {
+    const poolMode = dbConfig.poolMode || 'transaction';
+    const maxConnections = dbConfig.maxConnections || 100;
+    const poolSize = dbConfig.poolSize || 20;
+
+    return `[databases]
+${dbName} = host=${dbHost} port=${dbPort} dbname=${dbName} pool_size=${poolSize}
+
+[pgbouncer]
+pool_mode = ${poolMode}
+max_client_conn = ${maxConnections}
+default_pool_size = ${poolSize}
+min_pool_size = 5
+reserve_pool_size = 5
+reserve_pool_timeout = 5
+server_lifetime = 3600
+server_idle_timeout = 600
+log_connections = 0
+log_disconnections = 0
+`;
+}

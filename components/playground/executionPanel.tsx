@@ -7,9 +7,18 @@ import { Terminal, CheckCircle2, Loader2, PlayCircle, StopCircle, Command } from
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { ExecutionPanelErrorBoundary } from "@/components/ui/errorBoundary";
+import { HaMetricsPanel } from "@/components/playground/haMetricsPanel";
 const TerminalDialog = dynamic(() => import("./terminalDialog"), { ssr: false });
 
-export default function ExecutionPanel() {
+interface ExecutionPanelProps {
+    haConfig?: {
+        enabled: boolean;
+        minReplicas?: number;
+        maxReplicas?: number;
+    };
+}
+
+export default function ExecutionPanel({ haConfig }: ExecutionPanelProps) {
     const { isExecuting, serviceStatuses, logs } = useExecutionStore();
     const [terminalOpen, setTerminalOpen] = React.useState(false);
     const [activeContainer, setActiveContainer] = React.useState<{ id: string; name: string } | null>(null);
@@ -97,9 +106,12 @@ export default function ExecutionPanel() {
                         <div className="w-2 h-2 rounded-full bg-rose-500/20" />
                         <div className="w-2 h-2 rounded-full bg-amber-500/20" />
                         <div className="w-2 h-2 rounded-full bg-emerald-500/20" />
-                    </div>
-                </div>
-                <div className="p-4 h-[200px] overflow-y-auto font-mono text-[10px] text-slate-300 custom-scrollbar whitespace-pre-wrap leading-relaxed">
+</div>
+            </div>
+
+            {haConfig?.enabled && <HaMetricsPanel minReplicas={haConfig.minReplicas} maxReplicas={haConfig.maxReplicas} />}
+
+            <div className="p-4 h-[200px] overflow-y-auto font-mono text-[10px] text-slate-300 custom-scrollbar whitespace-pre-wrap leading-relaxed">
                     {logs ? logs : (
                         <div className="flex items-center justify-center h-full text-slate-500 italic">
                             {t('waitingForLogs')}
