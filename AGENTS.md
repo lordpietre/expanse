@@ -5,8 +5,7 @@
 - `pnpm sync-icons` — syncs library service icons (standalone script, must run before build)
 - `pnpm build` — production build (Dockerfile runs `sync-icons` automatically; local builds need it run first)
 - `pnpm lint` — ESLint
-
-No test suite is configured.
+- `pnpm test` — Vitest unit tests
 
 ## Environment Setup
 - Requires `SECRET_KEY` env var (middleware redirect loop if missing)
