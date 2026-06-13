@@ -84,7 +84,37 @@ const debouncedSave = (compose: Compose) => {
     }, 2000);
 };
 
+// Immediate save for beforeunload - clears timeout and saves immediately
+const immediateSave = (compose: Compose) => {
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
+    }
+    // Synchronous save without toast for beforeunload
+    save(compose).catch(err => {
+        console.error("Failed to save on unload:", err);
+    });
+};
+
+// Setup beforeunload handler once
+let beforeunloadHandlerSetup = false;
+const setupBeforeUnloadHandler = () => {
+    if (typeof window !== 'undefined' && !beforeunloadHandlerSetup) {
+        beforeunloadHandlerSetup = true;
+        window.addEventListener('beforeunload', (event) => {
+            const { isDirty, compose } = useComposeStore.getState();
+            const { state: disabledSave } = useDisableStateStore.getState();
+            if (isDirty && !disabledSave) {
+                immediateSave(compose);
+            }
+        });
+    }
+};
+
 export const useComposeStore = create<ComposeState>((set, get) => {
+    // Setup beforeunload handler on first store access
+    setupBeforeUnloadHandler();
+
     return {
         compose: new Compose({ name: generateRandomName() }),
         tick: 0,

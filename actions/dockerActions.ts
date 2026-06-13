@@ -21,6 +21,20 @@ const DB_HEALTHCHECKS: Record<string, object> = {
     postgres: { test: ["CMD-SHELL", "pg_isready -h localhost -U $${POSTGRES_USER:-postgres}"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
     mongo: { test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
     redis: { test: ["CMD", "redis-cli", "ping"], interval: "5s", timeout: "3s", retries: 5 },
+    couchdb: { test: ["CMD-SHELL", "curl -f http://localhost:5984/_up || exit 1"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    cassandra: { test: ["CMD-SHELL", "cqlsh -e 'describe cluster' || exit 1"], interval: "10s", timeout: "5s", retries: 5, start_period: "60s" },
+    neo4j: { test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "$${NEO4J_PASSWORD:-password}", "RETURN 1"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    clickhouse: { test: ["CMD-SHELL", "clickhouse-client --query 'SELECT 1'"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
+    influxdb: { test: ["CMD", "influx", "ping"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    timescale: { test: ["CMD-SHELL", "pg_isready -h localhost -U $${POSTGRES_USER:-postgres}"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
+    cockroachdb: { test: ["CMD-SHELL", "cockroach sql --execute 'SELECT 1'"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    surrealdb: { test: ["CMD-SHELL", "surreal sql --namespace namespace --database database --user root --pass root --pretty exit 0"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    scylladb: { test: ["CMD-SHELL", "cqlsh -e 'describe cluster' || exit 1"], interval: "10s", timeout: "5s", retries: 5, start_period: "60s" },
+    memcached: { test: ["CMD", "memcached", "-v"], interval: "10s", timeout: "5s", retries: 3 },
+    dragonfly: { test: ["CMD", "redis-cli", "ping"], interval: "5s", timeout: "3s", retries: 5 },
+    influxdb2: { test: ["CMD", "influx", "ping"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    questdb: { test: ["CMD-SHELL", "curl -f http://localhost:9000/health || exit 1"], interval: "10s", timeout: "5s", retries: 5, start_period: "30s" },
+    timescaledb: { test: ["CMD-SHELL", "pg_isready -h localhost -U $${POSTGRES_USER:-postgres}"], interval: "10s", timeout: "5s", retries: 5, start_period: "20s" },
 }
 
 function isDbImage(image: string): string | null {

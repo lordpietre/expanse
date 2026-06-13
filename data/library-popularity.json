@@ -1,0 +1,170 @@
+{
+  "categoryOrder": {
+    "Database": 0,
+    "Web Server": 1,
+    "Cache": 2,
+    "Social": 3,
+    "CMS": 4,
+    "Network": 5,
+    "Monitoring": 6,
+    "Automation": 7,
+    "Cloud": 8,
+    "AI": 9,
+    "Utilities": 10,
+    "Development": 11,
+    "Messaging": 12,
+    "Queue": 13,
+    "Applications": 14,
+    "OS": 15,
+    "Other": 16
+  },
+  "popularity": {
+    "Database": {
+      "PostgreSQL": 1,
+      "MySQL": 2,
+      "MongoDB": 3,
+      "MariaDB": 4,
+      "Redis": 5,
+      "Neo4j": 6,
+      "SQLite": 7,
+      "CouchDB": 8,
+      "ClickHouse": 9,
+      "InfluxDB": 10,
+      "TimescaleDB": 11,
+      "CockroachDB": 12,
+      "SurrealDB": 13,
+      "ScyllaDB": 14,
+      "Cassandra": 15
+    },
+    "CMS": {
+      "Ghost (Full Stack)": 1,
+      "WordPress (Full Stack)": 2,
+      "WordPress": 3,
+      "Drupal": 4,
+      "Joomla": 5,
+      "Ghost": 6,
+      "Strapi": 7,
+      "Directus": 8,
+      "Payload CMS": 9,
+      "October CMS": 10,
+      "TYPO3": 11,
+      "Plone": 12
+    },
+    "Network": {
+      "Traefik": 1,
+      "Nginx": 2,
+      "Nginx Proxy Manager": 3,
+      "WireGuard": 4,
+      "WireGuard UI": 5,
+      "NetBird": 6,
+      "Headscale": 7,
+      "Gluetun": 8,
+      "OpenVPN AS": 9,
+      "AmneziaVPN": 10,
+      "Pi-hole": 11,
+      "AdGuard Home": 12
+    },
+    "Cloud": {
+      "Nextcloud Enterprise (Optimized)": 1,
+      "Elasticsearch": 2,
+      "Nextcloud": 3,
+      "FileBrowser": 4,
+      "Seafile": 5,
+      "Cloudreve": 6,
+      "OpenCloud": 7,
+      "Ocis": 8,
+      "Cozy": 9,
+      "Syncthing": 10
+    },
+    "Social": {
+      "Mastodon": 1,
+      "GoToSocial": 2,
+      "Akkoma": 3,
+      "Pleroma": 4,
+      "Firefish": 5,
+      "Misskey": 6,
+      "Pixelfed": 7,
+      "Lemmy": 8,
+      "Friendica": 9
+    },
+    "AI": {
+      "Open WebUI": 1,
+      "LibreChat": 2,
+      "AnythingLLM": 3,
+      "LobeChat": 4
+    },
+    "Automation": {
+      "n8n (Full Stack)": 1,
+      "n8n": 2,
+      "Activepieces": 3,
+      "Node-RED": 4,
+      "Windmill": 5,
+      "Automatisch": 6,
+      "Kestra": 7,
+      "Huginn": 8,
+      "Flowise": 9,
+      "Apache Airflow": 10,
+      "Budibase": 11
+    },
+    "Web Server": {
+      "Nginx": 1,
+      "Apache": 2,
+      "Caddy": 3,
+      "Traefik": 4
+    },
+    "Cache": {
+      "Redis": 1,
+      "Memcached": 2,
+      "Dragonfly": 3
+    },
+    "Queue": {
+      "RabbitMQ": 1,
+      "Kafka": 2,
+      "Beanstalkd": 3
+    },
+    "Messaging": {
+      "Rocket.Chat": 1,
+      "Mattermost": 2,
+      "Zulip": 3,
+      "Matrix": 4,
+      "Element": 5
+    },
+    "Monitoring": {
+      "Monitoring Stack (Prometheus + Grafana)": 1,
+      "ELK Stack (Observability)": 2,
+      "PLG Stack (Modern Logging)": 3,
+      "Grafana + PostgreSQL (Full Stack)": 4,
+      "Grafana": 5,
+      "Prometheus": 6,
+      "Uptime Kuma": 7,
+      "Netdata": 8,
+      "Zabbix": 9
+    },
+    "Development": {
+      "Appwrite (Full Stack)": 1,
+      "Gitea (Full Stack)": 2,
+      "Gitea": 3,
+      "VS Code Server": 4,
+      "Postman": 5,
+      "Jenkins": 6
+    },
+    "Utilities": {
+      "Vaultwarden (Full Stack)": 1,
+      "Vaultwarden": 2,
+      "CyberChef": 3,
+      "IT-Tools": 4
+    },
+    "Applications": {
+      "Media Center (Jellyfin + Arrs)": 1,
+      "Portainer": 2,
+      "Watchtower": 3,
+      "Duplicati": 4
+    },
+    "OS": {
+      "Ubuntu": 1,
+      "Debian": 2,
+      "Alpine": 3,
+      "CentOS": 4
+    }
+  }
+}

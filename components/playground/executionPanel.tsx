@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Terminal, CheckCircle2, Loader2, PlayCircle, StopCircle, Command } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+import { ExecutionPanelErrorBoundary } from "@/components/ui/errorBoundary";
 const TerminalDialog = dynamic(() => import("./terminalDialog"), { ssr: false });
 
 export default function ExecutionPanel() {
@@ -31,6 +32,7 @@ export default function ExecutionPanel() {
     };
 
     return (
+        <ExecutionPanelErrorBoundary>
         <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Services Status */}
             <div className="grid grid-cols-1 gap-2">
@@ -106,5 +108,6 @@ export default function ExecutionPanel() {
                 </div>
             </div>
         </div>
+        </ExecutionPanelErrorBoundary>
     );
 }

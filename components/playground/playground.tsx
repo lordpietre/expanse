@@ -25,6 +25,7 @@ import usePositionMap from "@/store/metadataMap";
 import { handleBackspacePress } from "./playgroundUtils";
 import LabelNode from "./node/labelNode";
 import toast from "react-hot-toast";
+import { PlaygroundErrorBoundary } from "@/components/ui/errorBoundary";
 
 export type NodeData = {
     position: XYPosition,
@@ -599,6 +600,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
     }
 
     return (
+        <PlaygroundErrorBoundary>
         <ReactFlow
             nodes={composeToNodes(compose)}
             edges={composeToEdge(compose)}
@@ -634,6 +636,7 @@ const Playground = forwardRef<PlaygroundHandle, PlaygroundProps>(({ hideControls
                 onInteractiveChange={(isInteractive) => setIsDraggable(isInteractive)}
             />}
         </ReactFlow>
+        </PlaygroundErrorBoundary>
     )
 }
 )

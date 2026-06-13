@@ -313,6 +313,12 @@ High-risk ports when deploying multiple instances:
 | Fix missing exportToGoogleDrive | Done | 2026-06-03 |
 | Fix pnpm version in Dockerfile | Done | 2026-06-03 |
 | Improve library error handling | Done | 2026-06-03 |
+| Add test suite (Vitest) | Done | 2026-06-13 |
+| Error boundary components | Done | 2026-06-13 |
+| beforeunload save handler | Done | 2026-06-13 |
+| Verify disable state logic | Done | 2026-06-13 |
+| Externalize popularity config | Done | 2026-06-13 |
+| Extend DB healthchecks | Done | 2026-06-13 |
 
 ---
 
@@ -320,11 +326,11 @@ High-risk ports when deploying multiple instances:
 
 | Task | Priority | Effort | Status |
 |------|----------|--------|--------|
-| Add test suite | Critical | 2-3 days | TODO |
-| Error boundaries | Medium | 2h | TODO |
-| beforeunload save | Medium | 1h | TODO |
-| Externalize popularity | Low | 2h | TODO |
-| Extend healthchecks | Low | 1h | TODO |
+| Add test suite | Critical | 2-3 days | DONE |
+| Error boundaries | Medium | 2h | DONE |
+| beforeunload save | Medium | 1h | DONE |
+| Externalize popularity | Low | 2h | DONE |
+| Extend healthchecks | Low | 1h | DONE |
 
 ---
 

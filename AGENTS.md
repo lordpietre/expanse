@@ -2,9 +2,9 @@
 
 ## Dev Commands
 - `pnpm dev` — local dev with turbopack (port 3000)
-- `pnpm build` — production build (runs `sync-icons` first)
+- `pnpm sync-icons` — syncs library service icons (standalone script, must run before build)
+- `pnpm build` — production build (Dockerfile runs `sync-icons` automatically; local builds need it run first)
 - `pnpm lint` — ESLint
-- `pnpm sync-icons` — syncs library service icons (standalone script)
 
 No test suite is configured.
 
@@ -23,7 +23,7 @@ No test suite is configured.
 ## Build Notes
 - `next.config.mjs` has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` — ESLint/type errors do not block builds
 - Standalone output mode (`output: 'standalone'`) — server.js is the entrypoint
-- `pnpm sync-icons` must run before `build` (Dockerfile runs it)
+- Run `pnpm sync-icons` before `pnpm build` locally; Dockerfile runs it automatically
 
 ## Architecture
 - **State**: 9 Zustand stores in `store/` — `compose.ts` is central (auto-saves with 2s debounce)
