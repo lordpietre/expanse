@@ -567,35 +567,44 @@ export async function stopProjectByName(projectName: string) {
 export async function removeProjectByName(projectName: string, deleteVolumes: boolean = true) {
     await ensureAuth();
     try {
-        // 1. Try standard compose down first
         const downFlags = deleteVolumes ? "--volumes --remove-orphans" : "--remove-orphans";
-        const { stdout, stderr } = await execAsync(`docker compose -p ${projectName} down ${downFlags}`);
-        console.log('Remove project standard:', stdout);
 
-        // 2. Robust fallback: Identify any remaining containers with this project label
+        // 1. Try standard compose down (best effort, may fail without yaml file)
+        try {
+            const { stdout, stderr } = await execAsync(`docker compose -p ${projectName} down ${downFlags}`);
+            console.log('Remove project standard:', stdout);
+            if (stderr && !stderr.includes('no container') && !stderr.includes('Network')) {
+                console.log('Remove project stderr:', stderr);
+            }
+        } catch (composeError) {
+            // Compose down failed, but we'll clean up by label below
+            console.log('Compose down skipped, will cleanup by label:', composeError.message);
+        }
+
+        // 2. Force remove any containers with this project label
         const { stdout: containerIds } = await execAsync(`docker ps -a --filter "label=com.docker.compose.project=${projectName}" -q`);
         if (containerIds.trim()) {
             const ids = containerIds.trim().split(/\s+/).join(' ');
+            console.log('Removing containers by label:', ids);
             await execAsync(`docker rm -f ${ids}`);
         }
 
-        // Only remove volumes manually if requested
+        // 3. Remove volumes if requested
         if (deleteVolumes) {
             const { stdout: volumeNames } = await execAsync(`docker volume ls --filter "label=com.docker.compose.project=${projectName}" -q`);
             if (volumeNames.trim()) {
                 const names = volumeNames.trim().split(/\s+/).join(' ');
+                console.log('Removing volumes by label:', names);
                 await execAsync(`docker volume rm -f ${names}`);
             }
         }
 
+        // 4. Remove networks
         const { stdout: networkNames } = await execAsync(`docker network ls --filter "label=com.docker.compose.project=${projectName}" -q`);
         if (networkNames.trim()) {
             const names = networkNames.trim().split(/\s+/).join(' ');
+            console.log('Removing networks by label:', names);
             await execAsync(`docker network rm ${names}`);
-        }
-
-        if (stderr && !stderr.includes('Network') && !stderr.includes('Volume')) {
-            console.error('Remove project stderr:', stderr);
         }
 
         return {
