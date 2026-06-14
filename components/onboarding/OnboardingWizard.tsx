@@ -152,6 +152,7 @@ export default function OnboardingWizard({ onComplete, isNewUser }: OnboardingWi
         const hasSeenOnboarding = localStorage.getItem("expanse_onboarding_completed")
         const urlParams = new URLSearchParams(window.location.search)
         const forceShow = urlParams.get('wizard') === '1'
+        console.log('[Onboarding] hasSeen:', hasSeenOnboarding, 'isNewUser:', isNewUser, 'forceShow:', forceShow)
         if (!hasSeenOnboarding || isNewUser || forceShow) {
             setOpen(true)
         }
