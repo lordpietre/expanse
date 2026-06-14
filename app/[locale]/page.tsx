@@ -10,6 +10,7 @@ import { getGlobalDockerStats } from "@/actions/dockerActions";
 import { DataTable } from "@/components/display/dataTable";
 import { columns } from "@/components/display/composeTable/colums";
 import ProjectMonitor from "@/components/display/projectMonitor";
+import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
 import { useTranslations } from "next-intl";
 import LocaleSwitcher from "@/components/ui/localeSwitcher";
 
@@ -182,6 +183,8 @@ export default function HomePage() {
                     />
                 )}
             </div>
+
+            <OnboardingWizard onComplete={() => {}} />
         </div>
     );
 }
