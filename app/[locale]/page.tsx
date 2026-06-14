@@ -83,8 +83,8 @@ export default function HomePage() {
     const navItems = [
         { href: "/", label: nav('home'), icon: HouseIcon },
         { href: "/dashboard/playground", label: nav('deploy'), icon: Rocket },
-        { href: "/deploy/settings", label: nav('system'), icon: Activity },
-        { href: "/dashboard/settings", label: nav('settings'), icon: Settings },
+        { href: "/dashboard/settings", label: nav('system'), icon: Activity },
+        { href: "/deploy/settings", label: nav('settings'), icon: Settings },
     ];
 
     if (loading) {
