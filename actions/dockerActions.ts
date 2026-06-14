@@ -380,8 +380,8 @@ export async function getGlobalDockerStats() {
     try {
         const [projectsRes, containersRes, volumesRes, networksRes, dfRes] = await Promise.all([
             execAsync('docker compose ls --format json'),
-            execAsync('docker ps -a --format json'),
-            execAsync('docker volume ls --format json'),
+            execAsync('docker ps -a --format "{{json .}}"'),
+            execAsync('docker volume ls --format "{{json .}}"'),
             execAsync('docker network ls --format json'),
             execAsync('docker system df -v').catch(() => ({ stdout: '' }))
         ]);

@@ -334,9 +334,18 @@ function ProjectDetail({
                                                         c.State === "running" ? "bg-emerald-400 shadow-sm shadow-emerald-400/50" : "bg-slate-600"
                                                     )} />
                                                     <div className="min-w-0 flex-1">
-                                                        <div className="font-bold text-sm text-white truncate">{c.Names}</div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="font-bold text-sm text-white truncate">{c.Names}</div>
+                                                            <span className="text-[9px] text-slate-500 font-mono">• {c.CreatedAt || c.CreatedSince || 'N/A'}</span>
+                                                        </div>
                                                         <div className="text-[10px] text-slate-500 font-mono italic flex items-center gap-2">
                                                             {c.Image}
+                                                            <span className={cn(
+                                                                "text-[9px] font-bold px-1.5 py-0.5 rounded",
+                                                                c.State === "running" ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-700 text-slate-400"
+                                                            )}>
+                                                                {c.Status}
+                                                            </span>
                                                             {c.State === 'running' && stats.find(s => s.Name === c.Names) && (
                                                                 <div className="flex items-center gap-3 ml-2 border-l border-white/10 pl-3">
                                                                     <div className="flex items-center gap-1.5">
@@ -465,7 +474,12 @@ function ProjectDetail({
                                                 <HardDrive className="w-3.5 h-3.5 text-purple-400" />
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <div className="font-bold text-sm text-white truncate">{v.Name}</div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="font-bold text-sm text-white truncate">{v.Name}</div>
+                                                    {v.CreatedAt && (
+                                                        <span className="text-[9px] text-slate-500 font-mono">• {v.CreatedAt}</span>
+                                                    )}
+                                                </div>
                                                 <div className="text-[10px] text-slate-500 font-mono truncate">{v.Mountpoint}</div>
                                             </div>
                                             <div className="flex items-center gap-3 shrink-0">
