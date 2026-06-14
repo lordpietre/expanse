@@ -60,7 +60,16 @@ export async function createOrLoginUser(email: string, data: any): Promise<strin
         data.password = await bcrypt.hash(data.password, 10);
     }
 
-    const result = await collection.insertOne({ email: email, ...data, createdAt: new Date().getTime() });
+    // Check if this is the first user (becomes admin)
+    const userCount = await collection.countDocuments();
+    const isFirstUser = userCount === 0;
+
+    const result = await collection.insertOne({ 
+        email: email, 
+        ...data, 
+        role: isFirstUser ? 'admin' : 'user',
+        createdAt: new Date().getTime() 
+    });
 
     if (result.insertedId) {
         const token = await new SignJWT({ userId: result.insertedId, email: email })
