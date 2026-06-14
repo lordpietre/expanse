@@ -14,6 +14,7 @@ import { Rocket, Container, Globe, CheckCircle, ChevronRight, X } from "lucide-r
 
 interface OnboardingWizardProps {
     onComplete: () => void
+    isNewUser?: boolean
 }
 
 const steps = [
@@ -143,16 +144,18 @@ const steps = [
     }
 ]
 
-export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
+export default function OnboardingWizard({ onComplete, isNewUser }: OnboardingWizardProps) {
     const [open, setOpen] = useState(false)
     const [currentStep, setCurrentStep] = useState(0)
 
     useEffect(() => {
         const hasSeenOnboarding = localStorage.getItem("expanse_onboarding_completed")
-        if (!hasSeenOnboarding) {
+        const urlParams = new URLSearchParams(window.location.search)
+        const forceShow = urlParams.get('wizard') === '1'
+        if (!hasSeenOnboarding || isNewUser || forceShow) {
             setOpen(true)
         }
-    }, [])
+    }, [isNewUser])
 
     const handleNext = () => {
         if (currentStep < steps.length - 1) {

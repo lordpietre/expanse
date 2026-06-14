@@ -184,7 +184,7 @@ export default function HomePage() {
                 )}
             </div>
 
-            <OnboardingWizard onComplete={() => {}} />
+            <OnboardingWizard onComplete={() => {}} isNewUser={composes.length === 0} />
         </div>
     );
 }
