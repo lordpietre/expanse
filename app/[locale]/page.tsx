@@ -57,6 +57,7 @@ export default function HomePage() {
                     return name.toUpperCase();
                 }).join(", ");
 
+                console.log('[Home] composes count:', data.length, 'isNewUser:', data.length === 0);
                 return {
                     id: c.id.toString(),
                     name: serviceNames || c.data?.name || "Untitled Project",
