@@ -778,3 +778,104 @@ export async function execDockerCommand(containerId: string, command: string) {
         return { success: false, error: error.message || error.stderr || "Execution failed" };
     }
 }
+
+export async function searchDockerHub(query: string) {
+    await ensureAuth();
+    if (!query || query.trim().length < 2) {
+        return { results: [], error: null };
+    }
+
+    try {
+        const encodedQuery = encodeURIComponent(query.trim());
+        const res = await fetch(
+            `https://hub.docker.com/v2/search/repositories/?query=${encodedQuery}&page_size=20`,
+            { next: { revalidate: 0 } } as RequestInit
+        );
+
+        if (!res.ok) {
+            throw new Error(`Docker Hub API error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        return {
+            results: (data.results || []).map((r: any) => ({
+                name: r.repo_name || r.name,
+                description: r.short_description || r.description || "",
+                stars: r.star_count || r.stars || 0,
+                pulls: r.pull_count || r.downloads || 0,
+                official: r.official || false,
+                logo: r.logo || null,
+            })),
+            error: null
+        };
+    } catch (err: any) {
+        console.error('Docker Hub search error:', err);
+        return { results: [], error: err.message || "Search failed" };
+    }
+}
+
+export async function pullDockerImage(imageName: string) {
+    await ensureAuth();
+    if (!imageName || !imageName.trim()) {
+        return { success: false, error: "Image name is required" };
+    }
+
+    try {
+        const { stdout, stderr } = await execAsync(`docker pull "${imageName.trim()}"`);
+        if (stderr && stderr.includes("Error")) {
+            return { success: false, error: stderr };
+        }
+        return { success: true, output: stdout || `Image ${imageName} pulled successfully` };
+    } catch (error: any) {
+        console.error('Docker pull error:', error);
+        return { success: false, error: error.message || "Pull failed" };
+    }
+}
+
+export async function getLocalImages() {
+    await ensureAuth();
+    try {
+        const { stdout } = await execAsync(`docker images --format "{{json .}}"`);
+        if (!stdout.trim()) return { images: [], error: null };
+
+        const images = stdout.trim().split('\n').map(line => {
+            try {
+                return JSON.parse(line);
+            } catch {
+                return null;
+            }
+        }).filter(Boolean);
+
+        return { images, error: null };
+    } catch (error: any) {
+        console.error('Docker images error:', error);
+        return { images: [], error: error.message };
+    }
+}
+
+export async function dockerSearch(query: string) {
+    await ensureAuth();
+    if (!query || query.trim().length < 2) {
+        return { results: [], error: null };
+    }
+
+    try {
+        const { stdout, stderr } = await execAsync(`docker search --limit 20 --format "{{json .}}" "${query.trim()}"`);
+        if (stderr && !stdout) {
+            return { results: [], error: stderr || "Search failed" };
+        }
+
+        const results = stdout.trim().split('\n').map(line => {
+            try {
+                return JSON.parse(line);
+            } catch {
+                return null;
+            }
+        }).filter(Boolean);
+
+        return { results, error: null };
+    } catch (error: any) {
+        console.error('Docker search error:', error);
+        return { results: [], error: error.message || "Search failed" };
+    }
+}

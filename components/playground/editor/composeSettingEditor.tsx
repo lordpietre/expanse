@@ -85,8 +85,9 @@ const VolumeWizard = () => {
     );
 };
 
-import { ChevronDown, ChevronUp, Library } from "lucide-react";
+import { ChevronDown, ChevronUp, Library, Image as ImageIcon } from "lucide-react";
 import useUIStore from "@/store/ui";
+import ImageSearchDialog from "./imageSearchDialog";
 
 export default function ComposeSettingEditor() {
 
@@ -149,6 +150,14 @@ export default function ComposeSettingEditor() {
                     >
                         <Library width={16} className="text-indigo-400" /> Library
                     </Button>
+                    <ImageSearchDialog>
+                        <Button
+                            type='button'
+                            className="flex flex-row gap-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 text-white font-bold border border-white/8 shadow-none col-span-2 transition-colors"
+                        >
+                            <ImageIcon width={16} className="text-cyan-400" /> Images
+                        </Button>
+                    </ImageSearchDialog>
                     <Button type='button' className="flex flex-row gap-2 rounded-xl bg-white/5 hover:bg-emerald-500/15 text-white font-bold border border-white/8 shadow-none transition-colors" onClick={ser}>
                         <Container width={16} className="text-emerald-400" /> Service
                     </Button>

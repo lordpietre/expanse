@@ -30,7 +30,7 @@
 - **Docker bridge**: Server Actions in `actions/` wrap `docker compose` CLI via `child_process.exec()`
 - **Auth**: JWT (HS256 via `jose`) in HTTP-only cookie, 30-day expiry. Edge middleware enforces. `lib/auth.ts` `ensureAuth()` guards all server actions
 - **Database**: MongoDB via mongoose — schemaless collections: `users`, `composes`, `shares`, `reset_code`
-- **Service library**: 137 JSON templates in `data/library/` — each follows `TemplateService` interface in `types/library.ts`
+- **Service library**: 138 JSON templates in `data/library/` — each follows `TemplateService` interface in `types/library.ts`
 - **Compose library**: `expanse-docker-lib` provides `Compose`, `Service`, `Translator` classes (NOT i18n — translates between compose object formats)
 - **i18n**: `next-intl` with `[locale]` route segments (see i18n section below)
 

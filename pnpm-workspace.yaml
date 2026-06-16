@@ -1,0 +1,8 @@
+packages:
+  - '**'
+allowBuilds:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - 'core-js'
+  - 'sharp'
+  - 'unrs-resolver'

@@ -1,12 +1,14 @@
 "use client"
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     getGlobalDockerStats, getSystemInfo,
     stopProjectByName, removeProjectByName,
     stopContainer, removeContainer, getProjectContainers,
-    removeVolume, getComposeStats
+    removeVolume, getComposeStats,
+    dockerSearch, pullDockerImage, getLocalImages
 } from "@/actions/dockerActions";
 import usePositionMap from "@/store/metadataMap";
 import { useComposeStore } from "@/store/compose";
@@ -14,7 +16,8 @@ import { verifyUserPassword } from "@/actions/userActions";
 import {
     Layers, Database, Activity, RefreshCw, HardDrive, Cpu,
     Container, ChevronRight, Square, Trash2, X,
-    Lock, AlertTriangle, Boxes, MemoryStick, Network
+    Lock, AlertTriangle, Boxes, MemoryStick, Network,
+    Search, Download, Star, Rocket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -520,18 +523,32 @@ export default function DashboardPage() {
     const [stats, setStats] = useState<any>(null);
     const [sysInfo, setSysInfo] = useState<any>(null);
     const [selectedProject, setSelectedProject] = useState<any>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searching, setSearching] = useState(false);
+    const [searchError, setSearchError] = useState<string | null>(null);
+    const [localImages, setLocalImages] = useState<any[]>([]);
+    const [pullingImage, setPullingImage] = useState<string | null>(null);
 
     // Global action state
     const [modalAction, setModalAction] = useState<null | { label: string; desc: string; fn: () => Promise<any> }>(null);
 
+    const router = useRouter();
+    const { addServiceFromImage } = useComposeStore();
+
+    const localImagesCount = localImages.length;
+
     const fetchData = useCallback(async () => {
         try {
-            const [dockerStats, systemStats] = await Promise.all([
+            const [dockerStats, systemStats, imgs] = await Promise.all([
                 getGlobalDockerStats(),
-                getSystemInfo()
+                getSystemInfo(),
+                getLocalImages()
             ]);
             if (!('error' in dockerStats)) setStats(dockerStats);
             if (!('error' in systemStats)) setSysInfo(systemStats);
+            const imgsResult = imgs as { images?: any[]; error?: string | null };
+            if (imgsResult && !imgsResult.error && imgsResult.images) setLocalImages(imgsResult.images);
         } catch (err) {
             console.error('fetchData error:', err);
         }
@@ -542,6 +559,42 @@ export default function DashboardPage() {
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
     }, []);
+
+    // Debounced search
+    useEffect(() => {
+        if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+            setSearchResults([]);
+            setSearchError(null);
+            return;
+        }
+        const timer = setTimeout(async () => {
+            setSearching(true);
+            setSearchError(null);
+            const res = await dockerSearch(searchQuery);
+            setSearchResults(res.results);
+            setSearchError(res.error);
+            setSearching(false);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const handlePullImage = async (imageName: string) => {
+        setPullingImage(imageName);
+        const res = await pullDockerImage(imageName);
+        if (res.success) {
+            toast.success(`Pulled: ${imageName}`);
+            const imgsResult = (await getLocalImages()) as { images?: any[]; error?: string | null };
+            if (imgsResult && !imgsResult.error && imgsResult.images) setLocalImages(imgsResult.images);
+        } else {
+            toast.error(res.error || "Pull failed");
+        }
+        setPullingImage(null);
+    };
+
+    const handleDeployImage = async (imageName: string) => {
+        await addServiceFromImage(imageName);
+        router.push("/dashboard/playground");
+    };
 
     // Build a map of projectName -> all port mappings across its containers
     const portsByProject = useMemo(() => {
@@ -674,6 +727,7 @@ export default function DashboardPage() {
                             { value: "projects", label: "Projects", count: stats?.projects.length ?? 0 },
                             { value: "containers", label: "Containers", count: stats?.containers.length ?? 0 },
                             { value: "volumes", label: "Volumes", count: stats?.volumes.length ?? 0 },
+                            { value: "images", label: "Images", count: localImagesCount },
                         ].map(tab => (
                             <TabsTrigger key={tab.value} value={tab.value}
                                 className="rounded-lg px-5 py-2 text-slate-500 data-[state=active]:bg-white/10 data-[state=active]:text-white font-bold text-xs uppercase tracking-widest transition-all">
@@ -867,6 +921,116 @@ export default function DashboardPage() {
                                 ))}
                             </div>
                         )}
+                    </TabsContent>
+
+                    {/* Images Tab */}
+                    <TabsContent value="images" className="mt-0">
+                        <div className="space-y-4">
+                            {/* Search Bar */}
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    placeholder="Search Docker Hub for images..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                                />
+                                {searching && (
+                                    <RefreshCw className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 animate-spin" />
+                                )}
+                            </div>
+
+                            {/* Search Results */}
+                            {searchQuery.trim().length >= 2 && (
+                                <div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">
+                                        {searching ? "Searching Docker Hub..." : searchError ? "Search failed" : `${searchResults.length} results for "${searchQuery}"`}
+                                    </div>
+                                    {!searching && !searchError && searchResults.length > 0 && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            {searchResults.map((img: any) => (
+                                                <div key={img.Name}
+                                                    className="flex items-start justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-indigo-500/30 transition-all group">
+                                                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                                                        <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 shrink-0">
+                                                            <Container className="w-4 h-4 text-indigo-400" />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="font-bold text-sm text-white truncate">{img.Name}</div>
+                                                                {img.IsOfficial && (
+                                                                    <span className="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shrink-0">
+                                                                        Official
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-[10px] text-slate-500 line-clamp-2 mt-1">{img.Description || "No description"}</div>
+                                                            <div className="flex items-center gap-4 mt-2">
+                                                                <div className="flex items-center gap-1">
+                                                                    <Star className="w-3 h-3 text-amber-400" />
+                                                                    <span className="text-[9px] text-amber-400 font-bold">{img.StarCount?.toLocaleString()}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 shrink-0 ml-3">
+                                                        <button
+                                                            onClick={() => handleDeployImage(img.Name)}
+                                                            className="opacity-0 group-hover:opacity-100 p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 transition-all"
+                                                            title="Deploy to canvas">
+                                                            <Rocket className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handlePullImage(img.Name)}
+                                                            disabled={pullingImage === img.Name}
+                                                            className="opacity-0 group-hover:opacity-100 p-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-400 transition-all disabled:opacity-50"
+                                                            title="Pull image">
+                                                            {pullingImage === img.Name ? (
+                                                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                                            ) : (
+                                                                <Download className="w-4 h-4" />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Local Images */}
+                            <div>
+                                <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">
+                                    Local Images ({localImages.length})
+                                </div>
+                                {localImages.length === 0 ? (
+                                    <EmptyState icon={<Container className="w-12 h-12" />} label="No local images" />
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {localImages.map((img: any, i: number) => (
+                                            <div key={img.ID || i}
+                                                className="flex items-start justify-between p-4 bg-[#0d1117]/80 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
+                                                <div className="flex items-start gap-3 min-w-0 flex-1">
+                                                    <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shrink-0">
+                                                        <Container className="w-4 h-4 text-emerald-400" />
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="font-bold text-sm text-white truncate">{img.Repository || "<none>"}</div>
+                                                        <div className="text-[10px] text-slate-500 font-mono">{img.Tag || "<none>"}</div>
+                                                        <div className="flex items-center gap-4 mt-2">
+                                                            <span className="text-[9px] text-slate-500">Size: <span className="text-emerald-400 font-bold">{img.Size}</span></span>
+                                                            <span className="text-[9px] text-slate-500">ID: <span className="text-slate-400 font-mono">{img.ID?.replace("sha256:", "").substring(0, 12)}</span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </TabsContent>
                 </Tabs>
             </div>

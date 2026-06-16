@@ -21,6 +21,7 @@ interface ComposeState {
     setCompose: (updater: (currentCompose: Compose) => void) => Promise<boolean>;
     replaceCompose: (newCompose: Compose, options?: { disableSave?: boolean }) => void;
     addServiceFromTemplate: (template: TemplateService) => Promise<void>;
+    addServiceFromImage: (imageName: string) => Promise<void>;
     resetCompose: () => void;
 }
 
@@ -323,6 +324,28 @@ export const useComposeStore = create<ComposeState>((set, get) => {
             });
 
             toast.success(`${template.name} added to compose`);
+        },
+
+        addServiceFromImage: async (imageName: string) => {
+            const { setCompose } = useComposeStore.getState();
+            const stackSuffix = generateRandomName().substring(0, 4);
+
+            const [imgName, imgTag] = imageName.includes(':')
+                ? imageName.split(':')
+                : [imageName, 'latest'];
+
+            const baseName = imgName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            const finalName = baseName.length < 8 ? baseName : baseName + "_" + stackSuffix;
+
+            await setCompose((compose) => {
+                const service = new Service({
+                    name: finalName,
+                    image: new Image({ name: imgName, tag: imgTag }),
+                });
+                compose.addService(service);
+            });
+
+            toast.success(`${imageName} added to compose`);
         },
     };
 });
