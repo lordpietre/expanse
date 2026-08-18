@@ -4,7 +4,7 @@
     "category": "Monitoring",
     "isStack": true,
     "image": "prom/prometheus:latest",
-    "logo": "https://img.icons8.com/external-flat-icons-inmotus-design/512/external-prometheus-monitoring-flat-icons-inmotus-design.png",
+    "logo": "prometheus",
     "default_ports": [
         "9090:9090"
     ],

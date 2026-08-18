@@ -8,5 +8,5 @@
         "9443:9443",
         "1194:1194/udp"
     ],
-    "logo": "https://openvpn.net/wp-content/themes/openvpn/assets/images/logo-icon.svg"
+    "logo": "openvpn"
 }

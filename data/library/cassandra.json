@@ -2,7 +2,7 @@
     "name": "Cassandra",
     "image": "cassandra:latest",
     "category": "Database",
-    "logo": "cassandra",
+    "logo": "https://icons.duckduckgo.com/ip3/cassandra.apache.org.ico",
     "description": "Wide Column Distributed. Big Data, high availability. Robust for mass writes.",
     "default_ports": [
         "9042:9042"

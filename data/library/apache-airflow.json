@@ -2,7 +2,7 @@
     "name": "Apache Airflow",
     "image": "apache/airflow:2.10.0",
     "category": "Automation",
-    "logo": "https://cdn.simpleicons.org/apacheairflow",
+    "logo": "apache-airflow",
     "description": "Enterprise orchestration for data engineering and complex DAGs. Python-based, powerful scheduling, huge community. Overkill for simple tasks, ideal for ETL.",
     "default_ports": [
         "8090:8080"

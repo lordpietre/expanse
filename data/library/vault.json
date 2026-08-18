@@ -3,7 +3,7 @@
     "description": "Manage Secrets and Protect Sensitive Data. Centralized secret management.",
     "category": "Cloud",
     "image": "hashicorp/vault:latest",
-    "logo": "https://www.vectorlogo.zone/logos/vaultproject/vaultproject-icon.svg",
+    "logo": "hashicorp-vault",
     "default_ports": [
         "8200:8200"
     ],

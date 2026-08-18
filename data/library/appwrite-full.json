@@ -4,7 +4,7 @@
     "category": "Development",
     "isStack": true,
     "image": "appwrite/appwrite:latest",
-    "logo": "https://img.icons8.com/color/512/appwrite.png",
+    "logo": "appwrite",
     "default_ports": [
         "80:80",
         "443:443"

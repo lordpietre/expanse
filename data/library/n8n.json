@@ -2,7 +2,7 @@
     "name": "n8n",
     "image": "n8nio/n8n:latest",
     "category": "Automation",
-    "logo": "https://n8n.io/favicon.ico",
+    "logo": "n8n",
     "description": "Low-code workflow automation with +500 integrations, JS/Python steps, huge community, and integrated AI agents. Perfect balance for general automation, webhooks, and APIs.",
     "default_ports": [
         "5678:5678"

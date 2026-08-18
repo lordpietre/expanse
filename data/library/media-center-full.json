@@ -4,7 +4,7 @@
     "category": "Applications",
     "isStack": true,
     "image": "jellyfin/jellyfin:latest",
-    "logo": "https://img.icons8.com/color/512/jellyfin.png",
+    "logo": "jellyfin",
     "default_ports": [
         "8096:8096"
     ],

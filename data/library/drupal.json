@@ -2,7 +2,7 @@
     "name": "Drupal",
     "image": "drupal:11-apache",
     "category": "CMS",
-    "logo": "https://www.drupal.org/files/Wordmark_Full%20Color_RGB%20light_background.png",
+    "logo": "drupal",
     "description": "Enterprise-class, flexible content management system used by governments, universities, and large organizations. Highly secure with a steep learning curve.",
     "default_ports": [
         "8080:80"

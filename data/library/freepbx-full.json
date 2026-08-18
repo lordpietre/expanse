@@ -4,7 +4,7 @@
     "category": "Network",
     "isStack": true,
     "image": "tiredofit/freepbx:latest",
-    "logo": "https://img.icons8.com/color/512/asterisk.png",
+    "logo": "freepbx-full-stack",
     "default_ports": [
         "80:80",
         "443:443",
@@ -43,7 +43,10 @@
                 "freepbx_db_data:/var/lib/mysql"
             ],
             "healthcheck": {
-                "test": ["CMD-SHELL", "mysqladmin ping -h localhost -u root -ppassword || exit 1"],
+                "test": [
+                    "CMD-SHELL",
+                    "mysqladmin ping -h localhost -u root -ppassword || exit 1"
+                ],
                 "interval": "10s",
                 "timeout": "5s",
                 "retries": 5,

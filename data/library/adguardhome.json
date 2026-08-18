@@ -13,5 +13,5 @@
         "./adguard_work:/opt/adguardhome/work",
         "./adguard_conf:/opt/adguardhome/conf"
     ],
-    "logo": "https://cdn.simpleicons.org/adguard"
+    "logo": "adguard-home"
 }

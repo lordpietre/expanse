@@ -2,7 +2,7 @@
     "name": "Ubuntu",
     "image": "ubuntu:noble",
     "category": "OS",
-    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/ubuntu/logo.png",
+    "logo": "ubuntu",
     "description": "Ubuntu is a modern, open-source Linux operating system for enterprise server, desktop, cloud, and IoT.",
     "default_ports": []
 }

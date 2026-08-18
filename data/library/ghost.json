@@ -2,7 +2,7 @@
     "name": "Ghost",
     "image": "ghost:5-alpine",
     "category": "CMS",
-    "logo": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/512/external-ghost-a-free-and-open-source-blogging-platform-written-in-javascript-logo-color-tal-revivo.png",
+    "logo": "ghost",
     "description": "Professional publishing platform designed for blogs, newsletters, and membership sites. Fast, clean, and focused on writing.",
     "default_ports": [
         "2368:2368"

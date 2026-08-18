@@ -2,7 +2,7 @@
     "name": "Fooocus",
     "image": "thndrkrz/fooocus:latest",
     "category": "AI",
-    "logo": "https://img.icons8.com/color/512/fooocus.png",
+    "logo": "https://icons.duckduckgo.com/ip3/fooocus.ai.ico",
     "description": "Stable Diffusion fácil e intuitivo. Enfocado en calidad de imagen más que en opciones complejas.",
     "default_ports": [
         "7865:7865"

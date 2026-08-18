@@ -9,11 +9,20 @@ services:
       - "4000:3000"
     environment:
       - CORE_ONLY=true
+      - DISABLE_TELEMETRY=true
+      - DISABLE_SIGNUP=${DISABLE_SIGNUP:-false}
       - URL=${APP_URL:-http://localhost:4000}
       - SECRET_KEY=${SECRET_KEY:-please_change_me_to_something_secure}
       - MONGODB_URI=mongodb://${DB_USER:-dev}:${DB_PASS:-dev}@db:27017/expanse?authSource=admin
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
     restart: unless-stopped
     # We need root or being in docker group to access the socket
     user: root
@@ -24,7 +33,7 @@ services:
       - ./data/library:/app/data/library
 
   db:
-    image: mongo:8.2-rc-noble
+    image: mongo:8
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USER:-dev}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS:-dev}
@@ -33,6 +42,12 @@ services:
     networks:
       - expanse-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
 networks:
   expanse-net:

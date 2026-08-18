@@ -2,7 +2,7 @@
     "name": "Activepieces",
     "image": "activepieces/activepieces:latest",
     "category": "Automation",
-    "logo": "https://www.activepieces.com/favicon.ico",
+    "logo": "activepieces",
     "description": "No-code / AI-first alternative to Zapier. Very intuitive, growing ecosystem, multi-user support with native AI prompts. Easiest for non-devs.",
     "default_ports": [
         "3000:3000"

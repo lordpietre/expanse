@@ -10,5 +10,5 @@
         "./wg-ui-data:/app/db",
         "/etc/wireguard:/etc/wireguard"
     ],
-    "logo": "https://www.wireguard.com/img/wireguard.svg"
+    "logo": "wireguard-ui"
 }

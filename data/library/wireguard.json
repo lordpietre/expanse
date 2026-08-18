@@ -16,5 +16,5 @@
     "volumes": [
         "./wireguard:/config"
     ],
-    "logo": "https://cdn.simpleicons.org/wireguard"
+    "logo": "wireguard-linuxserver"
 }

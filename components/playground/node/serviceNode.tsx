@@ -127,10 +127,16 @@ export default function ServiceNode({ data, selected }: { data: { service: Servi
                                     const rawLogo = labels.find(l => l.key === "com.expanse.logo")?.value;
                                     const logo = resolveLogoPath(rawLogo);
                                     return logo ? (
-                                        <>
+                                        <div className="relative w-8 h-8">
+                                            <Icon className="w-8 h-8 text-white drop-shadow-lg" />
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={logo} className="w-8 h-8 object-contain drop-shadow-lg" alt="logo" />
-                                        </>
+                                            <img
+                                                src={logo}
+                                                alt="logo"
+                                                className="absolute inset-0 w-8 h-8 object-contain drop-shadow-lg"
+                                                onError={(e) => e.currentTarget.remove()}
+                                            />
+                                        </div>
                                     ) : (
                                         <Icon className="w-8 h-8 text-white drop-shadow-lg" />
                                     );

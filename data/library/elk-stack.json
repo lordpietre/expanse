@@ -4,7 +4,7 @@
     "category": "Monitoring",
     "isStack": true,
     "image": "docker.elastic.co/kibana/kibana:8.12.0",
-    "logo": "https://img.icons8.com/color/512/kibana.png",
+    "logo": "elk-stack-observability",
     "default_ports": [
         "5601:5601"
     ],

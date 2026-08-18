@@ -9,5 +9,5 @@
     "volumes": [
         "./uptime-kuma:/app/data"
     ],
-    "logo": "https://cdn.simpleicons.org/uptimekuma"
+    "logo": "uptime-kuma"
 }

@@ -2,7 +2,7 @@
     "name": "Rocket.Chat",
     "image": "rocketchat/rocket.chat:latest",
     "category": "Messaging",
-    "logo": "https://cdn.simpleicons.org/rocketdotchat",
+    "logo": "rocketchat",
     "description": "Discord-like team chat and omnichannel platform. Highly customizable, video/voice support, and mobile apps.",
     "default_ports": [
         "3000:3000"

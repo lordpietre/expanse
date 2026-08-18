@@ -14,5 +14,5 @@
     "volumes": [
         "./wg-easy:/etc/wireguard"
     ],
-    "logo": "https://raw.githubusercontent.com/wg-easy/wg-easy/master/src/public/favicon.ico"
+    "logo": "wg-easy"
 }

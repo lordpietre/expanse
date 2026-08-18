@@ -92,7 +92,7 @@ export async function createOrLoginUser(email: string, data: any): Promise<strin
 }
 
 export async function registerUser(email: string, password: string, company: string, terms: boolean, data: string) {
-    if (process.env.DISABLE_SIGNUP) {
+    if (process.env.DISABLE_SIGNUP && process.env.DISABLE_SIGNUP.toLowerCase() !== "false") {
         console.error("Signup is disabled")
         throw new Error("Signup is disabled")
     }

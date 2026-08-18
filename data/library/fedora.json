@@ -2,7 +2,7 @@
     "name": "Fedora",
     "image": "fedora",
     "category": "OS",
-    "logo": "https://raw.githubusercontent.com/docker-library/docs/master/fedora/logo.png",
+    "logo": "fedora",
     "description": "Fedora is a Linux-based operating system that provides a reliable, user-friendly, and powerful platform.",
     "default_ports": []
 }

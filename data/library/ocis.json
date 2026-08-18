@@ -9,5 +9,5 @@
     "env_vars": {
         "OCIS_INSECURE": "true"
     },
-    "logo": "https://owncloud.com/wp-content/uploads/2020/09/owncloud-logo-blue.svg"
+    "logo": "owncloud"
 }

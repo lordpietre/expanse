@@ -2,7 +2,7 @@
     "name": "Budibase",
     "image": "budibase/budibase:latest",
     "category": "Automation",
-    "logo": "https://budibase.com/favicon.ico",
+    "logo": "budibase",
     "description": "App builder with internal tools and basic workflows. Build apps + automate within, full low-code. If you want UI + automation together.",
     "default_ports": [
         "10000:10000"

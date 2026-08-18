@@ -2,7 +2,7 @@
     "name": "PrivateGPT",
     "image": "ghcr.io/imartinez/privategpt:latest",
     "category": "AI",
-    "logo": "https://img.icons8.com/color/512/private-gpt.png",
+    "logo": "https://icons.duckduckgo.com/ip3/www.privategpt.dev.ico",
     "description": "RAG completamente offline para chat con documentos privados. Sin datos saliendo del servidor.",
     "default_ports": [
         "8001:8001"

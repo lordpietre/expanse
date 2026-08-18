@@ -4,7 +4,7 @@
     "category": "Utilities",
     "isStack": true,
     "image": "vaultwarden/server:latest",
-    "logo": "https://img.icons8.com/color/512/shield.png",
+    "logo": "vaultwarden-full-stack",
     "default_ports": [
         "8080:80"
     ],
@@ -31,7 +31,10 @@
                 "vw_db_data:/var/lib/postgresql/data"
             ],
             "healthcheck": {
-                "test": ["CMD-SHELL", "pg_isready -h localhost -U vaultwarden"],
+                "test": [
+                    "CMD-SHELL",
+                    "pg_isready -h localhost -U vaultwarden"
+                ],
                 "interval": "10s",
                 "timeout": "5s",
                 "retries": 5,

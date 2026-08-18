@@ -166,11 +166,19 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
             )}
         >
             <div className="flex items-center gap-3 overflow-hidden">
-                <div className="flex-shrink-0 w-6 h-6 rounded bg-slate-800 flex items-center justify-center overflow-hidden">
+                <div className="flex-shrink-0 w-6 h-6 rounded bg-slate-800 flex items-center justify-center overflow-hidden relative">
                     {service.logo ? (
                         <>
+                            <span className="text-[10px] text-slate-500 font-bold">
+                                {service.name.substring(0, 2).toUpperCase()}
+                            </span>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={resolveLogoPath(service.logo) || ''} alt={service.name} className="w-4 h-4 object-contain" />
+                            <img
+                                src={resolveLogoPath(service.logo) || ''}
+                                alt={service.name}
+                                className="w-4 h-4 object-contain absolute inset-0 m-auto"
+                                onError={(e) => e.currentTarget.remove()}
+                            />
                         </>
                     ) : (
                         <span className="text-[10px] text-slate-500 font-bold">
@@ -294,8 +302,16 @@ export default function LibraryModal({ open, onOpenChange }: LibraryModalProps) 
                                         <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
                                         {selectedService.logo ? (
                                             <>
+                                                <div className="text-7xl relative z-10">
+                                                    {categoryIcons[selectedService.category as keyof typeof categoryIcons] || <Box className="w-32 h-32" />}
+                                                </div>
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={resolveLogoPath(selectedService.logo) || ''} alt={selectedService.name} className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
+                                                <img
+                                                    src={resolveLogoPath(selectedService.logo) || ''}
+                                                    alt={selectedService.name}
+                                                    className="w-full h-full object-contain relative z-10 drop-shadow-2xl"
+                                                    onError={(e) => e.currentTarget.remove()}
+                                                />
                                             </>
                                         ) : (
                                             <div className="text-7xl relative z-10">

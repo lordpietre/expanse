@@ -2,7 +2,7 @@
     "name": "vLLM",
     "image": "vllm/vllm-openai:latest",
     "category": "AI",
-    "logo": "https://img.icons8.com/color/512/hugging-face.png",
+    "logo": "vllm",
     "description": "Motor de inferencia muy rápido y optimizado (mejor throughput que Ollama en GPUs potentes). Compatible con OpenAI API.",
     "default_ports": [
         "8000:8000"

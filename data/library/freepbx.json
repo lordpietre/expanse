@@ -2,7 +2,7 @@
     "name": "FreePBX",
     "image": "tiredofit/freepbx:latest",
     "category": "Network",
-    "logo": "https://img.icons8.com/color/512/asterisk.png",
+    "logo": "freepbx",
     "description": "The world's most popular open source PBX (Private Branch Exchange) system.",
     "default_ports": [
         "80:80",

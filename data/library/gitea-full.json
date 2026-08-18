@@ -4,7 +4,7 @@
     "category": "Development",
     "isStack": true,
     "image": "gitea/gitea:latest",
-    "logo": "https://img.icons8.com/color/512/gitea.png",
+    "logo": "gitea",
     "default_ports": [
         "3000:3000",
         "2222:22"

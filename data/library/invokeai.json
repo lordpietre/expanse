@@ -2,7 +2,7 @@
     "name": "InvokeAI",
     "image": "invokeai/invokeai:latest",
     "category": "AI",
-    "logo": "https://img.icons8.com/color/512/invokeai.png",
+    "logo": "https://avatars.githubusercontent.com/invoke-ai?s=128",
     "description": "Alternativa a Stable Diffusion WebUI más limpia y con flujos de trabajo predefinidos. Excelente para principiantes.",
     "default_ports": [
         "9090:9090"

@@ -2,7 +2,7 @@
     "name": "Directus",
     "image": "directus/directus:11",
     "category": "CMS",
-    "logo": "https://directus.io/assets/images/logo.svg",
+    "logo": "directus",
     "description": "Turn any SQL database into an instant REST/GraphQL API. Perfect if you already have an existing database.",
     "default_ports": [
         "8055:8055"

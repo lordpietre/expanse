@@ -2,7 +2,7 @@
     "name": "Matrix (Dendrite)",
     "image": "matrixdotorg/dendrite-monolith:latest",
     "category": "Messaging",
-    "logo": "https://cdn.simpleicons.org/matrix",
+    "logo": "matrix-dendrite",
     "description": "Second-generation, efficient Matrix homeserver implementation. Lightweight alternative to Synapse.",
     "default_ports": [
         "8008:8008"
