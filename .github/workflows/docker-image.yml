@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
 
@@ -67,7 +68,7 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Delete stale sha tags from Docker Hub
+      - name: Delete stale tags from Docker Hub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -78,9 +79,12 @@ jobs:
             https://hub.docker.com/v2/users/login/ | jq -r .token)
           API="https://hub.docker.com/v2/repositories/${DOCKER_USERNAME}/expanse/tags"
           TAGS=$(curl -s -H "Authorization: JWT ${TOKEN}" "${API}?page_size=100" | jq -r '.results[]?.name')
-          KEEP=$(echo "${TAGS}" | grep -E '^[0-9a-f]{40}$' | head -10)
+          KEEP=$(echo "${TAGS}" | grep -E '^[0-9a-f]{7,40}$' | head -10)
           for tag in ${TAGS}; do
-            if echo "${tag}" | grep -qE '^[0-9a-f]{40}$' && ! echo "${KEEP}" | grep -qx "${tag}"; then
+            case "${tag}" in
+              latest|v[0-9]*|*[0-9]*.[0-9]*.[0-9]*) continue ;;
+            esac
+            if echo "${tag}" | grep -qE '^[0-9a-f]{7,40}$' && ! echo "${KEEP}" | grep -qx "${tag}"; then
               echo "Deleting stale tag: ${tag}"
               curl -s -X DELETE -H "Authorization: JWT ${TOKEN}" "${API}/${tag}" -o /dev/null -w "  -> %{http_code}\n"
             fi
