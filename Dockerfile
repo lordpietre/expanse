@@ -1,6 +1,6 @@
 # syntax=docker.io/docker/dockerfile:1
 
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -32,8 +32,9 @@ RUN npm install -g pnpm@9 && pnpm sync-icons && pnpm run build;
 FROM base AS runner
 WORKDIR /app
 
-# Install Docker CLI and Compose
-RUN apk add --no-cache ca-certificates docker-cli docker-cli-compose
+# Install Docker CLI and Compose, then patch base image CVEs
+RUN apk add --no-cache ca-certificates docker-cli docker-cli-compose \
+    && apk upgrade --no-cache
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
