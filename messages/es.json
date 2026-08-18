@@ -35,6 +35,7 @@
     "wrongPasswordOrEmail": "Contraseña o correo incorrectos",
     "creatingAccount": "Creando cuenta...",
     "accountCreated": "¡Cuenta creada!",
+    "email": "Correo electrónico",
     "password": "Contraseña",
     "passwordRecover": "Recuperar contraseña",
     "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",

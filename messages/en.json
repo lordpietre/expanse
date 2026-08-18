@@ -35,6 +35,7 @@
     "wrongPasswordOrEmail": "Wrong password or email",
     "creatingAccount": "Creating account...",
     "accountCreated": "Account created!",
+    "email": "Email",
     "password": "Password",
     "passwordRecover": "Password recover",
     "alreadyHaveAccount": "Already have an account? Login",

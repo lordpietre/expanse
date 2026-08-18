@@ -2,36 +2,40 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 
-// Known logos that should never be deleted
-const PROTECTED_LOGOS = [
-    'expanse.png',
-    'expanse-dark.png',
-    'og.png',
-    'favicon.ico',
-    'cgu.pdf'
-];
+// Must match scripts/sync-icons.mjs so build-time and runtime syncs agree.
+// Keyed by the logo basename slug (same algorithm as resolveLogoPath in lib/utils.ts).
+function logoSlug(logo: string): string {
+    const clean = logo.startsWith('/') ? logo.slice(1) : logo;
+    const inputFilename = clean.split('/').pop() || clean;
+    const baseName = inputFilename.replace(/\.[^/.]+$/, "");
+    return baseName
+        .toLowerCase()
+        .replace(/[\s_-]+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/^-|-$/g, '');
+}
 
-// Folders in public that should be ignored
-const PROTECTED_FOLDERS = [
-    'image',
-    'logos',
-    '_next'
-];
+function detectExt(url: string): string {
+    const pathname = url.split('?')[0];
+    const lastSeg = pathname.split('/').pop() || '';
+    const m = lastSeg.match(/\.([a-zA-Z0-9]{2,5})$/);
+    const ext = m ? m[1].toLowerCase() : 'png';
+    const validExts = ['svg', 'png', 'jpg', 'jpeg', 'webp', 'ico'];
+    return validExts.includes(ext) ? ext : 'png';
+}
 
 export class IconDownloader {
     private libraryDir: string;
     private logosDir: string;
-    private publicDir: string;
 
     constructor() {
         this.libraryDir = path.resolve(process.cwd(), 'data/library');
-        // We target public/logos/library to keep downloaded icons isolated
         this.logosDir = path.resolve(process.cwd(), 'public/logos/library');
-        this.publicDir = path.resolve(process.cwd(), 'public');
     }
 
     /**
-     * Run the sync process: clean old files and download missing ones.
+     * Run the sync process: download missing icons.
+     * Never deletes existing icons so runtime syncs don't undo build-time results.
      */
     public async syncIcons() {
         process.stdout.write('[IconDownloader] Starting icon sync...\n');
@@ -48,18 +52,15 @@ export class IconDownloader {
             const neededIcons = this.getNeededIcons();
             process.stdout.write(`[IconDownloader] Found ${neededIcons.length} apps to sync.\n`);
 
-            this.cleanupPublicRoot();
-
-            // We'll clean up icons that are no longer in the neededIcons list
-            const neededSlugs = neededIcons.map(i => i.slug);
-            this.cleanupOldIcons(neededSlugs);
+            const existing = fs.readdirSync(this.logosDir);
 
             for (const { slug, source } of neededIcons) {
-                const existing = fs.readdirSync(this.logosDir).find(f => f.startsWith(`${slug}.`));
-                if (existing) continue;
+                const found = existing.some(f => f.startsWith(`${slug}.`));
+                if (found) continue;
 
                 process.stdout.write(`[IconDownloader] Syncing: ${slug}\n`);
                 await this.syncOneIcon(slug, source);
+                existing.push(`${slug}.${'x'}`);
             }
 
             process.stdout.write('[IconDownloader] Icon sync completed.\n');
@@ -71,11 +72,8 @@ export class IconDownloader {
     private async syncOneIcon(slug: string, source: string) {
         // If it's a full URL, try to download it directly
         if (source.startsWith('http')) {
-            const ext = source.split('.').pop()?.split('?')[0].toLowerCase() || 'png';
-            const validExts = ['svg', 'png', 'jpg', 'jpeg', 'webp'];
-            const finalExt = validExts.includes(ext) ? ext : 'png';
-
-            const success = await this.downloadFile(source, path.join(this.logosDir, `${slug}.${finalExt}`));
+            const ext = detectExt(source);
+            const success = await this.downloadFile(source, path.join(this.logosDir, `${slug}.${ext}`));
             if (success) return;
         }
 
@@ -87,45 +85,21 @@ export class IconDownloader {
         const files = fs.readdirSync(this.libraryDir);
         const needed = new Map<string, string>();
 
-        const visit = (obj: any) => {
-            if (Array.isArray(obj)) {
-                obj.forEach(visit);
-            } else if (obj && typeof obj === 'object') {
-                const name = obj.name || '';
-                const logo = obj.logo || '';
-
-                if (name) {
-                    const slug = this.normalizeName(name);
-                    if (slug && !needed.has(slug)) {
-                        needed.set(slug, logo || slug);
-                    }
-                }
-
-                // Recursively check related_services etc.
-                Object.values(obj).forEach(visit);
-            }
-        };
-
         for (const file of files) {
             if (!file.endsWith('.json')) continue;
             try {
                 const content = JSON.parse(fs.readFileSync(path.join(this.libraryDir, file), 'utf-8'));
-                visit(content);
+                // Only top-level templates carry a logo the UI will resolve.
+                if (content && content.name && content.logo) {
+                    const slug = logoSlug(content.logo);
+                    if (slug && !needed.has(slug)) {
+                        needed.set(slug, content.logo);
+                    }
+                }
             } catch { /* ignore error */ }
         }
 
         return Array.from(needed.entries()).map(([slug, source]) => ({ slug, source }));
-    }
-
-    private cleanupOldIcons(neededSlugs: string[]) {
-        const files = fs.readdirSync(this.logosDir);
-        for (const file of files) {
-            if (PROTECTED_LOGOS.includes(file)) continue;
-            const slug = file.replace(/\.[^/.]+$/, "");
-            if (!neededSlugs.includes(slug)) {
-                try { fs.unlinkSync(path.join(this.logosDir, file)); } catch { /* ignore error */ }
-            }
-        }
     }
 
     private async tryDownload(slug: string): Promise<boolean> {
@@ -134,6 +108,7 @@ export class IconDownloader {
             { url: `https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/${slug}.png`, ext: 'png' },
             { url: `https://raw.githubusercontent.com/IceWhaleTech/AppIcon/main/${slug.replace(/-/g, '')}.png`, ext: 'png' },
             { url: `https://raw.githubusercontent.com/IceWhaleTech/CasaOS-AppStore/main/Apps/${slug}/icon.png`, ext: 'png' },
+            { url: `https://cdn.jsdelivr.net/gh/selfhst/icons/svg/${slug}.svg`, ext: 'svg' },
             { url: `https://cdn.simpleicons.org/${slug}`, ext: 'svg' }
         ];
 
@@ -144,36 +119,14 @@ export class IconDownloader {
         return false;
     }
 
-
-    /**
-     * Cleans loose .png/.svg files from public/ that aren't protected.
-     */
-    private cleanupPublicRoot() {
-        const files = fs.readdirSync(this.publicDir);
-        for (const file of files) {
-            const fullPath = path.join(this.publicDir, file);
-            const stat = fs.statSync(fullPath);
-
-            if (stat.isDirectory()) {
-                if (PROTECTED_FOLDERS.includes(file)) continue;
-                continue;
-            }
-            if (PROTECTED_LOGOS.includes(file)) continue;
-
-            const ext = path.extname(file).toLowerCase();
-            if (ext === '.png' || ext === '.svg') {
-                process.stdout.write(`[IconDownloader] Removing legacy logo from public/: ${file}\n`);
-                fs.unlinkSync(fullPath);
-            }
-        }
-    }
-
     /**
      * Helper to execute GET request and save to disk
      */
     private downloadFile(url: string, dest: string): Promise<boolean> {
         return new Promise((resolve) => {
-            https.get(url, (response: any) => {
+            // Some CDNs (e.g. Wikimedia) reject Node's default User-Agent with 403.
+            const options = { headers: { 'User-Agent': 'expanse-sync-icons/1.0' } };
+            https.get(url, options, (response: any) => {
                 if (response.statusCode === 200) {
                     const file = fs.createWriteStream(dest);
                     response.pipe(file);
@@ -200,16 +153,4 @@ export class IconDownloader {
             });
         });
     }
-
-    /**
-     * Normalize a name to kebab-case
-     */
-    private normalizeName(name: string): string {
-        return name
-            .toLowerCase()
-            .replace(/[\s_-]+/g, '-')
-            .replace(/[^a-z0-9-]/g, '')
-            .replace(/^-|-$/g, '');
-    }
 }
-
